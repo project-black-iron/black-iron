@@ -6,27 +6,27 @@ const prod = process.argv[2] === "production";
 const watch = !prod && process.argv[2] !== "nowatch";
 
 const context = await esbuild.context({
-    entryPoints: ["js/app.ts", "css/app.css"],
-    bundle: true,
-    loader: {
-        ".svg": "dataurl",
-    },
-    external: [
-        "/fonts/*",
-        "/images/*",
-    ],
-    target: "es2022",
-    logLevel: "info",
-    treeShaking: prod,
-    minify: prod,
-    plugins: [
-        typecheckPlugin({ watch }),
-    ],
+  entryPoints: ["js/app.ts", "css/app.css"],
+  bundle: true,
+  loader: {
+    ".svg": "dataurl",
+  },
+  external: [
+    "/fonts/*",
+    "/images/*",
+  ],
+  target: "es2022",
+  logLevel: "info",
+  treeShaking: prod,
+  minify: prod,
+  plugins: [
+    typecheckPlugin({ watch }),
+  ],
 });
 
 if (!watch) {
-    await context.rebuild();
-    process.exit(0);
+  await context.rebuild();
+  process.exit(0);
 } else {
-    await context.watch();
+  await context.watch();
 }

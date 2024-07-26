@@ -9,6 +9,7 @@
   "devDependencies": {
     "@jgoz/esbuild-plugin-typecheck": "^4.0.1",
     "@types/node": "^20.14.12",
+    "@types/phoenix": "^1.6.5",
     "borp": "^0.17.0",
     "esbuild": "^0.23.0",
     "eslint": "^9.7.0",
