@@ -3,6 +3,24 @@ defmodule BlackIronWeb.Router do
 
   import BlackIronWeb.UserAuth
 
+  @doc """
+  Gets the list of paths that a service worker should precache.
+  """
+  def get_service_worker_paths do
+    static_dir = Path.expand(Path.join(__DIR__, "../../priv/static/"))
+    static_len = String.length(static_dir)
+    Phoenix.Router.routes(BlackIronWeb.Router)
+    |> Enum.filter(&(&1[:verb] == :get))
+    |> Enum.map(&Phoenix.Router.route_info(BlackIronWeb.Router, "GET", &1[:path], ""))
+    |> Enum.filter(&(Enum.empty?(&1[:path_params]) && Enum.member?(&1[:pipe_through], :service_worker)))
+    |> Enum.map(&(&1[:route]))
+    |> Enum.concat(
+      Path.wildcard(Path.join(static_dir, "**/*"))
+      |> Enum.filter(&File.regular?/1)
+      |> Enum.map(&(String.slice(&1, static_len..(String.length(&1)))))
+      )
+  end
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -27,8 +45,11 @@ defmodule BlackIronWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :service_worker do
+  end
+
   scope "/", BlackIronWeb do
-    pipe_through :browser
+    pipe_through [:browser, :service_worker]
 
     get "/", PageController, :home
   end
@@ -58,7 +79,7 @@ defmodule BlackIronWeb.Router do
   ## Authentication routes
 
   scope "/", BlackIronWeb do
-    pipe_through [:browser, :redirect_if_user_is_authenticated]
+    pipe_through [:browser, :redirect_if_user_is_authenticated, :service_worker]
 
     get "/users/register", UserRegistrationController, :new
     post "/users/register", UserRegistrationController, :create
@@ -71,7 +92,7 @@ defmodule BlackIronWeb.Router do
   end
 
   scope "/", BlackIronWeb do
-    pipe_through [:browser, :require_authenticated_user]
+    pipe_through [:browser, :require_authenticated_user, :service_worker]
 
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
