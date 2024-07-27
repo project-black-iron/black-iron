@@ -46,12 +46,13 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <%# Managed by bi-theme-picker %>
-    <link id="theme" phx-track-static rel="stylesheet" href={~p"/assets/css/theme-light.css"} />
+    <link id="theme" phx-track-static rel="stylesheet" />
     <script>
-      const theme = localStorage.getItem("bi-theme");
-      if (theme) {
-        document.getElementById("theme").href = `/assets/css/theme-${theme}.css`;
-      }
+      const theme = localStorage.getItem("bi-theme") ||
+        matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light";
+      document.getElementById("theme").href = `/assets/css/theme-${theme}.css`;
     </script>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>

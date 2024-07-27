@@ -10,10 +10,13 @@ export enum Theme {
 export class BiThemePicker extends LitElement {
   @property()
   theme: Theme =
-    (localStorage.getItem("bi-theme") as Theme) ||
-    matchMedia("(prefers-color-scheme: dark)").matches
+    (localStorage.getItem("bi-theme") as Theme) || this.#preferredTheme();
+
+  #preferredTheme() {
+    return matchMedia("(prefers-color-scheme: dark)").matches
       ? Theme.Dark
       : Theme.Light;
+  }
 
   setTheme(theme: Theme, save?: boolean) {
     if (save) {
@@ -24,7 +27,7 @@ export class BiThemePicker extends LitElement {
 
   update(changedProps: Map<string, unknown>) {
     super.update(changedProps);
-    if (this.theme && typeof this.theme === "string") {
+    if (changedProps.has("theme")) {
       const themeLink = document.getElementById("theme");
       if (themeLink && themeLink instanceof HTMLLinkElement) {
         themeLink.href = `/assets/css/theme-${this.theme}.css`;
@@ -40,6 +43,7 @@ export class BiThemePicker extends LitElement {
           name="theme"
           type="radio"
           value=${Theme.Light}
+          .checked=${this.theme === Theme.Light}
           ?checked=${this.theme === Theme.Light}
         />
       </label>
@@ -50,12 +54,16 @@ export class BiThemePicker extends LitElement {
           name="theme"
           type="radio"
           value=${Theme.Dark}
+          .checked=${this.theme === Theme.Dark}
           ?checked=${this.theme === Theme.Dark}
         />
       </label>
       <button
         type="button"
-        @click=${() => window.localStorage.removeItem("bi-theme")}
+        @click=${() => {
+          window.localStorage.removeItem("bi-theme");
+          this.setTheme(this.#preferredTheme());
+        }}
       >
         Reset
       </button>`;
