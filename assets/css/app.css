@@ -1,1 +1,15 @@
-/* This file is for your main application CSS */
+/*
+This file is for your main application CSS.
+
+This CSS will not leak into the shadow DOM for custom elements. Use element
+styles plus theme variables to customize them instead.
+
+To customize common variables, see variables.css. For theme-specific changes,
+use theme-dark.css or theme-light.css.
+ */
+@import url("./variables.css");
+
+body {
+  background-color: var(--background-color);
+  color: var(--color);
+}

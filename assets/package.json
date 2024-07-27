@@ -1,19 +1,33 @@
 {
   "private": true,
+  "type": "module",
   "scripts": {
-    "build": "tsc --noEmit && eslint js && node esbuild.config.js production",
-    "build:dev": "tsc --noEmit && eslint js && node esbuild.config.js nowatch",
+    "build": "node esbuild.config.js production",
+    "build:dev": "node esbuild.config.js nowatch",
     "dev": "node esbuild.config.js",
-    "test": "borp --coverage"
+    "test": "borp --coverage",
+    "fmt": "dprint fmt",
+    "format": "dprint fmt"
   },
   "devDependencies": {
+    "@eslint/js": "^9.7.0",
     "@jgoz/esbuild-plugin-typecheck": "^4.0.1",
+    "@lit/context": "^1.1.2",
     "@types/node": "^20.14.12",
     "@types/phoenix": "^1.6.5",
     "borp": "^0.17.0",
+    "dprint": "^0.47.2",
     "esbuild": "^0.23.0",
+    "esbuild-plugin-eslint": "^0.3.12",
     "eslint": "^9.7.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.8.0",
+    "i18next": "^23.12.2",
+    "i18next-browser-languagedetector": "^8.0.0",
+    "i18next-localstorage-cache": "^1.1.1",
+    "lit": "^3.1.4",
     "tsx": "^4.16.2",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.0.0-alpha.54"
   }
 }

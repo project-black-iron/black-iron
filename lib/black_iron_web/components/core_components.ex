@@ -1,20 +1,12 @@
 defmodule BlackIronWeb.CoreComponents do
   @moduledoc """
   Provides core UI components.
-
-  At first glance, this module may seem daunting, but its goal is to provide
-  core building blocks for your application, such as modals, tables, and
-  forms. The components consist mostly of markup and are well-documented
-  with doc strings and declarative assigns. You may customize and style
-  them in any way you want, based on your application growth and needs.
-
-  The default components use Tailwind CSS, a utility-first CSS framework.
-  See the [Tailwind CSS documentation](https://tailwindcss.com) to learn
-  how to customize them or feel free to swap in another framework altogether.
-
-  Icons are provided by [heroicons](https://heroicons.com). See `icon/1` for usage.
   """
   use Phoenix.Component
+  use Phoenix.VerifiedRoutes,
+    router: BlackIronWeb.Router,
+    endpoint: BlackIronWeb.Endpoint,
+    statics: ~w(images)
 
   alias Phoenix.LiveView.JS
   import BlackIronWeb.Gettext
@@ -594,6 +586,54 @@ defmodule BlackIronWeb.CoreComponents do
   def icon(%{name: "hero-" <> _} = assigns) do
     ~H"""
     <span class={[@name, @class]} />
+    """
+  end
+
+  @doc """
+  Renders the nav bar.
+  """
+  attr :current_user, :any, default: nil
+  attr :class, :string, default: nil
+
+  def nav(assigns) do
+    ~H"""
+    <nav class={@class}>
+      <ul>
+      <%= if @current_user do %>
+        <li class="text-[0.8125rem] leading-6 text-zinc-900">
+          <%= @current_user.email %>
+        </li>
+        <li>
+          <a href={~p"/users/settings"}>
+            Settings
+          </a>
+        </li>
+        <li>
+          <a
+            href={~p"/users/log_out"}
+            method="delete"
+          >
+            Log out
+          </a>
+        </li>
+      <% else %>
+        <li>
+          <a
+            href={~p"/users/register"}
+          >
+            Register
+          </a>
+        </li>
+        <li>
+          <a
+            href={~p"/users/log_in"}
+          >
+            Log in
+          </a>
+        </li>
+      <% end %>
+      </ul>
+    </nav>
     """
   end
 

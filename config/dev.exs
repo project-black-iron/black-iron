@@ -25,7 +25,7 @@ config :black_iron, BlackIronWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "CPS9M3WTOm+J8ONwSGBojFgd/Zpro04OrhYtu4TOl6u++DLhomxUcVTcXeAe5FH7",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:black_iron, ~w(--sourcemap=inline --watch)]}
+    npm: ["run", "dev", cd: Path.expand("../assets", __DIR__)]
   ]
 
 # ## SSL Support
