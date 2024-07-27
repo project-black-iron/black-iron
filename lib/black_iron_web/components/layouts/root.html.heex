@@ -2,18 +2,62 @@
 <html lang="en" class="[scrollbar-gutter:stable]">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <link rel="manifest" href="/site.webmanifest">
     <meta name="csrf-token" content={get_csrf_token()} />
     <.live_title suffix=" · Black Iron">
       <%= assigns[:page_title] || "Black Iron" %>
     </.live_title>
+    <meta
+      property="og:title"
+      content={assigns[:page_title] || "Black Iron"}
+    />
+    <meta
+      property="og:description"
+      content={assigns[:page_description] ||
+        "Black Iron"}
+    />
+    <%= cond do %>
+      <% assigns[:page_small_image] -> %>
+        <meta property="og:image" content={assigns[:page_small_image]}>
+        <meta name="twitter:image:src" content={assigns[:page_image]}>
+        <meta name="twitter:card" content="summary">
+      <% assigns[:page_image] -> %>
+        <meta property="og:image" content={assigns[:page_image]}>
+        <meta name="twitter:image:src" content={assigns[:page_image]}>
+        <meta name="twitter:card" content="summary_large_image">
+      <% true -> %>
+    <% end %>
+    <%# The Common Crawl dataset. Used by GPT-3 (and GPT-3.5) and available for others. %>
+    <meta name="CCBot" content="nofollow">
+
+    <%# Used by DeviantArt, ArtStation, etc. based on opt-in or opt-out %>
+    <meta name="robots" content="noai, noimageai">
+
+    <%# Icons and favicons %>
+    <%#
+    <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    %>
+
+
+    <%# Styles, theme, scripts %>
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <%# Managed by bi-theme-picker %>
     <link id="theme" phx-track-static rel="stylesheet" href={~p"/assets/css/theme-light.css"} />
+    <script>
+      const theme = localStorage.getItem("bi-theme");
+      if (theme) {
+        document.getElementById("theme").href = `/assets/css/theme-${theme}.css`;
+      }
+    </script>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
     </script>
   </head>
   <body>
-    <.nav />
     <%= @inner_content %>
   </body>
 </html>

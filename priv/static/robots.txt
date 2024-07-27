@@ -1,5 +1,21 @@
-# See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+# See http://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
 #
 # To ban all spiders from the entire site uncomment the next two lines:
 # User-agent: *
 # Disallow: /
+
+# Fuck AI
+User-agent: GPTBot
+Disallow: /
+
+# The Common Crawl dataset. Original source for GPT and others.
+User-agent: CCBot
+Disallow: /
+
+# The example for img2dataset, although the default is *None*
+User-agent: img2dataset
+Disallow: /
+
+# Google's Bard and Vertex AI generative APIs
+User-agent: Google-Extended
+Disallow: /
