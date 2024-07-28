@@ -48,8 +48,16 @@ defmodule BlackIronWeb.Router do
   pipeline :service_worker do
   end
 
+  pipeline :app do
+    plug :put_layout, html: {BlackIronWeb.Layouts, :app}
+  end
+
+  pipeline :site do
+    plug :put_layout, html: {BlackIronWeb.Layouts, :site}
+  end
+
   scope "/", BlackIronWeb do
-    pipe_through [:browser, :service_worker]
+    pipe_through [:browser, :site, :service_worker]
 
     get "/", PageController, :home
   end
@@ -79,7 +87,7 @@ defmodule BlackIronWeb.Router do
   ## Authentication routes
 
   scope "/", BlackIronWeb do
-    pipe_through [:browser, :redirect_if_user_is_authenticated, :service_worker]
+    pipe_through [:browser, :site, :redirect_if_user_is_authenticated]
 
     get "/users/register", UserRegistrationController, :new
     post "/users/register", UserRegistrationController, :create
@@ -92,7 +100,7 @@ defmodule BlackIronWeb.Router do
   end
 
   scope "/", BlackIronWeb do
-    pipe_through [:browser, :require_authenticated_user, :service_worker]
+    pipe_through [:browser, :site, :require_authenticated_user]
 
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
@@ -100,12 +108,18 @@ defmodule BlackIronWeb.Router do
   end
 
   scope "/", BlackIronWeb do
-    pipe_through [:browser]
+    pipe_through [:browser, :site]
 
     delete "/users/log_out", UserSessionController, :delete
     get "/users/confirm", UserConfirmationController, :new
     post "/users/confirm", UserConfirmationController, :create
     get "/users/confirm/:token", UserConfirmationController, :edit
     post "/users/confirm/:token", UserConfirmationController, :update
+  end
+
+  scope "/campaigns", BlackIronWeb do
+    pipe_through [:browser, :app, :service_worker]
+
+    get "/character", CharacterSheetController, :show
   end
 end

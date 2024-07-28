@@ -7,7 +7,14 @@ const prod = process.argv[2] === "production";
 const watch = !prod && process.argv[2] !== "nowatch";
 
 const context = await esbuild.context({
-  entryPoints: ["js/app.ts", "css/app.css", "css/theme-dark.css", "css/theme-light.css"],
+  entryPoints: [
+    "js/app.ts",
+    "js/site.ts",
+    "js/service-worker.ts",
+    "css/app.css",
+    "css/theme-dark.css",
+    "css/theme-light.css"
+  ],
   outdir: "../priv/static/assets",
   bundle: true,
   loader: {
@@ -27,6 +34,7 @@ const context = await esbuild.context({
       warnIgnored: false
     }),
   ],
+  format: "esm",
   nodePaths: [
     "../deps",
   ]
