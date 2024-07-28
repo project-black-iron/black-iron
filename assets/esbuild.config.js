@@ -1,25 +1,13 @@
-import { typecheckPlugin } from "@jgoz/esbuild-plugin-typecheck";
-import eslint from "esbuild-plugin-eslint";
-import esbuild from "esbuild";
 import process from "process";
+import esbuild from "esbuild";
+import eslint from "esbuild-plugin-eslint";
+import { typecheckPlugin } from "@jgoz/esbuild-plugin-typecheck";
 
 const prod = process.argv[2] === "production";
 const watch = !prod && process.argv[2] !== "nowatch";
 
-const context = await esbuild.context({
-  entryPoints: [
-    "js/app.ts",
-    "js/site.ts",
-    "js/service-worker.ts",
-    "css/app.css",
-    "css/theme-dark.css",
-    "css/theme-light.css"
-  ],
-  outdir: "../priv/static/assets",
+const contextBase = {
   bundle: true,
-  loader: {
-    ".svg": "dataurl",
-  },
   external: [
     "/fonts/*",
     "/images/*",
@@ -32,17 +20,40 @@ const context = await esbuild.context({
     typecheckPlugin({ watch }),
     eslint({
       warnIgnored: false
-    }),
+    })
   ],
   format: "esm",
   nodePaths: [
     "../deps",
   ]
+};
+
+const mainContext = await esbuild.context({
+  ...contextBase,
+  entryPoints: [
+    "js/app.ts",
+    "js/site.ts",
+    "js/service-worker.ts",
+    "css/app.css",
+    "css/theme-dark.css",
+    "css/theme-light.css"
+  ],
+  outdir: "../priv/static/assets",
+  loader: {
+    ".svg": "dataurl",
+  },
+});
+
+const swContext = await esbuild.context({
+  entryPoints: [
+    "js/service-worker.ts",
+  ],
+  outfile: "../priv/static/service-worker.js",
 });
 
 if (!watch) {
-  await context.rebuild();
+  await Promise.all([mainContext.rebuild(), swContext.rebuild()]);
   process.exit(0);
 } else {
-  await context.watch();
+  await Promise.all([mainContext.watch(), swContext.watch()]);
 }
