@@ -5,6 +5,8 @@
 </header>
 <main>
   <.flash_group flash={@flash} />
-  This is the webapp part.
-  <%= @inner_content %>
+  <bi-app-context-provider>
+    <p>This is the webapp part. Everything inside here has access to BlackIronApp through the current context.</p>
+    <%= @inner_content %>
+  </bi-app-context-provider>
 </main>
