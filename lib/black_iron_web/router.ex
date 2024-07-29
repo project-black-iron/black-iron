@@ -3,24 +3,6 @@ defmodule BlackIronWeb.Router do
 
   import BlackIronWeb.UserAuth
 
-  @doc """
-  Gets the list of paths that a service worker should precache.
-  """
-  def get_service_worker_paths do
-    static_dir = Path.expand(Path.join(__DIR__, "../../priv/static/"))
-    static_len = String.length(static_dir)
-    Phoenix.Router.routes(BlackIronWeb.Router)
-    |> Enum.filter(&(&1[:verb] == :get))
-    |> Enum.map(&Phoenix.Router.route_info(BlackIronWeb.Router, "GET", &1[:path], ""))
-    |> Enum.filter(&(Enum.empty?(&1[:path_params]) && Enum.member?(&1[:pipe_through], :service_worker)))
-    |> Enum.map(&(&1[:route]))
-    |> Enum.concat(
-      Path.wildcard(Path.join(static_dir, "**/*"))
-      |> Enum.filter(&File.regular?/1)
-      |> Enum.map(&(String.slice(&1, static_len..(String.length(&1)))))
-      )
-  end
-
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -60,6 +42,13 @@ defmodule BlackIronWeb.Router do
     pipe_through [:browser, :site, :service_worker]
 
     get "/", PageController, :home
+    get "/offline", OfflineController, :site
+  end
+
+  scope "/", BlackIronWeb do
+    pipe_through [:api, :app]
+
+    get "/offline_paths", OfflineController, :offline_paths
   end
 
   # Other scopes may use custom stacks.
