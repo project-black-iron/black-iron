@@ -13,3 +13,34 @@ body {
   background-color: var(--background-color);
   color: var(--color);
 }
+
+/*
+Some fun view transition stuff. See https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API/Using
+
+TODO(@zkat): do this in JS so we can change direction based on what kind of nav we're doing.
+*/
+@view-transition {
+  navigation: auto;
+}
+@keyframes move-out {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes move-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+::view-transition-old(root) {
+  animation: 0.2s ease-in both move-out;
+}
+::view-transition-new(root) {
+  animation: 0.2s ease-in both move-in;
+}
