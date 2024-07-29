@@ -35,6 +35,7 @@
     <meta name="robots" content="noai, noimageai">
 
     <%# Icons and favicons %>
+    <%# TODO %>
     <%#
     <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -46,13 +47,16 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <%# Managed by bi-theme-picker %>
-    <link id="theme" phx-track-static rel="stylesheet" />
     <script>
       const theme = localStorage.getItem("bi-theme") ||
         matchMedia("(prefers-color-scheme: dark)").matches
           ? "dark"
           : "light";
-      document.getElementById("theme").href = `/assets/css/theme-${theme}.css`;
+      const linkEl = document.createElement("link");
+      linkEl.rel = "stylesheet";
+      linkEl.id = "theme";
+      linkEl.href = `/assets/css/theme-${theme}.css`;
+      document.head.appendChild(linkEl);
     </script>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
   </head>
