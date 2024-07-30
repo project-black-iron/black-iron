@@ -11,6 +11,7 @@ defmodule BlackIronWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_user
+    plug BlackIronWeb.Plugs.Locale, "en"
     plug :put_user_token
   end
 
