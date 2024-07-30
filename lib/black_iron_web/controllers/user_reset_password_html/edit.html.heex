@@ -1,11 +1,11 @@
 <div class="mx-auto max-w-sm">
   <.header class="text-center">
-    Reset Password
+    <%= gettext("Reset Password") %>
   </.header>
 
   <.simple_form :let={f} for={@changeset} action={~p"/users/reset_password/#{@token}"}>
     <.error :if={@changeset.action}>
-      Oops, something went wrong! Please check the errors below.
+      <%= gettext("Oops, something went wrong! Please check the errors below.") %>
     </.error>
 
     <.input field={f[:password]} type="password" label="New Password" required />
@@ -17,13 +17,13 @@
     />
     <:actions>
       <.button phx-disable-with="Resetting..." class="w-full">
-        Reset password
+        <%= gettext("Reset password") %>
       </.button>
     </:actions>
   </.simple_form>
 
   <p class="text-center text-sm mt-4">
-    <.link href={~p"/users/register"}>Register</.link>
-    | <.link href={~p"/users/log_in"}>Log in</.link>
+    <.link href={~p"/users/register"}><%= gettext("Register") %></.link>
+    | <.link href={~p"/users/log_in"}><%= gettext("Log in") %></.link>
   </p>
 </div>

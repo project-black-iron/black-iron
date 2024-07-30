@@ -1,28 +1,28 @@
 <.header class="text-center">
-  Account Settings
-  <:subtitle>Manage your account email address and password settings</:subtitle>
+  <%= gettext("Account Settings") %>
+  <:subtitle><%= gettext("Manage your account email address and password settings") %></:subtitle>
 </.header>
 
-<div class="space-y-12 divide-y">
+<div>
   <div>
     <.simple_form :let={f} for={@email_changeset} action={~p"/users/settings"} id="update_email">
       <.error :if={@email_changeset.action}>
-        Oops, something went wrong! Please check the errors below.
+        <%= gettext("Oops, something went wrong! Please check the errors below.") %>
       </.error>
 
       <input type="hidden" name="action" value="update_email" />
 
-      <.input field={f[:email]} type="email" label="Email" required />
+      <.input field={f[:email]} type="email" label={gettext("Email")} required />
       <.input
         field={f[:current_password]}
         name="current_password"
         type="password"
-        label="Current Password"
+        label={gettext("Current Password")}
         required
         id="current_password_for_email"
       />
       <:actions>
-        <.button phx-disable-with="Changing...">Change Email</.button>
+        <.button phx-disable-with={gettext("Changing...")}><%= gettext("Change Email") %></.button>
       </:actions>
     </.simple_form>
   </div>
@@ -34,16 +34,16 @@
       id="update_password"
     >
       <.error :if={@password_changeset.action}>
-        Oops, something went wrong! Please check the errors below.
+        <%= gettext("Oops, something went wrong! Please check the errors below.") %>
       </.error>
 
       <input type="hidden" name="action" value="update_password" />
 
-      <.input field={f[:password]} type="password" label="New password" required />
+      <.input field={f[:password]} type="password" label={gettext("New password")} required />
       <.input
         field={f[:password_confirmation]}
         type="password"
-        label="Confirm new password"
+        label={gettext("Confirm new password")}
         required
       />
 
@@ -51,12 +51,12 @@
         field={f[:current_password]}
         name="current_password"
         type="password"
-        label="Current password"
+        label={gettext("Current password")}
         id="current_password_for_password"
         required
       />
       <:actions>
-        <.button phx-disable-with="Changing...">Change Password</.button>
+        <.button phx-disable-with={gettext("Changing...")}><%= gettext("Change Password") %></.button>
       </:actions>
     </.simple_form>
   </div>
