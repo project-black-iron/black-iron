@@ -22,10 +22,8 @@
     "eslint": "^9.7.0",
     "eslint-plugin-prettier": "^5.2.1",
     "globals": "^15.8.0",
-    "i18next": "^23.12.2",
-    "i18next-browser-languagedetector": "^8.0.0",
-    "i18next-localstorage-cache": "^1.1.1",
     "lit": "^3.1.4",
+    "phoenix_html": "file:../deps/phoenix_html",
     "tsx": "^4.16.2",
     "typescript": "^5.5.4",
     "typescript-eslint": "^8.0.0-alpha.54"

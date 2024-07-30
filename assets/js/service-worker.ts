@@ -44,7 +44,7 @@ async function responseWithFallback(
 ) {
   try {
     return await fetch(request);
-  } catch (_e) {
+  } catch (e) { // eslint-disable-line
     const resFromCache = await caches.match(request);
     if (resFromCache) {
       return resFromCache;
