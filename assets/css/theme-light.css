@@ -1,5 +1,8 @@
 :root {
-  --background-color: none;
-  --color: black;
+  --background-primary: none;
+  --background-primary-alt: grey;
+  --text-normal: black;
+  --text-hover: darkgrey;
+  --shadow: rgba(0, 0, 0, 0.2);
 }
 

@@ -589,54 +589,6 @@ defmodule BlackIronWeb.CoreComponents do
     """
   end
 
-  @doc """
-  Renders the nav bar.
-  """
-  attr :current_user, :any, default: nil
-  attr :class, :string, default: nil
-
-  def nav(assigns) do
-    ~H"""
-    <nav class={@class}>
-      <ul>
-      <%= if @current_user do %>
-        <li class="text-[0.8125rem] leading-6 text-zinc-900">
-          <%= @current_user.email %>
-        </li>
-        <li>
-          <a href={~p"/users/settings"}>
-            Settings
-          </a>
-        </li>
-        <li>
-          <a
-            href={~p"/users/log_out"}
-            method="delete"
-          >
-            Log out
-          </a>
-        </li>
-      <% else %>
-        <li>
-          <a
-            href={~p"/users/register"}
-          >
-            Register
-          </a>
-        </li>
-        <li>
-          <a
-            href={~p"/users/log_in"}
-          >
-            Log in
-          </a>
-        </li>
-      <% end %>
-      </ul>
-    </nav>
-    """
-  end
-
   ## JS Commands
 
   def show(js \\ %JS{}, selector) do

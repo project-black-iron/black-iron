@@ -8,10 +8,13 @@ To customize common variables, see variables.css. For theme-specific changes,
 use theme-dark.css or theme-light.css.
  */
 @import url("./variables.css");
+@import url("./components/index.css");
 
 body {
-  background-color: var(--background-color);
-  color: var(--color);
+  background-color: var(--background-primary);
+  color: var(--text-normal);
+  padding: 0;
+  margin: 0;
 }
 
 /*

@@ -9,6 +9,7 @@ defmodule BlackIronWeb.Layouts do
   `use BlackIronWeb, :live_view`.
   """
   use BlackIronWeb, :html
+  import BlackIronWeb.Components.Nav
 
   embed_templates "layouts/*"
 end

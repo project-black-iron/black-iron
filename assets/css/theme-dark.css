@@ -1,4 +1,7 @@
 :root {
-  --background-color: black;
-  --color: white;
+  --background-primary: darkgrey;
+  --background-primary-alt: lightgrey;
+  --text-normal: white;
+  --text-hover: lightgrey;
+  --shadow: lightgrey;
 }

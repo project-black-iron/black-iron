@@ -1,0 +1,88 @@
+/*
+Based on
+https://blog.logrocket.com/create-responsive-mobile-menu-css-without-javascript/
+*/
+
+body:has(.side-menu:checked) {
+  overflow: hidden;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+body > header {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-primary);
+  box-shadow: 1px 1px 5px 0px var(--shadow);
+  position: sticky;
+  height: 4rem;
+  top: 0;
+  width: 100%;
+  & > .logo {
+    text-decoration: none;
+    display: inline-block;
+    color: var(--text-normal);
+    font-size: 3rem;
+    margin-left: 0.5rem;
+    height: 4rem;
+  }
+  & > #side-menu {
+    display: none;
+    &:checked {
+      & ~ nav {
+        max-height: 100%;
+      }
+      & ~ .hamburger .hamburger-line {
+        background: transparent;
+        &::before {
+          transform: rotate(-45deg);
+          top: 0;
+        }
+        &::after {
+          transform: rotate(45deg);
+          top: 0;
+        }
+      }
+    }
+  }
+  & > .hamburger {
+    @media (min-width: 768px) {
+      display: none;
+    }
+    cursor: pointer;
+    float: right;
+    padding: 2rem;
+    & > .hamburger-line {
+      background: var(--text-normal);
+      display: block;
+      height: 2px;
+      position: relative;
+      width: 1.5rem;
+      &::before,
+      &::after {
+        content: "";
+        background: var(--text-normal);
+        display: block;
+        height: 100%;
+        position: absolute;
+        width: 100%;
+      }
+      &::before {
+        top: 5px;
+      }
+      &::after {
+        top: -5px;
+      }
+    }
+  }
+}

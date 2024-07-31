@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <link rel="manifest" href="/site.webmanifest">
+    <%# <link rel="manifest" href="/site.webmanifest"> %>
     <meta name="csrf-token" content={get_csrf_token()} />
     <.live_title suffix=" · Black Iron">
       <%= assigns[:page_title] || "Black Iron" %>
@@ -42,12 +42,11 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     %>
 
-
     <%# Styles, theme, scripts %>
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <%# Managed by bi-theme-picker %>
-    <script>
+    <script type="module">
       const theme = localStorage.getItem("bi-theme") ||
         matchMedia("(prefers-color-scheme: dark)").matches
           ? "dark"
