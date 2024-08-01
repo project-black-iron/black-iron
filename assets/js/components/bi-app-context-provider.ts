@@ -31,11 +31,16 @@ export class BiAppContextProvider extends LitElement {
   @property({ attribute: false })
   blackIronApp?: BlackIronApp;
 
+  @property()
+  campaignId?: string;
+
   update(changedProps: Map<string, unknown>) {
     super.update(changedProps);
-    const userToken = changedProps.get("userToken");
-    if (userToken && typeof userToken === "string") {
-      this.blackIronApp = new BlackIronApp(userToken as string);
+    if (changedProps.has("userToken") && typeof this.userToken === "string") {
+      this.blackIronApp = new BlackIronApp(this.userToken);
+    }
+    if (changedProps.has("campaignId") && this.blackIronApp) {
+      this.blackIronApp.changeCampaign(this.campaignId);
     }
   }
 
