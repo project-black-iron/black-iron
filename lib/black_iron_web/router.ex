@@ -110,6 +110,12 @@ defmodule BlackIronWeb.Router do
   scope "/campaigns", BlackIronWeb do
     pipe_through [:browser, :app, :service_worker]
 
+    get "/", CampaignsController, :show
+    get "/world", WorldController, :show
+    get "/npcs", NPCsController, :show
+    get "/lore", LoreController, :show
+    get "/tracks", TracksController, :show
+    get "/journals", JournalsController, :show
     get "/character", CharacterSheetController, :show
   end
 end
