@@ -1,6 +1,6 @@
 defmodule BlackIronWeb.TracksController do
   @moduledoc """
-  Controller for the /campaigns/tracks page
+  Controller for the /play/tracks page
   """
   use BlackIronWeb, :controller
 

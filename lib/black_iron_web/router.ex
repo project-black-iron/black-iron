@@ -107,15 +107,16 @@ defmodule BlackIronWeb.Router do
     post "/users/confirm/:token", UserConfirmationController, :update
   end
 
-  scope "/campaigns", BlackIronWeb do
+  scope "/play", BlackIronWeb do
     pipe_through [:browser, :app, :service_worker]
 
-    get "/", CampaignsController, :show
-    get "/world", WorldController, :show
+    get "/", PlayController, :show
+    get "/campaigns", CampaignsController, :show
+    get "/worlds", WorldsController, :show
     get "/npcs", NPCsController, :show
     get "/lore", LoreController, :show
     get "/tracks", TracksController, :show
     get "/journals", JournalsController, :show
-    get "/character", CharacterSheetController, :show
+    get "/characters", CharacterSheetController, :show
   end
 end

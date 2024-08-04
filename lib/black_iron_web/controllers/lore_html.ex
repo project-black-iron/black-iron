@@ -1,6 +1,6 @@
 defmodule BlackIronWeb.LoreHTML do
   @moduledoc """
-  HTML view for /campaigns/lore
+  HTML view for /play/lore
   """
   use BlackIronWeb, :html
 

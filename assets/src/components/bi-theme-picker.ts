@@ -6,10 +6,12 @@ export enum Theme {
   Light = "light",
 }
 
+const THEME_STORAGE_KEY = "bi-theme";
+
 @customElement("bi-theme-picker")
 export class BiThemePicker extends LitElement {
   @property()
-  theme: Theme = (localStorage.getItem("bi-theme") as Theme) || this.#preferredTheme();
+  theme: Theme = (localStorage.getItem(THEME_STORAGE_KEY) as Theme) || this.#preferredTheme();
 
   #preferredTheme() {
     return matchMedia("(prefers-color-scheme: dark)").matches
@@ -19,7 +21,7 @@ export class BiThemePicker extends LitElement {
 
   setTheme(theme: Theme, save?: boolean) {
     if (save) {
-      localStorage.setItem("bi-theme", theme);
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
     }
     this.theme = theme;
   }
@@ -60,7 +62,7 @@ export class BiThemePicker extends LitElement {
       <button
         type="button"
         @click=${() => {
-      window.localStorage.removeItem("bi-theme");
+      window.localStorage.removeItem(THEME_STORAGE_KEY);
       this.setTheme(this.#preferredTheme());
     }}
       >

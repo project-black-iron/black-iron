@@ -1,6 +1,6 @@
 defmodule BlackIronWeb.JournalsController do
   @moduledoc """
-  Controller for the /campaigns/journals page
+  Controller for the /play/journals page
   """
   use BlackIronWeb, :controller
 

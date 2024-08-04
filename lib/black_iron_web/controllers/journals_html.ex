@@ -1,6 +1,6 @@
 defmodule BlackIronWeb.JournalsHTML do
   @moduledoc """
-  HTML view for /campaigns/journals
+  HTML view for /play/journals
   """
   use BlackIronWeb, :html
 

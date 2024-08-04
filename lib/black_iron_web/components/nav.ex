@@ -21,7 +21,7 @@ defmodule BlackIronWeb.Components.Nav do
     <nav class="main-nav">
       <ul class="menu">
         <li>
-          <a href={~p"/campaigns"}><%= gettext("Play Now!") %></a>
+          <a href={~p"/play"}><%= gettext("Play Now!") %></a>
         </li>
         <%= if @current_user do %>
           <li>

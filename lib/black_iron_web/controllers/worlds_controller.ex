@@ -1,6 +1,6 @@
-defmodule BlackIronWeb.CampaignsController do
+defmodule BlackIronWeb.WorldsController do
   @moduledoc """
-  Controller for the /play/campaigns page
+  Controller for the /play/world page
   """
   use BlackIronWeb, :controller
 

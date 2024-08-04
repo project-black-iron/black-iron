@@ -1,6 +1,6 @@
 defmodule BlackIronWeb.LoreController do
   @moduledoc """
-  Controller for the /campaigns/lore page
+  Controller for the /play/lore page
   """
   use BlackIronWeb, :controller
 

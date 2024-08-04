@@ -1,6 +1,6 @@
 defmodule BlackIronWeb.NPCsController do
   @moduledoc """
-  Controller for the /campaigns/npcs page
+  Controller for the /play/npcs page
   """
   use BlackIronWeb, :controller
 

@@ -1,6 +1,6 @@
 defmodule BlackIronWeb.TracksHTML do
   @moduledoc """
-  HTML view for /campaigns/npcs
+  HTML view for /play/npcs
   """
   use BlackIronWeb, :html
 

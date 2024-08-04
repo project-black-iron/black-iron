@@ -26,17 +26,17 @@
         <meta name="twitter:card" content="summary_large_image" />
       <% true -> %>
     <% end %>
+    <!-- Yeah fuck you -->
     <meta name="CCBot" content="nofollow" />
-
     <meta name="robots" content="noai, noimageai" />
 
     <meta name="msapplication-TileColor" content="#da532c" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <script type="module">
       const theme = localStorage.getItem("bi-theme") ||
-        matchMedia("(prefers-color-scheme: dark)").matches
+        (matchMedia("(prefers-color-scheme: dark)").matches
           ? "dark"
-          : "light";
+          : "light");
       const linkEl = document.createElement("link");
       linkEl.rel = "stylesheet";
       linkEl.id = "theme";

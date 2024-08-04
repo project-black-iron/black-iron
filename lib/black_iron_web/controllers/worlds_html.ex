@@ -1,6 +1,6 @@
-defmodule BlackIronWeb.WorldHTML do
+defmodule BlackIronWeb.WorldsHTML do
   @moduledoc """
-  HTML view for /campaigns/world
+  HTML view for /play/world
   """
   use BlackIronWeb, :html
 
