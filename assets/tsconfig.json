@@ -1,11 +1,11 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "outDir": "../priv/static/assets",
+    "outDir": "dist",
     "tsBuildInfoFile": ".tsbuildinfo",
     "sourceMap": true,
     "target": "ES2022",
-    "module": "Preserve",
+    "module": "ESNext",
     "moduleResolution": "Bundler",
     "esModuleInterop": true,
     "strict": true,

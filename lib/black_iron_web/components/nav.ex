@@ -3,6 +3,7 @@ defmodule BlackIronWeb.Components.Nav do
   Provides core UI components.
   """
   use Phoenix.Component
+
   use Phoenix.VerifiedRoutes,
     router: BlackIronWeb.Router,
     endpoint: BlackIronWeb.Endpoint,
@@ -22,42 +23,34 @@ defmodule BlackIronWeb.Components.Nav do
         <li>
           <a href={~p"/campaigns"}><%= gettext("Play Now!") %></a>
         </li>
-      <%= if @current_user do %>
-        <li>
-          <%= @current_user.email %>
-        </li>
-        <li>
-          <a href={~p"/users/settings"}>
-            <%= gettext("Settings") %>
-          </a>
-        </li>
-        <li>
-          <a
-            href={~p"/users/log_out"}
-            method="delete"
-          >
-            <%= gettext("Log out") %>
-          </a>
-        </li>
-      <% else %>
-        <li>
-          <a
-            href={~p"/users/register"}
-          >
-            <%= gettext("Register") %>
-          </a>
-        </li>
-        <li>
-          <a
-            href={~p"/users/log_in"}
-          >
-            <%= gettext("Log in") %>
-          </a>
-        </li>
-      <% end %>
+        <%= if @current_user do %>
+          <li>
+            <%= @current_user.email %>
+          </li>
+          <li>
+            <a href={~p"/users/settings"}>
+              <%= gettext("Settings") %>
+            </a>
+          </li>
+          <li>
+            <a href={~p"/users/log_out"} method="delete">
+              <%= gettext("Log out") %>
+            </a>
+          </li>
+        <% else %>
+          <li>
+            <a href={~p"/users/register"}>
+              <%= gettext("Register") %>
+            </a>
+          </li>
+          <li>
+            <a href={~p"/users/log_in"}>
+              <%= gettext("Log in") %>
+            </a>
+          </li>
+        <% end %>
       </ul>
     </nav>
     """
   end
-
 end

@@ -10,9 +10,12 @@ defmodule BlackIronWeb.Plugs.Locale do
 
   def call(conn, _opts) do
     case locale_from_cookies(conn) || locale_from_header(conn) do
-      nil -> conn
+      nil ->
+        conn
+
       locale ->
         Gettext.put_locale(BlackIronWeb.Gettext, locale)
+
         conn
         |> persist_locale(locale)
     end
@@ -48,9 +51,10 @@ defmodule BlackIronWeb.Plugs.Locale do
         |> String.split(",")
         |> Enum.map(&parse_language_option/1)
         |> Enum.sort(&(&1.quality > &2.quality))
-        |> Enum.map(&(&1.tag))
+        |> Enum.map(& &1.tag)
         |> Enum.reject(&is_nil/1)
         |> ensure_language_fallbacks()
+
       _ ->
         []
     end
@@ -58,18 +62,20 @@ defmodule BlackIronWeb.Plugs.Locale do
 
   defp parse_language_option(string) do
     captures = Regex.named_captures(~r/^\s?(?<tag>[\w\-]+)(?:;q=(?<quality>[\d\.]+))?$/i, string)
-    quality = case Float.parse(captures["quality"] || "1.0") do
-      {val, _} -> val
-      _ -> 1.0
-    end
+
+    quality =
+      case Float.parse(captures["quality"] || "1.0") do
+        {val, _} -> val
+        _ -> 1.0
+      end
 
     %{tag: captures["tag"], quality: quality}
   end
 
   defp ensure_language_fallbacks(tags) do
-    Enum.flat_map tags, fn tag ->
+    Enum.flat_map(tags, fn tag ->
       [language | _] = String.split(tag, "-")
       if Enum.member?(tags, language), do: [tag], else: [tag, language]
-    end
+    end)
   end
 end

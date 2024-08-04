@@ -73,7 +73,7 @@ defmodule BlackIron.MixProject do
         "cmd --cd assets npm install",
         "ecto.reset"
       ],
-      fmt: ["format"]
+      fmt: ["format", "cmd --cd assets npm run format"]
     ]
   end
 

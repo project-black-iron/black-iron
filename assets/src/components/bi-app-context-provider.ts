@@ -1,6 +1,6 @@
 import { createContext } from "@lit/context";
-import { LitElement, html } from "lit";
 import { provide } from "@lit/context";
+import { html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
 import { BlackIronApp } from "../black-iron-app";

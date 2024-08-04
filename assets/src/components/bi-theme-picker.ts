@@ -1,4 +1,4 @@
-import { LitElement, html } from "lit";
+import { html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
 export enum Theme {
@@ -9,8 +9,7 @@ export enum Theme {
 @customElement("bi-theme-picker")
 export class BiThemePicker extends LitElement {
   @property()
-  theme: Theme =
-    (localStorage.getItem("bi-theme") as Theme) || this.#preferredTheme();
+  theme: Theme = (localStorage.getItem("bi-theme") as Theme) || this.#preferredTheme();
 
   #preferredTheme() {
     return matchMedia("(prefers-color-scheme: dark)").matches
@@ -61,9 +60,9 @@ export class BiThemePicker extends LitElement {
       <button
         type="button"
         @click=${() => {
-          window.localStorage.removeItem("bi-theme");
-          this.setTheme(this.#preferredTheme());
-        }}
+      window.localStorage.removeItem("bi-theme");
+      this.setTheme(this.#preferredTheme());
+    }}
       >
         Reset
       </button>`;

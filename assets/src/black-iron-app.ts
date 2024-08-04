@@ -1,6 +1,6 @@
 import { Channel, Socket } from "phoenix";
-import { BlackIronDB } from "./db";
 import { BlackIronCampaign } from "./campaigns/campaign";
+import { BlackIronDB } from "./db";
 
 export class BlackIronApp {
   // >> socket.enableDebug()
@@ -44,6 +44,6 @@ export class BlackIronApp {
     }
     this.currentChannel = this.socket!.channel("campaign_sync:" + id, {});
     this.currentChannel
-      .join()
+      .join();
   }
 }

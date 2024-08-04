@@ -1,8 +1,5 @@
 import { DBSchema, IDBPDatabase, openDB } from "idb";
-import {
-  BlackIronCampaign,
-  BlackIronCampaignSchema,
-} from "./campaigns/campaign";
+import { BlackIronCampaign, BlackIronCampaignSchema } from "./campaigns/campaign";
 
 type BlackIronDBSchema = DBSchema & BlackIronCampaignSchema;
 

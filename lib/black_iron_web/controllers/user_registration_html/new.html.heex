@@ -18,7 +18,9 @@
     <.input field={f[:password]} type="password" label="Password" required />
 
     <:actions>
-      <.button phx-disable-with={gettext("Creating account...")} class="w-full"><%= gettext("Create an account") %></.button>
+      <.button phx-disable-with={gettext("Creating account...")} class="w-full">
+        <%= gettext("Create an account") %>
+      </.button>
     </:actions>
   </.simple_form>
 </div>

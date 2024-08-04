@@ -1,7 +1,7 @@
-import process from "process";
+import { typecheckPlugin } from "@jgoz/esbuild-plugin-typecheck";
 import esbuild from "esbuild";
 import eslint from "esbuild-plugin-eslint";
-import { typecheckPlugin } from "@jgoz/esbuild-plugin-typecheck";
+import process from "process";
 
 const prod = process.argv[2] === "production";
 const watch = !prod && process.argv[2] !== "nowatch";
@@ -19,13 +19,13 @@ const contextBase = {
   plugins: [
     typecheckPlugin({ watch }),
     eslint({
-      warnIgnored: false
-    })
+      warnIgnored: false,
+    }),
   ],
   format: "esm",
   nodePaths: [
     "../deps",
-  ]
+  ],
 };
 
 const mainContext = await esbuild.context({
@@ -36,7 +36,7 @@ const mainContext = await esbuild.context({
     "src/service-worker.ts",
     "css/app.css",
     "css/theme-dark.css",
-    "css/theme-light.css"
+    "css/theme-light.css",
   ],
   outdir: "../priv/static/assets",
   loader: {

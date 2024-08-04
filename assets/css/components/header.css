@@ -68,8 +68,7 @@ body > header {
       height: 2px;
       position: relative;
       width: 1.5rem;
-      &::before,
-      &::after {
+      &::before, &::after {
         content: "";
         background: var(--text-normal);
         display: block;

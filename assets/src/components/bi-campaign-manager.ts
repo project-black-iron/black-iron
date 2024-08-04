@@ -1,11 +1,11 @@
-import { LitElement, html, css } from "lit";
-import { customElement, property } from "lit/decorators.js";
 import { consume, createContext, provide } from "@lit/context";
+import { css, html, LitElement } from "lit";
+import { customElement, property } from "lit/decorators.js";
 
-import { blackIronAppContext } from "./bi-app-context-provider";
-import { BlackIronApp } from "../black-iron-app";
 import { Channel } from "phoenix";
+import { BlackIronApp } from "../black-iron-app";
 import { BlackIronCampaign } from "../campaigns/campaign";
+import { blackIronAppContext } from "./bi-app-context-provider";
 
 export const campaignContext = createContext<BlackIronCampaign | undefined>(
   "campaign",

@@ -3,6 +3,7 @@ defmodule BlackIronWeb.CoreComponents do
   Provides core UI components.
   """
   use Phoenix.Component
+
   use Phoenix.VerifiedRoutes,
     router: BlackIronWeb.Router,
     endpoint: BlackIronWeb.Endpoint,

@@ -1,7 +1,7 @@
 <div class="mx-auto max-w-sm">
   <.header class="text-center">
     <%= gettext("No confirmation instructions received?") %>
-    <:subtitle><%= gettext("We'll send a new confirmation link to your inbox")%></:subtitle>
+    <:subtitle><%= gettext("We'll send a new confirmation link to your inbox") %></:subtitle>
   </.header>
 
   <.simple_form :let={f} for={@conn.params["user"]} as={:user} action={~p"/users/confirm"}>

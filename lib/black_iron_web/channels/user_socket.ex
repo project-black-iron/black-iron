@@ -35,6 +35,7 @@ defmodule BlackIronWeb.UserSocket do
         :error
     end
   end
+
   def connect(_params, _socket, _connect_info) do
     :error
   end

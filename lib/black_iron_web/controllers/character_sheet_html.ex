@@ -6,13 +6,11 @@ defmodule BlackIronWeb.CharacterSheetHTML do
   def show(assigns) do
     ~H"""
     <bi-character-sheet>
-      <%# Rendered when there's no active character. %>
       <article slot="placeholder">
         <header><%= gettext("Character Sheet") %></header>
         <p><%= gettext("Select a character to view their sheet.") %></p>
         <bi-character-picker />
       </article>
-      <%# Rendered when we have an active character in the context. %>
       <article slot="sheet">
         <header><%= gettext("Character Sheet") %></header>
         <.character_info />
@@ -52,36 +50,31 @@ defmodule BlackIronWeb.CharacterSheetHTML do
 
   defp character_stats(assigns) do
     ~H"""
-    <section class="stats">
-    </section>
+    <section class="stats"></section>
     """
   end
 
   defp character_meters(assigns) do
     ~H"""
-    <section class="meters">
-    </section>
+    <section class="meters"></section>
     """
   end
 
   defp character_special_tracks(assigns) do
     ~H"""
-    <section class="special-tracks">
-    </section>
+    <section class="special-tracks"></section>
     """
   end
 
   defp character_impacts(assigns) do
     ~H"""
-    <section class="impacts">
-    </section>
+    <section class="impacts"></section>
     """
   end
 
   defp character_assets(assigns) do
     ~H"""
-    <section class="assets">
-    </section>
+    <section class="assets"></section>
     """
   end
 end
