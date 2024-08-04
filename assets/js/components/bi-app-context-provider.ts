@@ -3,7 +3,7 @@ import { LitElement, html } from "lit";
 import { provide } from "@lit/context";
 import { customElement, property } from "lit/decorators.js";
 
-import { BlackIronApp } from "../black-iron-app.ts";
+import { BlackIronApp } from "../black-iron-app";
 
 export const blackIronAppContext = createContext<BlackIronApp | undefined>(
   "blackIronApp",

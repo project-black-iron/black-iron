@@ -5,8 +5,8 @@
     "tsBuildInfoFile": ".tsbuildinfo",
     "sourceMap": true,
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
     "esModuleInterop": true,
     "strict": true,
     "resolveJsonModule": true,
@@ -21,8 +21,6 @@
       "ESNext",
       "dom"
     ],
-    "noEmit": true,
-    "allowImportingTsExtensions": true,
     "incremental": true,
     "experimentalDecorators": true,
     "useDefineForClassFields": false

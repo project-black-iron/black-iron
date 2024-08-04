@@ -6,6 +6,6 @@
 import "./components/bi-theme-picker";
 
 // Launch service worker
-import { installServiceWorker } from "./install-sw.ts";
+import { installServiceWorker } from "./install-sw";
 
 await installServiceWorker();

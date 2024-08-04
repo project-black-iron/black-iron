@@ -2,10 +2,10 @@ import { LitElement, html, css } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { consume, createContext, provide } from "@lit/context";
 
-import { blackIronAppContext } from "./bi-app-context-provider.ts";
-import { BlackIronApp } from "../black-iron-app.ts";
+import { blackIronAppContext } from "./bi-app-context-provider";
+import { BlackIronApp } from "../black-iron-app";
 import { Channel } from "phoenix";
-import { BlackIronCampaign } from "../campaigns/campaign.ts";
+import { BlackIronCampaign } from "../campaigns/campaign";
 
 export const campaignContext = createContext<BlackIronCampaign | undefined>(
   "campaign",

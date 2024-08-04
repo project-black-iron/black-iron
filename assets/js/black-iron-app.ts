@@ -1,6 +1,6 @@
 import { Channel, Socket } from "phoenix";
-import { BlackIronDB } from "./db.ts";
-import { BlackIronCampaign } from "./campaigns/campaign.ts";
+import { BlackIronDB } from "./db";
+import { BlackIronCampaign } from "./campaigns/campaign";
 
 export class BlackIronApp {
   // >> socket.enableDebug()
