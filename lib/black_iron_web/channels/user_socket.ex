@@ -31,7 +31,7 @@ defmodule BlackIronWeb.UserSocket do
       {:ok, user_id} ->
         {:ok, assign(socket, :user, user_id)}
 
-      {:error, reason} ->
+      {:error, _reason} ->
         :error
     end
   end

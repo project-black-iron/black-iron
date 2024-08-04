@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  MIX_ENV: test
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    services:
+      db:
+        image: postgres:12
+        ports: ['5432:5432']
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    runs-on: ubuntu-latest
+    name: Test on OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}} / Node ${{matrix.node}}
+    strategy:
+      matrix:
+        otp: ['26.0.1']
+        elixir: ['1.16.1']
+        node: ['20.11.1']
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.6.0
+        with:
+          access_token: ${{ github.token }}
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{matrix.node}}
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Cache JS dependencies
+        uses: actions/cache@v3
+        id: cache-NPM
+        with:
+          path: |
+            assets/node_modules
+          key: ${{ runner.os }}-${{ matrix.node }}-${{ hashFiles('assets/package-lock.json')}}
+
+      - name: Cache Elixir dependencies
+        uses: actions/cache@v3
+        id: cache-elixir
+        with:
+          path: |
+            deps
+            priv/plts
+          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
+
+      # Step: Define how to cache the `_build` directory. After the first run,
+      # this speeds up tests runs a lot. This includes not re-compiling our
+      # project's downloaded deps every run.
+      - name: Cache compiled build
+        id: cache-build
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-compiled-build
+        with:
+          path: _build
+          key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{ env.cache-name }}-
+            ${{ runner.os }}-mix-
+
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Install JS dependencies
+        run: mix assets.setup
+
+      - name: Compile backend
+        run: mix compile --warnings-as-errors
+
+      - name: Compile frontend
+        run: mix assets.build
+
+      - name: Check formatting
+        run: |
+          mix format --check-formatted
+          cd assets && npm run format:check
+
+      - name: Run tests
+        run: mix test
+
