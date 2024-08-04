@@ -144,7 +144,7 @@ To see what kind of weight a dependency brings in, you can use
       - NOTE: While regular styles don't leak into shadow DOM, `--variables`
         do, so we can use this for things we need to have consistent styling
         for.
-  - `js/` - JS/TS files (should probably be renamed to `src/`)
+  - `src/` - JS/TS files
     - `components/` - Lit components
     - `app.ts` - entry point for the app side (the game, the offline-first part)
     - `site.ts` - entry point for the site side (the entry point and rest of the site)
