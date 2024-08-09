@@ -17,6 +17,10 @@ body {
   margin: 0;
 }
 
+main {
+  padding: 0 1rem;
+}
+
 /*
 Some fun view transition stuff. See https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API/Using
 

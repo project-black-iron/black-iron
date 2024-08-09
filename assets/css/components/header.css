@@ -19,22 +19,26 @@ body:has(.side-menu:checked) {
 }
 
 body > header {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   background-color: var(--background-primary);
   box-shadow: 1px 1px 5px 0px var(--shadow);
   position: sticky;
-  height: 4rem;
+  height: 3rem;
   top: 0;
   width: 100%;
   & > .logo {
+    flex-grow: 1;
+    vertical-align: center;
     text-decoration: none;
-    display: inline-block;
     color: var(--text-normal);
-    font-size: 3rem;
+    font-size: 2rem;
     margin-left: 0.5rem;
-    height: 4rem;
+    height: 100%;
   }
   & > #side-menu {
     display: none;
