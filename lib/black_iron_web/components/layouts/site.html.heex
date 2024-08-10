@@ -1,12 +1,3 @@
 <script defer phx-track-static type="module" src={~p"/assets/js/site.js"}>
 </script>
-<header class="site-header">
-  <a href="/" class="logo">Black Iron</a>
-  <input id="side-menu" type="checkbox" />
-  <label for="side-menu" class="hamburger"><span class="hamburger-line" /></label>
-  <.nav current_user={@current_user} />
-</header>
 <%= @inner_content %>
-<footer class="site-footer">
-  <bi-theme-picker />
-</footer>

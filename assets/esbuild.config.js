@@ -31,9 +31,9 @@ const contextBase = {
 const mainContext = await esbuild.context({
   ...contextBase,
   entryPoints: [
-    "src/app.ts",
-    "src/site.ts",
-    "src/service-worker.ts",
+    "js/app.ts",
+    "js/site.ts",
+    "js/service-worker.ts",
     "css/app.css",
     "css/theme-dark.css",
     "css/theme-light.css",
@@ -46,7 +46,7 @@ const mainContext = await esbuild.context({
 
 const swContext = await esbuild.context({
   entryPoints: [
-    "src/service-worker.ts",
+    "js/service-worker.ts",
   ],
   outfile: "../priv/static/service-worker.js",
 });

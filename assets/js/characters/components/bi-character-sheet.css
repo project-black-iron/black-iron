@@ -1,0 +1,5 @@
+bi-character-sheet:not(:defined) {
+  [slot="sheet"] {
+    display: none;
+  }
+}

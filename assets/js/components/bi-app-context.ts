@@ -22,8 +22,8 @@ export const blackIronAppContext = createContext<BlackIronApp | undefined>(
  *
  * @usage `<bi-app-context-provider usertoken="<%= assigns[:user_token] %>">Rest of your app here</bi-app-context-provider>`
  */
-@customElement("bi-app-context-provider")
-export class BiAppContextProvider extends LitElement {
+@customElement("bi-app-context")
+export class BiAppContext extends LitElement {
   @property()
   userToken?: string;
 

@@ -44,8 +44,22 @@
       document.head.appendChild(linkEl);
     </script>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
+    <!-- Styles imported by JS source files -->
+    <link phx-track-static rel="stylesheet" href={~p"/assets/js/app.css"} />
   </head>
   <body>
-    <%= @inner_content %>
+    <header class="site-header">
+      <a href="/" class="logo">Black Iron</a>
+      <input id="side-menu" type="checkbox" />
+      <label for="side-menu" class="hamburger"><span class="hamburger-line" /></label>
+      <.nav current_user={@current_user} />
+    </header>
+    <main>
+      <.flash_group flash={@flash} />
+      <%= @inner_content %>
+    </main>
+    <footer class="site-footer">
+      <bi-theme-picker />
+    </footer>
   </body>
 </html>

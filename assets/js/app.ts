@@ -6,10 +6,10 @@ import "phoenix_html";
 // import topbar from "../vendor/topbar"
 
 // Components
-import "./components/bi-app-context-provider";
-import "./components/bi-theme-picker";
+import "./components/index"
 
 // Launch service worker
 import { installServiceWorker } from "./install-sw";
 
 await installServiceWorker();
+
