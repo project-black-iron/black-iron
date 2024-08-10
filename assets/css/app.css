@@ -15,10 +15,15 @@ body {
   color: var(--text-normal);
   padding: 0;
   margin: 0;
-}
+  font-family: var(--font-family);
 
-main {
-  padding: 0 1rem;
+  & > main {
+    padding: 1rem;
+  }
+
+  & > footer {
+    padding: 0 1rem;
+  }
 }
 
 /*

@@ -6,10 +6,9 @@ import "phoenix_html";
 // import topbar from "../vendor/topbar"
 
 // Components
-import "./components/index"
+import "./components/index";
 
 // Launch service worker
 import { installServiceWorker } from "./install-sw";
 
 await installServiceWorker();
-

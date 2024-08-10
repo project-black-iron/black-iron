@@ -3,13 +3,25 @@ Non-theme variables
 */
 :root {
   --border-radius: 10px;
+  --font-thin: 100;
+  --font-extralight: 200;
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-extrabold: 800;
+  --font-black: 900;
+  --font-family: Arial, Verdana, sans-serif;
+
+  /* Colors (from themes) */
   --background-primary: var(--theme-bg-color);
   --background-primary-alt: var(--theme-light-color);
   --text-normal: var(--theme-text-color);
   --text-muted: var(--theme-text-soft-color);
-  --text-faint: vat(--theme-subtle-color);
+  --text-faint: var(--theme-subtle-color);
   --text-strong: var(--theme-text-strong-color);
-  --text-hover: var(--theme-text-hover);
+  --text-hover: var(--theme-text-soft-color);
   --text-on-accent: var(--theme-special-text-color);
   --shadow: var(--theme-shadow-color);
   --text-success: var(--theme-text-success);

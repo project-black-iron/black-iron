@@ -1,2 +1,1 @@
-
-export class Character { }
+export class Character {}

@@ -22,9 +22,9 @@ Do not use these variables directly. Use the more "semantic" ones in
   --theme-special-mark-color: rgba(224, 222, 227, 0.08);
   --theme-light-color: rgba(215, 208, 233, 1);
   --theme-dark-color: rgba(55, 51, 65, 1);
-  --theme-error: rgba(243,80,103, 1);
-  --theme-text-error: rgba(230,221,221, 1);
-  --theme-bg-error: rgba(190,36,50, 1);
+  --theme-error: rgba(243, 80, 103, 1);
+  --theme-text-error: rgba(230, 221, 221, 1);
+  --theme-bg-error: rgba(190, 36, 50, 1);
 
   --theme-text-color-rgb: 206, 228, 219;
   --theme-bg-color-rgb: 32, 32, 32;

@@ -1,11 +1,11 @@
-import { Channel } from "phoenix";
 import { consume, createContext, provide } from "@lit/context";
 import { html, LitElement, PropertyValues } from "lit";
 import { customElement, property } from "lit/decorators.js";
+import { Channel } from "phoenix";
 
 import { BlackIronApp } from "../../black-iron-app";
-import { BlackIronCampaign } from "../campaign";
 import { blackIronAppContext } from "../../components/bi-app-context";
+import { BlackIronCampaign } from "../campaign";
 
 @customElement("bi-campaign-context")
 export class BiCampaignContext extends LitElement {
@@ -27,10 +27,9 @@ export class BiCampaignContext extends LitElement {
     if (changed.has("_campaignId") || changed.has("app")) {
       if (this._campaignId) {
         console.log("loading campaign", this._campaignId);
-        this.campaign =
-          this._campaignId == null
-            ? undefined
-            : await this.app?.db.getCampaign(this._campaignId);
+        this.campaign = this._campaignId == null
+          ? undefined
+          : await this.app?.db.getCampaign(this._campaignId);
       }
       if (this.campaign) {
         this.channel = this.app?.socket?.channel(
@@ -50,8 +49,8 @@ export class BiCampaignContext extends LitElement {
       }
     }
     if (
-      changed.has("campaign") &&
-      changed.get("campaign")?.id !== this.campaign?.id
+      changed.has("campaign")
+      && changed.get("campaign")?.id !== this.campaign?.id
     ) {
       this._campaignId = this.campaign?.id;
     }

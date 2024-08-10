@@ -1,11 +1,11 @@
+import { consume, createContext, provide } from "@lit/context";
 import { html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { consume, createContext, provide } from "@lit/context";
 
 import "./bi-character-sheet.css";
-import { Character } from "../character";
-import { BiCampaignContext } from "../../campaigns/components/bi-campaign-context";
 import { BlackIronCampaign } from "../../campaigns/campaign";
+import { BiCampaignContext } from "../../campaigns/components/bi-campaign-context";
+import { Character } from "../character";
 
 @customElement("bi-character-sheet")
 export class BiCharacterSheet extends LitElement {
@@ -21,8 +21,10 @@ export class BiCharacterSheet extends LitElement {
   campaign?: BlackIronCampaign;
 
   render() {
-    return html`${this.character
-      ? html`<slot name="sheet"></slot>`
-      : html`<slot name="placeholder"></slot>`}`;
+    return html`${
+      this.character
+        ? html`<slot name="sheet"></slot>`
+        : html`<slot name="placeholder"></slot>`
+    }`;
   }
 }
