@@ -1,7 +1,40 @@
+/*
+Theme generated from https://theme.tenphi.me/
+
+Do not use these variables directly. Use the more "semantic" ones in
+`variables.css` instead.
+*/
 :root {
-  --background-primary: none;
-  --background-primary-alt: grey;
-  --text-normal: black;
-  --text-hover: darkgrey;
-  --shadow: rgba(0, 0, 0, 0.2);
+  --theme-bg-color: rgba(255, 255, 255, 1);
+  --theme-text-color: rgba(38, 51, 46, 1);
+  --theme-text-soft-color: rgba(68, 76, 73, 1);
+  --theme-text-strong-color: rgba(74, 74, 74, 1);
+  --theme-subtle-color: rgba(246, 250, 248, 1);
+  --theme-border-color: rgba(214, 235, 227, 1);
+  --theme-shadow-color: rgba(157, 200, 183, 1);
+  --theme-input-color: rgba(255, 255, 255, 1);
+  --theme-outline-color: rgba(197, 184, 228, 1);
+  --theme-mark-color: rgba(142, 106, 207, 0.08);
+  --theme-special-color: rgba(142, 106, 207, 1);
+  --theme-special-bg-color: rgba(145, 111, 209, 1);
+  --theme-special-text-color: rgba(255, 255, 255, 1);
+  --theme-special-shadow-color: rgba(91, 84, 108, 1);
+  --theme-special-mark-color: rgba(255, 255, 255, 0.08);
+  --theme-light-color: rgba(245, 242, 251, 1);
+  --theme-dark-color: rgba(75, 66, 96, 1);
+  --theme-error: rgba(255,41,64, 1);
+  --theme-text-error: rgba(255,255,255, 1);
+  --theme-bg-error: rgba(255,56,74, 1);
+
+  --theme-text-color-rgb: 38, 51, 46;
+  --theme-bg-color-rgb: 255, 255, 255;
+  --theme-subtle-color-rgb: 246, 250, 248;
+  --theme-special-color-rgb: 142, 106, 207;
+  --theme-special-text-color-rgb: 255, 255, 255;
+  --theme-special-bg-color-rgb: 145, 111, 209;
+  --theme-shadow-color-rgb: 157, 200, 183;
+  --theme-special-shadow-color-rgb: 91, 84, 108;
+  --theme-outline-color-rgb: 197, 184, 228;
+  --theme-dark-color-rgb: 75, 66, 96;
+  --theme-light-color-rgb: 245, 242, 251;
 }

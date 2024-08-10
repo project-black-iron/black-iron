@@ -3,4 +3,17 @@ Non-theme variables
 */
 :root {
   --border-radius: 10px;
+  --background-primary: var(--theme-bg-color);
+  --background-primary-alt: var(--theme-light-color);
+  --text-normal: var(--theme-text-color);
+  --text-muted: var(--theme-text-soft-color);
+  --text-faint: vat(--theme-subtle-color);
+  --text-strong: var(--theme-text-strong-color);
+  --text-hover: var(--theme-text-hover);
+  --text-on-accent: var(--theme-special-text-color);
+  --shadow: var(--theme-shadow-color);
+  --text-success: var(--theme-text-success);
+  --text-success: var(--theme-text-success);
+  --text-warning: var(--theme-text-warning);
+  --text-error: var(--theme-text-error);
 }
