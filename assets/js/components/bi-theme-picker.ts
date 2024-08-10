@@ -1,4 +1,4 @@
-import { html, LitElement } from "lit";
+import { css, html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
 export enum Theme {
@@ -10,63 +10,76 @@ const THEME_STORAGE_KEY = "bi-theme";
 
 @customElement("bi-theme-picker")
 export class BiThemePicker extends LitElement {
-  @property()
-  theme: Theme = (localStorage.getItem(THEME_STORAGE_KEY) as Theme) || this.#preferredTheme();
+  static styles = css`
+    :host {
+      display: flex;
+      flex-flow: column nowrap;
+      & label {
+        height: 1.5rem;
+      }
+    }
+  `;
 
-  #preferredTheme() {
+  @property()
+  theme?: Theme = this.storageTheme();
+
+  systemTheme() {
     return matchMedia("(prefers-color-scheme: dark)").matches
       ? Theme.Dark
       : Theme.Light;
   }
 
-  setTheme(theme: Theme, save?: boolean) {
-    if (save) {
-      localStorage.setItem(THEME_STORAGE_KEY, theme);
-    }
-    this.theme = theme;
+  storageTheme() {
+    return localStorage.getItem(THEME_STORAGE_KEY) as Theme;
   }
 
-  update(changedProps: Map<string, unknown>) {
-    super.update(changedProps);
+  willUpdate(changedProps: Map<string, unknown>) {
     if (changedProps.has("theme")) {
       const themeLink = document.getElementById("theme");
       if (themeLink && themeLink instanceof HTMLLinkElement) {
-        themeLink.href = `/assets/css/theme-${this.theme}.css`;
+        if (!this.theme) {
+          localStorage.removeItem(THEME_STORAGE_KEY);
+        } else {
+          localStorage.setItem(THEME_STORAGE_KEY, this.theme);
+        }
+        themeLink.href = `/assets/css/theme-${this.theme || this.systemTheme()}.css`;
       }
     }
   }
 
   render() {
     return html`<label
-        >Light
-        <input
-          @click=${() => this.setTheme(Theme.Light, true)}
+        ><input
+          @click=${() => this.theme = Theme.Light}
           name="theme"
           type="radio"
           value=${Theme.Light}
-          .checked=${this.theme === Theme.Light}
-          ?checked=${this.theme === Theme.Light}
+          .checked=${this.storageTheme() === Theme.Light}
+          ?checked=${this.storageTheme() === Theme.Light}
         />
+        Light
       </label>
       <label>
-        Dark
         <input
-          @click=${() => this.setTheme(Theme.Dark, true)}
+          @click=${() => this.theme = Theme.Dark}
           name="theme"
           type="radio"
           value=${Theme.Dark}
-          .checked=${this.theme === Theme.Dark}
-          ?checked=${this.theme === Theme.Dark}
+          .checked=${this.storageTheme() === Theme.Dark}
+          ?checked=${this.storageTheme() === Theme.Dark}
         />
+        Dark
       </label>
-      <button
-        type="button"
-        @click=${() => {
-      window.localStorage.removeItem(THEME_STORAGE_KEY);
-      this.setTheme(this.#preferredTheme());
-    }}
-      >
-        Reset
-      </button>`;
+      <label>
+        <input
+          @click=${() => this.theme = undefined}
+          name="theme"
+          type="radio"
+          value=${this.systemTheme()}
+          .checked=${this.storageTheme() == null}
+          ?checked=${this.storageTheme() == null}
+        />
+        System
+      </label>`;
   }
 }
