@@ -2,62 +2,55 @@
 // part and the app part.
 /// <reference lib="webworker" />
 
-const CACHE_VERSION = "v1";
+import {
+  NavigationRoute,
+  registerRoute,
+  setDefaultHandler,
+} from "workbox-routing";
+import { PrecacheController } from "workbox-precaching";
+import { NetworkFirst } from "workbox-strategies";
 
-addEventListener("install", (event: Event) => {
-  // @ts-expect-error idk where the service worker specific types are, but this is fine.
-  event.waitUntil(addResourcesToCache());
-});
+// const CACHE_VERSION = "v1";
 
-async function addResourcesToCache() {
-  const response = await fetch("/offline_paths");
-  if (!response.ok) {
-    throw new Error("Failed to fetch offline paths");
-  }
-  const offlinePaths = await response.json();
-  const cache = await caches.open(CACHE_VERSION);
-  await cache.addAll(offlinePaths.paths);
-}
+const precacheController = new PrecacheController();
 
-addEventListener("activate", (event) => {
-  // @ts-expect-error idk where the service worker specific types are, but this is fine.
-  event.waitUntil(registration?.navigationPreload.enable());
-});
-
-async function putInCache(request: Request, response: Response) {
-  const cache = await caches.open(CACHE_VERSION);
-  await cache.put(request, response);
-}
-
-addEventListener("fetch", (event: Event) => {
-  (event as FetchEvent).respondWith(
-    responseWithFallback(
-      (event as FetchEvent).request,
-      (event as FetchEvent).preloadResponse,
-    ),
+// @ts-expect-error this is actually an ExtendableEvent
+addEventListener("install", (event: ExtendableEvent) => {
+  event.waitUntil(
+    (async () => {
+      const staticPaths = await getStaticPaths();
+      const appPaths = (await getAppPaths()).map(
+        (path: string) =>
+          path
+            .split("/")
+            .map((x) => (x.startsWith(":") ? `__${x.slice(1)}` : x))
+            .join("/") || "/",
+      );
+      const allPaths = staticPaths.concat(appPaths);
+      precacheController.addToCacheList(
+        allPaths.map((path: string) => ({ url: path, revision: null })),
+      );
+      await precacheController.install(event);
+      await cacheStaticPaths(staticPaths);
+      await cacheAppPaths(appPaths);
+    })(),
   );
 });
 
-async function responseWithFallback(
-  request: Request,
-  preload: Promise<Response | undefined>,
-) {
+// @ts-expect-error this is actually an ExtendableEvent
+addEventListener("activate", (event: ExtendableEvent) => {
+  event.waitUntil(
+    (async () => {
+      await precacheController.activate(event);
+    })(),
+  );
+});
+
+setDefaultHandler(async ({ request }) => {
   try {
     return await fetch(request);
-  } catch (e) { // eslint-disable-line
-    const resFromCache = await caches.match(request);
-    if (resFromCache) {
-      return resFromCache;
-    }
-    try {
-      const preloadedRes = await preload;
-      if (preloadedRes && preloadedRes.ok) {
-        putInCache(request, preloadedRes.clone());
-        return preloadedRes;
-      }
-    } catch (e) {
-      console.error("Error on preload:", e);
-    }
+    // eslint-disable-next-line
+  } catch (e) {
     const fallbackUrl = new URL(request.url);
     fallbackUrl.pathname = "/offline";
     fallbackUrl.search = "";
@@ -70,5 +63,44 @@ async function responseWithFallback(
         headers: { "Content-Type": "text/plain" },
       });
     }
+  }
+});
+
+async function getStaticPaths() {
+  const response = await fetch("/offline/static_paths");
+  if (!response.ok) {
+    throw new Error("Failed to fetch offline paths");
+  }
+  const res = await response.json();
+  return res.paths;
+}
+
+async function getAppPaths() {
+  const response = await fetch("/offline/app_paths");
+  if (!response.ok) {
+    throw new Error("Failed to fetch app paths");
+  }
+  const res = await response.json();
+  return res.paths;
+}
+
+async function cacheStaticPaths(staticPaths: string[]) {
+  for (const path of staticPaths) {
+    registerRoute(({ url }) => url.pathname === path, new NetworkFirst());
+  }
+}
+
+async function cacheAppPaths(appPaths: string[]) {
+  for (const path of appPaths) {
+    const match = path
+      .split("/")
+      .map((x) => (x.startsWith("__") ? "[^/]+" : x))
+      .join("/");
+    const regex = new RegExp(`^${match}$`);
+    const handler = precacheController.createHandlerBoundToURL(path);
+    const navigationRoute = new NavigationRoute(handler, {
+      allowlist: [regex],
+    });
+    registerRoute(navigationRoute, new NetworkFirst());
   }
 }

@@ -33,7 +33,6 @@ const mainContext = await esbuild.context({
   entryPoints: [
     "js/app.ts",
     "js/site.ts",
-    "js/service-worker.ts",
     "css/app.css",
     "css/theme-dark.css",
     "css/theme-light.css",
@@ -45,6 +44,7 @@ const mainContext = await esbuild.context({
 });
 
 const swContext = await esbuild.context({
+  ...contextBase,
   entryPoints: [
     "js/service-worker.ts",
   ],

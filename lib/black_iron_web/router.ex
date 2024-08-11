@@ -49,7 +49,8 @@ defmodule BlackIronWeb.Router do
   scope "/", BlackIronWeb do
     pipe_through [:api, :app]
 
-    get "/offline_paths", OfflineController, :offline_paths
+    get "/offline/static_paths", OfflineController, :static_paths
+    get "/offline/app_paths", OfflineController, :app_paths
   end
 
   # Other scopes may use custom stacks.
