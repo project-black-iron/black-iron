@@ -27,23 +27,18 @@ export class BiCharacterSheet extends LitElement {
   }
 
   async #updateCampaignFromUrl() {
-    const route = document.head.querySelector("meta[name=page-route]")?.getAttribute("content");
-    if (!route) {
-      console.log("no route found");
-      return;
-    }
-    console.log("route found", route, window.location.pathname);
-    const match = new Route(route).match(window.location.pathname);
-    if (match) {
+    const route = document.head
+      .querySelector("meta[name=page-route]")
+      ?.getAttribute("content");
+    if (route) {
+      const match = new Route(route).match(window.location.pathname);
       console.log(match);
     }
   }
 
   render() {
-    return html`${
-      this.character
-        ? html`<slot name="sheet"></slot>`
-        : html`<slot name="placeholder"></slot>`
-    }`;
+    return html`${this.character
+      ? html`<slot name="sheet"></slot>`
+      : html`<slot name="placeholder"></slot>`}`;
   }
 }

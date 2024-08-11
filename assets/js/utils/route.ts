@@ -16,15 +16,10 @@ export class Route {
           .join("/") || "/") +
         "$",
     );
-    console.log("regexp", this.#regex);
   }
 
   match(path: string): RouteMatch | undefined {
-    const match = this.#regex.exec(path);
-    console.log("match", match);
-    if (match) {
-      return match.groups;
-    }
+    return this.#regex.exec(path)?.groups;
   }
 }
 
