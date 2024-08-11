@@ -6,6 +6,7 @@ import "./bi-character-sheet.css";
 import { BlackIronCampaign } from "../../campaigns/campaign";
 import { BiCampaignContext } from "../../campaigns/components/bi-campaign-context";
 import { Character } from "../character";
+import { Route } from "../../utils/route";
 
 @customElement("bi-character-sheet")
 export class BiCharacterSheet extends LitElement {
@@ -19,6 +20,24 @@ export class BiCharacterSheet extends LitElement {
   @consume({ context: BiCampaignContext.context })
   @property({ attribute: false })
   campaign?: BlackIronCampaign;
+
+  constructor() {
+    super();
+    this.#updateCampaignFromUrl();
+  }
+
+  async #updateCampaignFromUrl() {
+    const route = document.head.querySelector("meta[name=page-route]")?.getAttribute("content");
+    if (!route) {
+      console.log("no route found");
+      return;
+    }
+    console.log("route found", route, window.location.pathname);
+    const match = new Route(route).match(window.location.pathname);
+    if (match) {
+      console.log(match);
+    }
+  }
 
   render() {
     return html`${

@@ -8,6 +8,7 @@
       <%= assigns[:page_title] || "Black Iron" %>
     </.live_title>
     <meta name="description" content={assigns[:page_description] || "Black Iron"} />
+    <meta name="page-route" content={assigns[:current_route]} />
     <meta property="og:title" content={assigns[:page_title] || "Black Iron"} />
     <meta
       property="og:description"

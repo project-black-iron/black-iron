@@ -11,8 +11,17 @@ defmodule BlackIronWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_user
+    plug :put_current_route
     plug BlackIronWeb.Plugs.Locale, "en"
     plug :put_user_token
+  end
+
+  defp put_current_route(conn, _) do
+    if info = Phoenix.Router.route_info(BlackIronWeb.Router, "GET", current_path(conn), "any") do
+      assign(conn, :current_route, info.route)
+    else
+      conn
+    end
   end
 
   defp put_user_token(conn, _) do
@@ -112,12 +121,19 @@ defmodule BlackIronWeb.Router do
     pipe_through [:browser, :app, :service_worker]
 
     get "/", PlayController, :show
-    get "/campaigns", CampaignsController, :show
-    get "/worlds", WorldsController, :show
-    get "/npcs", NPCsController, :show
-    get "/lore", LoreController, :show
-    get "/tracks", TracksController, :show
-    get "/journals", JournalsController, :show
-    get "/characters", CharacterSheetController, :show
+    get "/campaigns", CampaignsController, :index
+    get "/campaigns/:campaignId", CampaignsController, :show
+    get "/worlds", WorldsController, :index
+    get "/worlds/:worldId", WorldsController, :show
+    get "/npcs", NPCsController, :index
+    get "/npcs/:npcId", NPCsController, :show
+    get "/lore", LoreController, :index
+    get "/lore/:loreId", LoreController, :show
+    get "/tracks", TracksController, :index
+    get "/tracks/:trackId", TracksController, :show
+    get "/journals", JournalsController, :index
+    get "/journals/:journalId", JournalsController, :show
+    get "/characters", CharacterSheetController, :index
+    get "/characters/:characterId", CharacterSheetController, :show
   end
 end
