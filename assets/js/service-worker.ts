@@ -1,52 +1,54 @@
 // This is the general service worker for the app. It covers both the site
-// part and the app part.
-/// <reference lib="webworker" />
+// part and the app part, by precaching things that need to be available
+// offline.
 
 import {
-  NavigationRoute,
   registerRoute,
+  setCatchHandler,
   setDefaultHandler,
 } from "workbox-routing";
-import { PrecacheController } from "workbox-precaching";
-import { NetworkFirst } from "workbox-strategies";
+import { StaleWhileRevalidate } from "workbox-strategies";
+import type { RouteHandlerCallbackOptions } from "workbox-core/types";
 
-// const CACHE_VERSION = "v1";
-
-const precacheController = new PrecacheController();
+const CACHE_NAME = "precache-v1";
 
 // @ts-expect-error this is actually an ExtendableEvent
 addEventListener("install", (event: ExtendableEvent) => {
-  event.waitUntil(
-    (async () => {
-      const staticPaths = await getStaticPaths();
-      const appPaths = (await getAppPaths()).map(
-        (path: string) =>
-          path
-            .split("/")
-            .map((x) => (x.startsWith(":") ? `__${x.slice(1)}` : x))
-            .join("/") || "/",
-      );
-      const allPaths = staticPaths.concat(appPaths);
-      precacheController.addToCacheList(
-        allPaths.map((path: string) => ({ url: path, revision: null })),
-      );
-      await precacheController.install(event);
-      await cacheStaticPaths(staticPaths);
-      await cacheAppPaths(appPaths);
-    })(),
-  );
+  event.waitUntil(precacheRoutes());
 });
-
 // @ts-expect-error this is actually an ExtendableEvent
 addEventListener("activate", (event: ExtendableEvent) => {
-  event.waitUntil(
-    (async () => {
-      await precacheController.activate(event);
-    })(),
-  );
+  event.waitUntil(precacheRoutes());
 });
 
-setDefaultHandler(async ({ request }) => {
+setDefaultHandler(offlineFallback);
+setCatchHandler(offlineFallback);
+
+async function precacheRoutes() {
+  const staticPaths = await getStaticPaths();
+  const appPaths = (await getAppPaths()).map(
+    (path: string) =>
+      path
+        .split("/")
+        .map((x) => (x.startsWith(":") ? `__${x.slice(1)}` : x))
+        .join("/") || "/",
+  );
+  const allPaths: string[] = staticPaths.concat(appPaths);
+  const pathSet = new Set(allPaths);
+  const cache = await caches.open(CACHE_NAME);
+  const keys = await cache.keys();
+  for (const key of keys) {
+    if (!pathSet.has(new URL(key.url).pathname)) {
+      await cache.delete(key);
+    }
+  }
+  await cache.addAll(allPaths);
+  await routeStaticPaths(staticPaths);
+  await routeAppPaths(appPaths);
+  routePostRequests();
+}
+
+async function offlineFallback({ request }: RouteHandlerCallbackOptions) {
   try {
     return await fetch(request);
     // eslint-disable-next-line
@@ -64,7 +66,7 @@ setDefaultHandler(async ({ request }) => {
       });
     }
   }
-});
+}
 
 async function getStaticPaths() {
   const response = await fetch("/offline/static_paths");
@@ -84,23 +86,40 @@ async function getAppPaths() {
   return res.paths;
 }
 
-async function cacheStaticPaths(staticPaths: string[]) {
+async function routeStaticPaths(staticPaths: string[]) {
   for (const path of staticPaths) {
-    registerRoute(({ url }) => url.pathname === path, new NetworkFirst());
+    registerRoute(
+      ({ url }) => url.pathname === path,
+      new StaleWhileRevalidate({
+        cacheName: CACHE_NAME,
+      }),
+    );
   }
 }
 
-async function cacheAppPaths(appPaths: string[]) {
+async function routeAppPaths(appPaths: string[]) {
+  const networkFirst = new StaleWhileRevalidate({
+    cacheName: CACHE_NAME,
+  });
   for (const path of appPaths) {
     const match = path
       .split("/")
       .map((x) => (x.startsWith("__") ? "[^/]+" : x))
       .join("/");
-    const regex = new RegExp(`^${match}$`);
-    const handler = precacheController.createHandlerBoundToURL(path);
-    const navigationRoute = new NavigationRoute(handler, {
-      allowlist: [regex],
-    });
-    registerRoute(navigationRoute, new NetworkFirst());
+    const regex = new RegExp(`^(:?https?://[^/]+)?${match}$`);
+    registerRoute(
+      ({ url }) => {
+        return regex.test(url.href);
+      },
+      async (opts) => {
+        opts.url.pathname = path;
+        opts.request = new Request(path);
+        return networkFirst.handle(opts);
+      },
+    );
   }
+}
+
+function routePostRequests() {
+  registerRoute(() => true, offlineFallback, "POST");
 }

@@ -45,7 +45,7 @@ defmodule BlackIronWeb.OfflineController do
     |> Enum.filter(&(&1[:verb] == :get))
     |> Enum.map(&Phoenix.Router.route_info(BlackIronWeb.Router, "GET", &1[:path], ""))
     |> Enum.filter(
-      &(Enum.empty?(&1[:path_params]) && Enum.member?(&1[:pipe_through], :service_worker))
+      &Enum.member?(&1[:pipe_through], :service_worker)
     )
     |> Enum.map(& &1[:route])
   end

@@ -3,6 +3,16 @@ defmodule BlackIronWeb.CharacterSheetHTML do
   """
   use BlackIronWeb, :html
 
+  def index(assigns) do
+    ~H"""
+    <h3>Characters list</h3>
+    <ul class="character-list">
+      <!-- Campaigns go here -->
+      <li><a href="/play/campaigns/1/characters/1">Character 1</a></li>
+    </ul>
+    """
+  end
+
   def show(assigns) do
     ~H"""
     <bi-character-sheet>

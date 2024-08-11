@@ -4,7 +4,11 @@ defmodule BlackIronWeb.CampaignsController do
   """
   use BlackIronWeb, :controller
 
-  def show(conn, _params) do
-    render(conn, :show)
+  def index(conn, params) do
+    render(conn, :index, campaignId: params["campaignId"])
+  end
+
+  def show(conn, params) do
+    render(conn, :show, campaignId: params["campaignId"])
   end
 end

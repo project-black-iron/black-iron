@@ -4,6 +4,10 @@ defmodule BlackIronWeb.WorldsController do
   """
   use BlackIronWeb, :controller
 
+  def index(conn, _params) do
+    render(conn, :index)
+  end
+
   def show(conn, _params) do
     render(conn, :show)
   end

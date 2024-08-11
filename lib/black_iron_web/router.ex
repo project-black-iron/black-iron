@@ -123,17 +123,20 @@ defmodule BlackIronWeb.Router do
     get "/", PlayController, :show
     get "/campaigns", CampaignsController, :index
     get "/campaigns/:campaignId", CampaignsController, :show
-    get "/worlds", WorldsController, :index
-    get "/worlds/:worldId", WorldsController, :show
-    get "/npcs", NPCsController, :index
-    get "/npcs/:npcId", NPCsController, :show
-    get "/lore", LoreController, :index
-    get "/lore/:loreId", LoreController, :show
-    get "/tracks", TracksController, :index
-    get "/tracks/:trackId", TracksController, :show
-    get "/journals", JournalsController, :index
-    get "/journals/:journalId", JournalsController, :show
-    get "/characters", CharacterSheetController, :index
-    get "/characters/:characterId", CharacterSheetController, :show
+
+    scope "/campaigns/:campaignId" do
+      get "/worlds", WorldsController, :index
+      get "/worlds/:worldId", WorldsController, :show
+      get "/npcs", NPCsController, :index
+      get "/npcs/:npcId", NPCsController, :show
+      get "/lore", LoreController, :index
+      get "/lore/:loreId", LoreController, :show
+      get "/tracks", TracksController, :index
+      get "/tracks/:trackId", TracksController, :show
+      get "/journals", JournalsController, :index
+      get "/journals/:journalId", JournalsController, :show
+      get "/characters", CharacterSheetController, :index
+      get "/characters/:characterId", CharacterSheetController, :show
+    end
   end
 end
