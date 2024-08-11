@@ -50,6 +50,11 @@ TODO(@zkat): do this in JS so we can change direction based on what kind of nav 
     transform: translateX(0%);
   }
 }
+/*
+TODO(@zkat): It would be nice to isolate the transition to `main`, but when I
+tried that, the nav became transparent (???), so that's a problem for another
+time or another person.
+*/
 ::view-transition-old(root) {
   animation: 0.2s ease-in both move-out;
 }
