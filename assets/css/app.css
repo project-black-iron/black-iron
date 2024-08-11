@@ -27,13 +27,20 @@ body {
 }
 
 /*
-Some fun view transition stuff. See https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API/Using
-
-TODO(@zkat): do this in JS so we can change direction based on what kind of nav we're doing.
+Some fun view transition stuff. See
+https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API/Using
 */
 @view-transition {
   navigation: auto;
 }
+
+/*
+TODO(@zkat): do this in JS so we can change direction based on what kind of
+nav we're doing.
+
+TODO(@zkat): revisit this after we figure out why the transition config is
+making the nav overlay transparent. (???)
+
 @keyframes move-out {
   from {
     transform: translateX(0%);
@@ -50,14 +57,33 @@ TODO(@zkat): do this in JS so we can change direction based on what kind of nav 
     transform: translateX(0%);
   }
 }
-/*
-TODO(@zkat): It would be nice to isolate the transition to `main`, but when I
-tried that, the nav became transparent (???), so that's a problem for another
-time or another person.
-*/
-::view-transition-old(root) {
+header.site-header {
+  view-transition-name: header-transition;
+}
+main {
+  view-transition-name: main-transition;
+}
+footer.site-footer {
+  view-transition-name: footer-transition;
+}
+::view-transition-group(root),
+::view-transition-old(root),
+::view-transition-new(root) {
+}
+::view-transition-group(header-transition),
+::view-transition-old(header-transition),
+::view-transition-new(header-transition) {
+}
+::view-transition-group(footer-transition),
+::view-transition-old(footer-transition),
+::view-transition-new(footer-transition) {
+}
+::view-transition-group(main-transition) {
+}
+::view-transition-old(main-transition) {
   animation: 0.2s ease-in both move-out;
 }
-::view-transition-new(root) {
+::view-transition-new(main-transition) {
   animation: 0.2s ease-in both move-in;
 }
+*/
