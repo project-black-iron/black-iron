@@ -1,7 +1,7 @@
 bi-character-sheet {
   /* Prevent FOUC by hiding sheet slot */
   &:not(:defined) {
-    [slot="sheet"] {
+    & [slot="sheet"] {
       display: none;
     }
   }
@@ -10,6 +10,16 @@ bi-character-sheet {
     & > header {
       font-size: 1.5rem;
       font-weight: var(--font-semibold);
+    }
+
+    &[slot="placeholder"] {
+      & > p {
+        font-style: italic;
+      }
+    }
+
+    &[slot="sheet"] {
+
     }
   }
 }
