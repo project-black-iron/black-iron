@@ -22,7 +22,7 @@ defmodule BlackIronWeb.Endpoint do
   plug Plug.Static,
     at: "/",
     from: :black_iron,
-    gzip: false,
+    gzip: true,
     only: BlackIronWeb.static_paths()
 
   # Code reloading can be explicitly enabled under the

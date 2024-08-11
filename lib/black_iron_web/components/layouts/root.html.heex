@@ -2,11 +2,12 @@
 <html lang="en" class="[scrollbar-gutter:stable]">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content={get_csrf_token()} />
     <.live_title suffix=" · Black Iron">
       <%= assigns[:page_title] || "Black Iron" %>
     </.live_title>
+    <meta name="description" content={assigns[:page_description] || "Black Iron"} />
     <meta property="og:title" content={assigns[:page_title] || "Black Iron"} />
     <meta
       property="og:description"
