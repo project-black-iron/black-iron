@@ -51,9 +51,23 @@ const swContext = await esbuild.context({
   outfile: "../priv/static/service-worker.js",
 });
 
+const litSSRContext = await esbuild.context({
+  ...contextBase,
+  external: [
+    "node:process",
+    "node:readline",
+  ],
+  entryPoints: [
+    "js/lit-ssr.ts",
+  ],
+  outfile: "../priv/lit-ssr.js",
+  platform: "node",
+  format: "cjs",
+});
+
 if (!watch) {
-  await Promise.all([mainContext.rebuild(), swContext.rebuild()]);
+  await Promise.all([mainContext.rebuild(), swContext.rebuild(), litSSRContext.rebuild()]);
   process.exit(0);
 } else {
-  await Promise.all([mainContext.watch(), swContext.watch()]);
+  await Promise.all([mainContext.watch(), swContext.watch(), litSSRContext.watch()]);
 }

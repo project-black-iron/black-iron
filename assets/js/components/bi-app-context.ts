@@ -1,20 +1,16 @@
 import { createContext } from "@lit/context";
-import { provide } from "@lit/context";
-import { html, LitElement } from "lit";
+import { html, isServer, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
 import { BlackIronApp } from "../black-iron-app";
-
-export const blackIronAppContext = createContext<BlackIronApp | undefined>(
-  "blackIronApp",
-);
+import { ssrProvide } from "../utils/ssr-context";
 
 /**
  * Sets up a `BlackIronApp` in the context to be consumed by any descendants.
  *
  * From consumers, you can then do:
  * ```typescript
- * @consume({context: blackIronAppContext, subscribe: true})
+ * @ssrConsume({context: blackIronAppContext, subscribe: true})
  * blackIronApp?: BlackIronApp;
  * ```
  *
@@ -24,10 +20,12 @@ export const blackIronAppContext = createContext<BlackIronApp | undefined>(
  */
 @customElement("bi-app-context")
 export class BiAppContext extends LitElement {
+  static context = createContext<BlackIronApp | undefined>("blackIronApp");
+
   @property()
   userToken?: string;
 
-  @provide({ context: blackIronAppContext })
+  @ssrProvide({ context: BiAppContext.context })
   @property({ attribute: false })
   blackIronApp?: BlackIronApp;
 
@@ -46,7 +44,7 @@ export class BiAppContext extends LitElement {
 
   constructor() {
     super();
-    if (this.userToken) {
+    if (this.userToken && !isServer) {
       this.blackIronApp = new BlackIronApp(this.userToken);
     }
   }

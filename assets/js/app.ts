@@ -6,6 +6,7 @@ import "phoenix_html";
 // import topbar from "../vendor/topbar"
 
 // Components
+import "@lit-labs/ssr-client/lit-element-hydrate-support.js";
 import "./components/index";
 
 // Launch service worker

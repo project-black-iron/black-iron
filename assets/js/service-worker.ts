@@ -2,13 +2,13 @@
 // part and the app part, by precaching things that need to be available
 // offline.
 
+import type { RouteHandlerCallbackOptions } from "workbox-core/types";
 import {
   registerRoute,
   setCatchHandler,
   setDefaultHandler,
 } from "workbox-routing";
-import { StaleWhileRevalidate } from "workbox-strategies";
-import type { RouteHandlerCallbackOptions } from "workbox-core/types";
+import { NetworkOnly, StaleWhileRevalidate } from "workbox-strategies";
 
 const CACHE_NAME = "precache-v1";
 
@@ -98,9 +98,10 @@ async function routeStaticPaths(staticPaths: string[]) {
 }
 
 async function routeAppPaths(appPaths: string[]) {
-  const networkFirst = new StaleWhileRevalidate({
+  const staleWhileRevalidate = new StaleWhileRevalidate({
     cacheName: CACHE_NAME,
   });
+  const networkOnly = new NetworkOnly();
   for (const path of appPaths) {
     const match = path
       .split("/")
@@ -112,9 +113,37 @@ async function routeAppPaths(appPaths: string[]) {
         return regex.test(url.href);
       },
       async (opts) => {
-        opts.url.pathname = path;
-        opts.request = new Request(path);
-        return networkFirst.handle(opts);
+        // When requesting an app path, we ideally get a server-rendered, full
+        // response. If that doesn't work, we fall back to a shell page and
+        // try to do client-side rendering with offline cached data.
+        //
+        // In either case, we want to make sure that the shell page gets
+        // updated reasonably often. It doesn't always have to be the latest,
+        // but we try and keep it fresh by always requesting (and caching) the
+        // shell, even if the server-rendered request succeeded.
+        const shellUrl = new URL(opts.url.href);
+        shellUrl.pathname = path;
+        const shellReq = new Request(path);
+        const shellResponsePromise = staleWhileRevalidate.handle({
+          ...opts,
+          request: shellReq,
+          url: shellUrl,
+        })
+
+        // Let's try to get the full server-rendered response first.
+        try {
+          const res = await networkOnly.handle(opts);
+          if (res.ok) {
+            return res;
+          }
+        } catch (e) { // eslint-disable-line
+          // Fall through...
+        }
+
+        // If the network request fails, we fall back to the cached response,
+        // under the "default" route which returns the page shell, without
+        // param-specific data.
+        return shellResponsePromise;
       },
     );
   }

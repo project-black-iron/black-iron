@@ -14,6 +14,7 @@ defmodule BlackIronWeb.Router do
     plug :put_current_route
     plug BlackIronWeb.Plugs.Locale, "en"
     plug :put_user_token
+    plug :lit_ssr_content
   end
 
   defp put_current_route(conn, _) do
@@ -22,6 +23,13 @@ defmodule BlackIronWeb.Router do
     else
       conn
     end
+  end
+
+  defp lit_ssr_content(conn, _) do
+    register_before_send(conn, fn conn ->
+      {:ok, rendered} = BlackIron.LitSSRWorker.prerender_html(conn.resp_body |> to_string())
+      resp(conn, conn.status, rendered)
+    end)
   end
 
   defp put_user_token(conn, _) do

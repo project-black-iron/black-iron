@@ -18,8 +18,6 @@ bi-character-sheet {
       }
     }
 
-    &[slot="sheet"] {
-
-    }
+    &[slot="sheet"] {}
   }
 }

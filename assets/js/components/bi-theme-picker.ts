@@ -1,4 +1,4 @@
-import { css, html, LitElement } from "lit";
+import { css, html, isServer, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
 export enum Theme {
@@ -24,13 +24,17 @@ export class BiThemePicker extends LitElement {
   theme?: Theme = this.storageTheme();
 
   systemTheme() {
-    return matchMedia("(prefers-color-scheme: dark)").matches
+    return isServer
+      ? Theme.Light
+      : matchMedia("(prefers-color-scheme: dark)").matches
       ? Theme.Dark
       : Theme.Light;
   }
 
   storageTheme() {
-    return localStorage.getItem(THEME_STORAGE_KEY) as Theme;
+    return isServer
+      ? undefined
+      : (localStorage.getItem(THEME_STORAGE_KEY) as Theme);
   }
 
   willUpdate(changedProps: Map<string, unknown>) {
@@ -50,7 +54,7 @@ export class BiThemePicker extends LitElement {
   render() {
     return html`<label
         ><input
-          @click=${() => this.theme = Theme.Light}
+          @click=${() => (this.theme = Theme.Light)}
           name="theme"
           type="radio"
           value=${Theme.Light}
@@ -61,7 +65,7 @@ export class BiThemePicker extends LitElement {
       </label>
       <label>
         <input
-          @click=${() => this.theme = Theme.Dark}
+          @click=${() => (this.theme = Theme.Dark)}
           name="theme"
           type="radio"
           value=${Theme.Dark}
@@ -72,7 +76,7 @@ export class BiThemePicker extends LitElement {
       </label>
       <label>
         <input
-          @click=${() => this.theme = undefined}
+          @click=${() => (this.theme = undefined)}
           name="theme"
           type="radio"
           value=${this.systemTheme()}

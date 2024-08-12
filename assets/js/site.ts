@@ -3,6 +3,7 @@
 // server-side.
 
 // Components: we really don't need most of them.
+import "@lit-labs/ssr-client/lit-element-hydrate-support.js";
 import "./components/bi-theme-picker";
 
 // Launch service worker
