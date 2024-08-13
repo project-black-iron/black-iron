@@ -10,9 +10,13 @@ defmodule BlackIron.LitSSRWorker do
   @timeout 5000
 
   def prerender_html(html) do
-    :poolboy.transaction(:lit_ssr_worker, fn pid ->
-      GenServer.call(pid, {:render, html})
-    end, @timeout)
+    :poolboy.transaction(
+      :lit_ssr_worker,
+      fn pid ->
+        GenServer.call(pid, {:render, html})
+      end,
+      @timeout
+    )
   end
 
   def start_link(args \\ [], opts \\ []) do
@@ -48,7 +52,7 @@ defmodule BlackIron.LitSSRWorker do
           GenServer.reply(decode_pid(pid_str), {:ok, Jason.decode!(result)})
 
         x ->
-          Logger.error("oops, got #{inspect x}")
+          Logger.error("oops, got #{inspect(x)}")
       end
     end)
 
@@ -58,11 +62,11 @@ defmodule BlackIron.LitSSRWorker do
   def handle_info({port, {:exit_status, status}}, state) do
     Logger.error("Lit SSR process #{self()} exited with status #{status}")
 
-    {:stop, (if status == 0, do: :normal, else: :error), %{state | port: port}}
+    {:stop, if(status == 0, do: :normal, else: :error), %{state | port: port}}
   end
 
   def handle_info({:DOWN, _ref, :port, port, :normal}, state) do
-    Logger.info "Handled :DOWN message from port: #{inspect port}"
+    Logger.info("Handled :DOWN message from port: #{inspect(port)}")
 
     {:stop, :port_down, %{state | port: port}}
   end

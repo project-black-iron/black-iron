@@ -13,6 +13,7 @@ defmodule BlackIronWeb.TracksHTML do
     </ul>
     """
   end
+
   def show(assigns) do
     ~H"""
     <h3>Here's the track</h3>

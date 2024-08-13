@@ -5,8 +5,8 @@ export class Route {
 
   constructor(route: string) {
     this.#regex = new RegExp(
-      "^" +
-        (route
+      "^"
+        + (route
           .split("/")
           .map((part) => {
             if (part.startsWith(":")) {
@@ -15,8 +15,8 @@ export class Route {
               return part;
             }
           })
-          .join("/") || "/") +
-        "$",
+          .join("/") || "/")
+        + "$",
     );
   }
 

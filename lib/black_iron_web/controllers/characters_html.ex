@@ -34,20 +34,33 @@ defmodule BlackIronWeb.CharactersHTML do
     <section class="info">
       <header>
         <bi-character-portrait href={assigns[:character] && assigns[:character][:portrait]} />
-        <bi-character-name name={assigns[:character] && assigns[:character][:name]}/>
+        <bi-character-name name={assigns[:character] && assigns[:character][:name]} />
       </header>
-      <bi-character-initiative initiative={assigns[:character] && assigns[:character][:initiative]}/>
+      <bi-character-initiative initiative={assigns[:character] && assigns[:character][:initiative]} />
       <dl>
-        <dt><bi-character-alias-label /></dt>
-        <dd><bi-character-alias alias={assigns[:character] && assigns[:character][:alias]}/></dd>
+        <dt>
+          <bi-character-alias-label label={assigns[:campaign] && assigns[:campaign][:alias_label]} />
+        </dt>
+        <dd><bi-character-alias alias={assigns[:character] && assigns[:character][:alias]} /></dd>
         <dt><%= gettext("Pronouns") %></dt>
-        <dd><bi-character-pronouns pronouns={assigns[:character] && assigns[:character][:pronouns]}/></dd>
+        <dd>
+          <bi-character-pronouns pronouns={assigns[:character] && assigns[:character][:pronouns]} />
+        </dd>
         <dt><%= gettext("Description") %></dt>
-        <dd><bi-character-description description={assigns[:character] && assigns[:character][:description]}/></dd>
+        <dd>
+          <bi-character-description description={
+            assigns[:character] && assigns[:character][:description]
+          } />
+        </dd>
         <dt><%= gettext("Player") %></dt>
-        <dd><bi-character-player player={assigns[:character] && assigns[:character][:player]}/></dd>
+        <dd><bi-character-player player={assigns[:character] && assigns[:character][:player]} /></dd>
         <dt><%= gettext("Experience") %></dt>
-        <dd><bi-character-xp added={assigns[:character] && assigns[:character][:xp_added]} spent={assigns[:character] && assigns[:character][:xp_spent]} /></dd>
+        <dd>
+          <bi-character-xp
+            added={assigns[:character] && assigns[:character][:xp_added]}
+            spent={assigns[:character] && assigns[:character][:xp_spent]}
+          />
+        </dd>
       </dl>
     </section>
     """

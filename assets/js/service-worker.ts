@@ -3,11 +3,7 @@
 // offline.
 
 import type { RouteHandlerCallbackOptions } from "workbox-core/types";
-import {
-  registerRoute,
-  setCatchHandler,
-  setDefaultHandler,
-} from "workbox-routing";
+import { registerRoute, setCatchHandler, setDefaultHandler } from "workbox-routing";
 import { NetworkOnly, StaleWhileRevalidate } from "workbox-strategies";
 
 const CACHE_NAME = "precache-v1";
@@ -57,13 +53,11 @@ async function offlineFallback({ request }: RouteHandlerCallbackOptions) {
     fallbackUrl.pathname = "/offline";
     fallbackUrl.search = "";
     const fallbackResponse = await caches.match(fallbackUrl);
-    const body =
-      fallbackResponse?.body || "Unable to fall back to offline mode.";
+    const body = fallbackResponse?.body || "Unable to fall back to offline mode.";
     return new Response(body, {
       status: 408,
       headers: {
-        "Content-Type":
-          fallbackResponse?.headers.get("Content-Type") || "text/plain",
+        "Content-Type": fallbackResponse?.headers.get("Content-Type") || "text/plain",
       },
     });
   }
