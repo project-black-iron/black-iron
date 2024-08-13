@@ -143,8 +143,8 @@ defmodule BlackIronWeb.Router do
       get "/tracks/:trackId", TracksController, :show
       get "/journals", JournalsController, :index
       get "/journals/:journalId", JournalsController, :show
-      get "/characters", CharacterSheetController, :index
-      get "/characters/:characterId", CharacterSheetController, :show
+      get "/characters", CharactersController, :index
+      get "/characters/:characterId", CharactersController, :show
     end
   end
 end
