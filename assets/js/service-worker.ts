@@ -57,14 +57,15 @@ async function offlineFallback({ request }: RouteHandlerCallbackOptions) {
     fallbackUrl.pathname = "/offline";
     fallbackUrl.search = "";
     const fallbackResponse = await caches.match(fallbackUrl);
-    if (fallbackResponse) {
-      return fallbackResponse;
-    } else {
-      return new Response("Unable to fall back to offline mode.", {
-        status: 408,
-        headers: { "Content-Type": "text/plain" },
-      });
-    }
+    const body =
+      fallbackResponse?.body || "Unable to fall back to offline mode.";
+    return new Response(body, {
+      status: 408,
+      headers: {
+        "Content-Type":
+          fallbackResponse?.headers.get("Content-Type") || "text/plain",
+      },
+    });
   }
 }
 
@@ -128,7 +129,7 @@ async function routeAppPaths(appPaths: string[]) {
           ...opts,
           request: shellReq,
           url: shellUrl,
-        })
+        });
 
         // Let's try to get the full server-rendered response first.
         try {
@@ -136,7 +137,8 @@ async function routeAppPaths(appPaths: string[]) {
           if (res.ok) {
             return res;
           }
-        } catch (e) { // eslint-disable-line
+          // eslint-disable-next-line
+        } catch (e) {
           // Fall through...
         }
 
