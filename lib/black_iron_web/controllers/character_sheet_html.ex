@@ -15,13 +15,8 @@ defmodule BlackIronWeb.CharacterSheetHTML do
 
   def show(assigns) do
     ~H"""
-    <bi-character-sheet>
-      <article slot="placeholder">
-        <header><%= gettext("Character Sheet") %></header>
-        <p><%= gettext("Select a character to view their sheet.") %></p>
-        <bi-character-picker />
-      </article>
-      <article slot="sheet">
+    <bi-character-context>
+      <article>
         <header><%= gettext("Character Sheet") %></header>
         <.character_info />
         <.character_stats />
@@ -30,7 +25,7 @@ defmodule BlackIronWeb.CharacterSheetHTML do
         <.character_impacts />
         <.character_assets />
       </article>
-    </bi-character-sheet>
+    </bi-character-context>
     """
   end
 

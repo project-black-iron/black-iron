@@ -2,19 +2,19 @@ import { createContext } from "@lit/context";
 import { html, isServer, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
-import "./bi-character-sheet.css";
+import "./bi-character-context.css";
 import { BlackIronCampaign } from "../../campaigns/campaign";
 import { BiCampaignContext } from "../../campaigns/components/bi-campaign-context";
 import { Route } from "../../utils/route";
 import { ssrConsume, ssrProvide } from "../../utils/ssr-context";
 import { Character } from "../character";
 
-@customElement("bi-character-sheet")
-export class BiCharacterSheet extends LitElement {
+@customElement("bi-character-context")
+export class BiCharacterContext extends LitElement {
   static context = createContext<Character | undefined>("character");
 
   // TODO(@zkat): maybe allow character ID to be passed in?
-  @ssrProvide({ context: BiCharacterSheet.context })
+  @ssrProvide({ context: BiCharacterContext.context })
   @property({ attribute: false })
   character?: Character;
 
@@ -30,20 +30,11 @@ export class BiCharacterSheet extends LitElement {
   }
 
   async #updateCampaignFromUrl() {
-    const route = document.head
-      .querySelector("meta[name=page-route]")
-      ?.getAttribute("content");
-    if (route) {
-      const match = new Route(route).match(window.location.pathname);
-      console.log(match);
-    }
+    console.log("matched route:", Route.matchLocation());
+    // TODO: fill in this.character based on route.
   }
 
   render() {
-    return html`${
-      this.character
-        ? html`<slot name="sheet"></slot>`
-        : html`<slot name="placeholder"></slot>`
-    }`;
+    return html`<slot></slot>`;
   }
 }

@@ -1,1 +1,1 @@
-import "./bi-character-sheet";
+import "./bi-character-context";
