@@ -1,6 +1,8 @@
 <.header class="text-center">
   <%= gettext("Account Settings") %>
-  <:subtitle><%= gettext("Manage your account email address and password settings") %></:subtitle>
+  <:subtitle>
+    <%= gettext("Manage your account email address, username, and password settings") %>
+  </:subtitle>
 </.header>
 
 <div>
@@ -31,6 +33,39 @@
   <div>
     <.simple_form
       :let={f}
+      for={@username_changeset}
+      action={~p"/users/settings"}
+      id="update_username"
+    >
+      <.error :if={@username_changeset.action}>
+        <%= gettext("Oops, something went wrong! Please check the errors below.") %>
+      </.error>
+
+      <.input
+        field={f[:username]}
+        pattern="^[a-zA-Z][-_a-zA-Z0-9]{3,15}$"
+        title="4-16 characters. Can only contain letters, numbers, -, or _, and must start with a letter"
+        label="Username"
+        required
+      />
+      <.input
+        field={f[:current_password]}
+        name="current_password"
+        type="password"
+        label={gettext("Current Password")}
+        required
+        id="current_password_for_email"
+      />
+      <:actions>
+        <.button phx-disable-with={gettext("Changing...")}>
+          <%= gettext("Change Username") %>
+        </.button>
+      </:actions>
+    </.simple_form>
+  </div>
+  <div>
+    <.simple_form
+      :let={f}
       for={@password_changeset}
       action={~p"/users/settings"}
       id="update_password"
@@ -41,7 +76,14 @@
 
       <input type="hidden" name="action" value="update_password" />
 
-      <.input field={f[:password]} type="password" label={gettext("New password")} required />
+      <.input
+        field={f[:password]}
+        type="password"
+        pattern=".{12,}"
+        title="At least 12 characters"
+        label={gettext("New password")}
+        required
+      />
       <.input
         field={f[:password_confirmation]}
         type="password"

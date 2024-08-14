@@ -174,6 +174,26 @@ defmodule BlackIron.Accounts do
     UserNotifier.deliver_update_email_instructions(user, update_email_url_fun.(encoded_token))
   end
 
+  def change_username(user, attrs \\ %{}) do
+    User.username_changeset(user, attrs)
+  end
+
+  def update_username(user, password, attrs) do
+    changeset =
+      user
+      |> User.password_changeset(attrs)
+      |> User.validate_current_password(password)
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.update(:user, changeset)
+    |> Ecto.Multi.delete_all(:tokens, UserToken.by_user_and_contexts_query(user, :all))
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{user: user}} -> {:ok, user}
+      {:error, :user, changeset, _} -> {:error, changeset}
+    end
+  end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for changing the user password.
 

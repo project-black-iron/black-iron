@@ -12,14 +12,7 @@ defmodule BlackIron.Campaigns do
   def list_campaigns_for_user(%User{id: user_id}) do
     from(c in Campaign,
       join: m in assoc(c, :memberships),
-      where: m.user_id == ^user_id,
-      select: %{
-        id: c.id,
-        name: c.name,
-        description: c.description,
-        slug: c.slug,
-        roles: m.roles
-      }
+      where: m.user_id == ^user_id
     )
     |> Repo.all()
   end

@@ -7,16 +7,12 @@ defmodule BlackIronWeb.CampaignsController do
   alias BlackIron.Campaigns
 
   def index(conn, _params) do
-    campaigns = case conn.assigns[:current_user] do
-      nil -> []
-      user -> Campaigns.list_campaigns_for_user(user) |> Enum.map(&%{
-        id: &1.id,
-        name: &1.name,
-        description: &1.description,
-        slug: &1.slug,
-        roles: &1.roles
-      })
-    end
+    campaigns =
+      case conn.assigns[:current_user] do
+        nil -> []
+        user -> Campaigns.list_campaigns_for_user(user)
+      end
+
     render(conn, :index, campaigns: campaigns)
   end
 

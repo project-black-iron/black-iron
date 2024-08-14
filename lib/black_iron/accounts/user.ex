@@ -4,6 +4,7 @@ defmodule BlackIron.Accounts.User do
 
   schema "users" do
     field :email, :string
+    field :username, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :current_password, :string, virtual: true, redact: true
@@ -39,8 +40,9 @@ defmodule BlackIron.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :username, :password])
     |> validate_email(opts)
+    |> validate_username(opts)
     |> validate_password(opts)
   end
 
@@ -50,6 +52,17 @@ defmodule BlackIron.Accounts.User do
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     |> validate_length(:email, max: 160)
     |> maybe_validate_unique_email(opts)
+  end
+
+  defp validate_username(changeset, opts) do
+    changeset
+    |> validate_required([:username])
+    |> validate_length(:username, min: 4, max: 16)
+    |> validate_format(:username, ~r/^[a-zA-Z][-_a-zA-Z0-9]{3,15}$/,
+      message:
+        "must start with a letter and only contain letters, digits, hyphens, and underscores"
+    )
+    |> maybe_validate_unique_username(opts)
   end
 
   defp validate_password(changeset, opts) do
@@ -88,6 +101,16 @@ defmodule BlackIron.Accounts.User do
     end
   end
 
+  defp maybe_validate_unique_username(changeset, opts) do
+    if Keyword.get(opts, :validate_username, true) do
+      changeset
+      |> unsafe_validate_unique(:username, BlackIron.Repo)
+      |> unique_constraint(:username)
+    else
+      changeset
+    end
+  end
+
   @doc """
   A user changeset for changing the email.
 
@@ -101,6 +124,12 @@ defmodule BlackIron.Accounts.User do
       %{changes: %{email: _}} = changeset -> changeset
       %{} = changeset -> add_error(changeset, :email, "did not change")
     end
+  end
+
+  def username_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:username])
+    |> validate_username(opts)
   end
 
   @doc """
