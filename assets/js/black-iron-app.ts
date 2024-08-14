@@ -1,6 +1,6 @@
 import { Channel, Socket } from "phoenix";
 
-import { BlackIronCampaign } from "./campaigns/campaign";
+import { Campaign } from "./campaigns/campaign";
 import { BlackIronDB } from "./db";
 
 export class BlackIronApp {
@@ -9,7 +9,7 @@ export class BlackIronApp {
   // >> socket.disableLatencySim()
   socket?: Socket;
   db: BlackIronDB = new BlackIronDB();
-  _activeCampaign?: BlackIronCampaign;
+  _activeCampaign?: Campaign;
   currentChannel?: Channel;
 
   constructor(private userToken: string) {}
@@ -29,7 +29,7 @@ export class BlackIronApp {
   get activeCampaign() {
     return this._activeCampaign;
   }
-  set activeCampaign(campaign: BlackIronCampaign | undefined) {
+  set activeCampaign(campaign: Campaign | undefined) {
     this._activeCampaign = campaign;
     if (campaign) {
       this.connectCampaignSync(campaign.id);
@@ -44,7 +44,6 @@ export class BlackIronApp {
       this.currentChannel.leave();
     }
     this.currentChannel = this.socket!.channel("campaign_sync:" + id, {});
-    this.currentChannel
-      .join();
+    this.currentChannel.join();
   }
 }

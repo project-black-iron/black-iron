@@ -9,6 +9,8 @@ defmodule BlackIron.Accounts.User do
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
 
+    many_to_many :campaigns, BlackIron.Campaigns.Campaign, join_through: "campaign_memberships"
+
     timestamps(type: :utc_datetime)
   end
 

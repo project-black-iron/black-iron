@@ -6,19 +6,22 @@ defmodule BlackIron.Campaigns do
   import Ecto.Query, warn: false
   alias BlackIron.Repo
 
+  alias BlackIron.Accounts.User
   alias BlackIron.Campaigns.Campaign
 
-  @doc """
-  Returns the list of campaigns.
-
-  ## Examples
-
-      iex> list_campaigns()
-      [%Campaign{}, ...]
-
-  """
-  def list_campaigns do
-    Repo.all(Campaign)
+  def list_campaigns_for_user(%User{id: user_id}) do
+    from(c in Campaign,
+      join: m in assoc(c, :memberships),
+      where: m.user_id == ^user_id,
+      select: %{
+        id: c.id,
+        name: c.name,
+        description: c.description,
+        slug: c.slug,
+        roles: m.roles
+      }
+    )
+    |> Repo.all()
   end
 
   @doc """

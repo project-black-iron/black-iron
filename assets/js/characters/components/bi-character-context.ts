@@ -3,7 +3,7 @@ import { html, isServer, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
 import "./bi-character-context.css";
-import { BlackIronCampaign } from "../../campaigns/campaign";
+import { Campaign } from "../../campaigns/campaign";
 import { BiCampaignContext } from "../../campaigns/components/bi-campaign-context";
 import { Route } from "../../utils/route";
 import { ssrConsume, ssrProvide } from "../../utils/ssr-context";
@@ -20,7 +20,7 @@ export class BiCharacterContext extends LitElement {
 
   @ssrConsume({ context: BiCampaignContext.context })
   @property({ attribute: false })
-  campaign?: BlackIronCampaign;
+  campaign?: Campaign;
 
   constructor() {
     super();

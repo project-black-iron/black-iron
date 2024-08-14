@@ -7,11 +7,7 @@ defmodule BlackIronWeb.CampaignsHTML do
   def index(assigns) do
     ~H"""
     <h3>Campaigns list</h3>
-    <ul class="campaigns-list">
-      <!-- Campaigns go here -->
-      <li><a href="/play/campaigns/1">Campaign 1</a></li>
-    </ul>
-    <p>new content</p>
+    <bi-campaign-list campaigns={Jason.encode!(assigns[:campaigns])}></bi-campaign-list>
     """
   end
 

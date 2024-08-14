@@ -35,12 +35,17 @@ defmodule BlackIron.CampaignsTest do
 
     test "update_campaign/2 with valid data updates the campaign" do
       campaign = campaign_fixture()
-      update_attrs = %{name: "some updated name", slug: "some updated slug", description: "some updated description"}
+
+      update_attrs = %{
+        name: "some updated name",
+        slug: "some updated slug",
+        description: "some updated description"
+      }
 
       assert {:ok, %Campaign{} = campaign} = Campaigns.update_campaign(campaign, update_attrs)
       assert campaign.name == "some updated name"
       assert campaign.slug == "some updated slug"
-      asset campaign.description == "some updated description"
+      asset(campaign.description == "some updated description")
     end
 
     test "update_campaign/2 with invalid data returns error changeset" do

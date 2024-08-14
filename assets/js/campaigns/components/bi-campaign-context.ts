@@ -6,11 +6,11 @@ import { Channel } from "phoenix";
 import { BlackIronApp } from "../../black-iron-app";
 import { BiAppContext } from "../../components/bi-app-context";
 import { ssrConsume, ssrProvide } from "../../utils/ssr-context";
-import { BlackIronCampaign } from "../campaign";
+import { Campaign } from "../campaign";
 
 @customElement("bi-campaign-context")
 export class BiCampaignContext extends LitElement {
-  static context = createContext<BlackIronCampaign | undefined>("campaign");
+  static context = createContext<Campaign | undefined>("campaign");
   @ssrConsume({ context: BiAppContext.context })
   @property({ attribute: false })
   app?: BlackIronApp;
@@ -20,7 +20,7 @@ export class BiCampaignContext extends LitElement {
 
   @ssrProvide({ context: BiCampaignContext.context })
   @property({ attribute: false })
-  campaign?: BlackIronCampaign;
+  campaign?: Campaign;
 
   channel?: Channel;
 

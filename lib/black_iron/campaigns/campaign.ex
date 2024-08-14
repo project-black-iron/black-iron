@@ -7,6 +7,9 @@ defmodule BlackIron.Campaigns.Campaign do
     field :description, :string
     field :slug, :string
 
+    many_to_many :users, BlackIron.Accounts.User, join_through: "campaign_memberships"
+    has_many :memberships, BlackIron.Campaigns.Membership
+
     timestamps(type: :utc_datetime)
   end
 

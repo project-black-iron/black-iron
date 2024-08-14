@@ -1,7 +1,7 @@
 import { DBSchema, IDBPDatabase, openDB } from "idb";
-import { BlackIronCampaign, BlackIronCampaignSchema } from "./campaigns/campaign";
+import { Campaign, CampaignSchema } from "./campaigns/campaign";
 
-type BlackIronDBSchema = DBSchema & BlackIronCampaignSchema;
+type BlackIronDBSchema = DBSchema & CampaignSchema;
 
 const DB_NAME = "black-iron";
 const DB_VERSION = 1;
@@ -34,7 +34,7 @@ export class BlackIronDB {
   async getCampaign(id: string) {
     const data = await (await this.idb).get("campaigns", id);
     if (data) {
-      return new BlackIronCampaign(id, data);
+      return new Campaign(data);
     }
   }
 
@@ -44,7 +44,7 @@ export class BlackIronDB {
       return [];
     }
     return (await tx.store.getAll("campaigns")).map(
-      (data) => new BlackIronCampaign(data.id, data),
+      (data) => new Campaign(data),
     );
   }
 }
