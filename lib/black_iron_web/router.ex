@@ -18,10 +18,9 @@ defmodule BlackIronWeb.Router do
   end
 
   defp put_current_route(conn, _) do
-    if info = Phoenix.Router.route_info(BlackIronWeb.Router, "GET", current_path(conn), "any") do
-      assign(conn, :current_route, info.route)
-    else
-      conn
+    case Phoenix.Router.route_info(BlackIronWeb.Router, "GET", current_path(conn), "any") do
+      :error -> conn
+      info -> assign(conn, :current_route, info.route)
     end
   end
 
