@@ -1,7 +1,6 @@
 import { createContext } from "@lit/context";
 import { html, LitElement, PropertyValues } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { Channel } from "phoenix";
 
 import { BlackIronApp } from "../../black-iron-app";
 import { BiAppContext } from "../../components/bi-app-context";
@@ -22,7 +21,6 @@ export class BiCampaignContext extends LitElement {
   @property({ attribute: false })
   campaign?: Campaign;
 
-  channel?: Channel;
 
   async willUpdate(changed: PropertyValues<this>) {
     if (changed.has("_campaignId") || changed.has("app")) {
@@ -30,23 +28,7 @@ export class BiCampaignContext extends LitElement {
         console.log("loading campaign", this._campaignId);
         this.campaign = this._campaignId == null
           ? undefined
-          : await this.app?.db.getCampaign(this._campaignId);
-      }
-      if (this.campaign) {
-        this.channel = this.app?.socket?.channel(
-          "campaign_sync:" + this._campaignId,
-          {},
-        );
-        this.channel
-          ?.join()
-          .receive("ok", (resp) => {
-            console.log("Joined successfully", resp);
-          })
-          .receive("error", (resp) => {
-            console.log("Unable to join", resp);
-          });
-      } else {
-        this.channel?.leave();
+          : await this.app?.campaignManager.getCampaign(this._campaignId);
       }
     }
     if (

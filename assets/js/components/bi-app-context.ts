@@ -22,29 +22,23 @@ import { ssrProvide } from "../utils/ssr-context";
 export class BiAppContext extends LitElement {
   static context = createContext<BlackIronApp | undefined>("blackIronApp");
 
-  @property()
+  @property({ attribute: "user-token" })
   userToken?: string;
 
   @ssrProvide({ context: BiAppContext.context })
   @property({ attribute: false })
   blackIronApp?: BlackIronApp;
 
-  @property()
-  campaignId?: string;
-
   update(changedProps: Map<string, unknown>) {
     super.update(changedProps);
-    if (changedProps.has("userToken") && typeof this.userToken === "string") {
+    if (changedProps.has("userToken")) {
       this.blackIronApp = new BlackIronApp(this.userToken);
-    }
-    if (changedProps.has("campaignId") && this.blackIronApp) {
-      this.blackIronApp.changeCampaign(this.campaignId);
     }
   }
 
   constructor() {
     super();
-    if (this.userToken && !isServer) {
+    if (!isServer) {
       this.blackIronApp = new BlackIronApp(this.userToken);
     }
   }

@@ -1,49 +1,42 @@
-import { Channel, Socket } from "phoenix";
+import { Socket } from "phoenix";
 
-import { Campaign } from "./campaigns/campaign";
 import { BlackIronDB } from "./db";
+import { CampaignManager } from "./campaigns/campaign-manager";
 
 export class BlackIronApp {
   // >> socket.enableDebug()
   // >> socket.enableLatencySim(1000)  // enabled for duration of browser session
   // >> socket.disableLatencySim()
-  socket?: Socket;
   db: BlackIronDB = new BlackIronDB();
-  _activeCampaign?: Campaign;
-  currentChannel?: Channel;
+  campaignManager = new CampaignManager(this);
+  socket?: Socket;
+  #userToken?: string;
+  username?: string;
 
-  constructor(private userToken: string) {}
+  constructor(userToken?: string) {
+    this.userToken = userToken;
+  }
+
+  disconnect() {
+    this.socket?.disconnect();
+    this.socket = undefined;
+  }
 
   connect() {
     this.socket = new Socket("/socket", {
       longPollFallbackMs: 2500,
-      params: { token: this.userToken },
+      params: { token: this.#userToken },
     });
     this.socket.connect();
   }
 
-  async changeCampaign(id?: string) {
-    this.activeCampaign = id ? await this.db.getCampaign(id) : undefined;
-  }
-
-  get activeCampaign() {
-    return this._activeCampaign;
-  }
-  set activeCampaign(campaign: Campaign | undefined) {
-    this._activeCampaign = campaign;
-    if (campaign) {
-      this.connectCampaignSync(campaign.id);
-    }
-  }
-
-  connectCampaignSync(id: string) {
-    if (!this.socket) {
+  set userToken(userToken: string | undefined) {
+    this.#userToken = userToken;
+    this.disconnect();
+    if (userToken) {
+      // We don't do any syncing with the server unless the player is actually
+      // logged in.
       this.connect();
     }
-    if (this.currentChannel) {
-      this.currentChannel.leave();
-    }
-    this.currentChannel = this.socket!.channel("campaign_sync:" + id, {});
-    this.currentChannel.join();
   }
 }

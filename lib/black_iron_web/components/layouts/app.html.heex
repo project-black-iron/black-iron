@@ -1,7 +1,5 @@
 <script defer phx-track-static type="module" src={~p"/assets/js/app.js"}>
 </script>
-<bi-app-context>
-  <bi-campaign-context>
-    <%= @inner_content %>
-  </bi-campaign-context>
+<bi-app-context user-token>
+  <%= @inner_content %>
 </bi-app-context>

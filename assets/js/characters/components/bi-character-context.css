@@ -1,8 +1,6 @@
 bi-character-context {
-  & > article {
-    & > header {
-      font-size: 1.5rem;
-      font-weight: var(--font-semibold);
-    }
+  & > article > header {
+    font-size: 1.5rem;
+    font-weight: var(--font-semibold);
   }
 }
