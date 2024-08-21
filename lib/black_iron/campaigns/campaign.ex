@@ -31,6 +31,17 @@ defmodule BlackIron.Campaigns.Campaign do
   def changeset(campaign, attrs) do
     campaign
     |> cast(attrs, [:name, :description, :slug, :_rev, :_revisions])
+    |> unique_constraint(:slug)
+    |> validate_format(:slug, slug_format(), message: slug_message())
     |> validate_required([:name, :description, :slug, :_rev, :_revisions])
+  end
+
+  @doc false
+  def slug_format do
+    ~r/^[a-z0-9\-_]+$/
+  end
+
+  def slug_message do
+    "must be lowercase, alphanumeric, and may contain dashes and underscores"
   end
 end

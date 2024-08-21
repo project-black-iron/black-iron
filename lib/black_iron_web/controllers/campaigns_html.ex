@@ -4,24 +4,47 @@ defmodule BlackIronWeb.CampaignsHTML do
   """
   use BlackIronWeb, :html
 
+  alias BlackIron.Campaigns.Campaign
+
   def index(assigns) do
     ~H"""
-    <h3>Campaigns list</h3>
-    <bi-campaign-list campaigns={Jason.encode!(assigns[:campaigns])}></bi-campaign-list>
-    <bi-create-campaign>
-      <.simple_form :let={f} for={assigns[:conn].params} as={:campaign} action={~p"/play/campaigns/"}>
-        <.error :if={assigns[:error_message]}><%= assigns[:error_message] %></.error>
+    <%= if !assigns[:htmx] do %>
+      <h3>Campaigns list</h3>
+    <% end %>
+    <bi-campaign-list
+      id="campaign-list"
+      hx-swap-oob="true"
+      foo="bar"
+      campaigns={Jason.encode!(assigns[:campaigns])}
+    >
+    </bi-campaign-list>
+    <.simple_form
+      :let={f}
+      for={@changeset}
+      action={~p"/play/campaigns/"}
+      hx-post={~p"/play/campaigns"}
+    >
+      <.error :if={@changeset.action == :insert}>
+        <%= gettext("Oops, something went wrong! Please check the errors below.") %>
+      </.error>
 
-        <.input field={f[:name]} type="text" label="Name" required />
-        <.input field={f[:description]} type="textarea" label="Description" required />
+      <.input field={f[:name]} type="text" label="Name" required />
+      <.input
+        field={f[:slug]}
+        type="text"
+        pattern={Regex.source(Campaign.slug_format())}
+        title={Campaign.slug_message()}
+        label="Slug"
+        required
+      />
+      <.input field={f[:description]} type="textarea" label="Description" required />
 
-        <:actions>
-          <.button phx-disable-with="" class="w-full">
-            <%= gettext("Create campaign") %>
-          </.button>
-        </:actions>
-      </.simple_form>
-    </bi-create-campaign>
+      <:actions>
+        <.button phx-disable-with="">
+          <%= gettext("Create campaign") %>
+        </.button>
+      </:actions>
+    </.simple_form>
     """
   end
 

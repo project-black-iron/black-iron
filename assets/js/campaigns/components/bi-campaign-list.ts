@@ -3,8 +3,8 @@ import { customElement, property } from "lit/decorators.js";
 
 import { BlackIronApp } from "../../black-iron-app";
 import { BiAppContext } from "../../components/bi-app-context";
-import { Campaign, CampaignData } from "../campaign";
 import { ssrConsume } from "../../utils/ssr-context";
+import { CampaignData } from "../campaign";
 
 @customElement("bi-campaign-list")
 export class BiCampaignList extends LitElement {
@@ -14,7 +14,7 @@ export class BiCampaignList extends LitElement {
         list-style: none;
         padding: 0;
         display: flex;
-        flex-flow: row wrap;
+        flex-flow: column nowrap;
       }
     }
   `;
@@ -29,6 +29,7 @@ export class BiCampaignList extends LitElement {
   // This is the attribute one, which is what we usually get from the server.
   @property({
     type: Array,
+    attribute: "campaigns",
     hasChanged(
       newVal: CampaignData[] | undefined,
       oldVal: CampaignData[] | undefined,
@@ -46,30 +47,22 @@ export class BiCampaignList extends LitElement {
       return false;
     },
   })
-  _campaignData?: CampaignData[];
-
-  @property({ attribute: false })
-  campaigns?: Campaign[];
+  campaigns?: CampaignData[];
 
   constructor() {
     super();
-    // We do an initial load with just the latest remote data that we got from
-    // the server, if any.
-    this.campaigns = this._campaignData?.map((data) => new Campaign(data));
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
     if (!isServer) {
-      // Then we do an async load to get the latest data from the server, and
-      // merge it with the local data. Local data won't show up until this
-      // step is done.
-      //
-      // TODO(@zkat): Maybe we put a loading spinner/message somewhere in the
-      // component? Although this whole thing should be very fast.
       this.app?.campaignManager.joinSyncChannel();
-      this.#syncCampaignData(this._campaignData).catch(console.error);
     }
+    this.#syncCampaignData();
   }
 
   willUpdate(changed: Map<string | number | symbol, unknown>) {
-    if (changed.has("app")) {
+    if (changed.has("app") && !isServer) {
       this.app?.campaignManager.joinSyncChannel();
     }
     if (changed.has("_campaignData") || changed.has("app")) {
@@ -80,21 +73,19 @@ export class BiCampaignList extends LitElement {
 
   async #syncCampaignData(data?: CampaignData[]) {
     await this.app?.campaignManager.syncCampaigns(data);
-    // Assigning to _campaignData is idempotent, so we can do it even though `#syncCampaignData` is called on update.
-    this._campaignData =
-      this.campaigns =
-        await this.app?.campaignManager.listCampaigns();
+    // Assigning to _campaignData is idempotent, so we can do it even though
+    // `#syncCampaignData` is called on update.
+    this.campaigns = await this.app?.campaignManager.listCampaigns();
   }
 
   render() {
     return html`<ul>
-      ${
-      this.campaigns
+      ${this.campaigns
         ?.filter((c) => !c.deleted_at)
         .map(
           (campaign) =>
             html`<li>
-              <a href="/campaigns/${campaign.slug}">
+              <a href="/play/campaigns/${campaign.slug}">
                 <article>
                   <header>
                     <h3>${campaign.name}</h3>
@@ -103,8 +94,7 @@ export class BiCampaignList extends LitElement {
                 </article>
               </a>
             </li>`,
-        )
-    }
+        )}
     </ul>`;
   }
 }

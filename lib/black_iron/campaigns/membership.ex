@@ -2,13 +2,15 @@ defmodule BlackIron.Campaigns.Membership do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @primary_key {:id, :binary_id, autogenerate: true}
-
   @derive {Jason.Encoder, only: [:username, :roles]}
 
   schema "campaign_memberships" do
-    belongs_to :user, BlackIron.Accounts.User, references: :username, foreign_key: :username, type: :string
-    belongs_to :campaign, BlackIron.Campaigns.Campaign
+    belongs_to :user, BlackIron.Accounts.User,
+      references: :username,
+      foreign_key: :username,
+      type: :string
+
+    belongs_to :campaign, BlackIron.Campaigns.Campaign, type: :binary_id
     field :roles, {:array, Ecto.Enum}, values: [:owner, :guide, :player], default: [:player]
 
     timestamps(type: :utc_datetime)

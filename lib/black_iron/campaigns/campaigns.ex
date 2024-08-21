@@ -50,7 +50,9 @@ defmodule BlackIron.Campaigns do
   def create_campaign(%User{} = user, attrs \\ %{}) do
     %Campaign{}
     |> Campaign.changeset(attrs |> put_rev(%Campaign{}))
-    |> Ecto.Changeset.put_assoc(:memberships, [%Membership{username: user.username, roles: [:owner]}])
+    |> Ecto.Changeset.put_assoc(:memberships, [
+      %Membership{username: user.username, roles: [:owner]}
+    ])
     |> Repo.insert()
   end
 

@@ -17,9 +17,7 @@ defmodule BlackIron.Repo.Migrations.CreateCampaigns do
 
     create unique_index(:campaigns, [:slug])
 
-    create table(:campaign_memberships, primary_key: false) do
-      add :id, :uuid, primary_key: true
-
+    create table(:campaign_memberships) do
       add :username, references(:users, column: :username, type: :citext, on_delete: :delete_all),
         null: false
 

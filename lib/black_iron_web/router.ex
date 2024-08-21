@@ -8,6 +8,7 @@ defmodule BlackIronWeb.Router do
     plug :fetch_session
     plug :fetch_live_flash
     plug :put_root_layout, html: {BlackIronWeb.Layouts, :root}
+    plug :check_htmx_request
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_user
@@ -21,6 +22,17 @@ defmodule BlackIronWeb.Router do
     case Phoenix.Router.route_info(BlackIronWeb.Router, "GET", current_path(conn), "any") do
       :error -> conn
       info -> assign(conn, :current_route, info.route)
+    end
+  end
+
+  defp check_htmx_request(conn, _) do
+    if IO.inspect(get_req_header(conn, "hx-request")) == ["true"] do
+      conn
+      |> assign(:htmx, true)
+      |> put_root_layout(html: false)
+      |> put_layout(html: false)
+    else
+      conn
     end
   end
 
@@ -86,7 +98,6 @@ defmodule BlackIronWeb.Router do
 
     scope "/play" do
       get "/campaigns", CampaignsController, :index
-      post "/campaigns", CampaignsController, :create
     end
   end
 
@@ -133,6 +144,7 @@ defmodule BlackIronWeb.Router do
   scope "/", BlackIronWeb do
     pipe_through [:browser, :site]
 
+    get "/users/log_out", UserSessionController, :delete
     delete "/users/log_out", UserSessionController, :delete
     get "/users/confirm", UserConfirmationController, :new
     post "/users/confirm", UserConfirmationController, :create
