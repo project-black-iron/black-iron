@@ -21,7 +21,6 @@ export class BiCampaignContext extends LitElement {
   @property({ attribute: false })
   campaign?: Campaign;
 
-
   async willUpdate(changed: PropertyValues<this>) {
     if (changed.has("_campaignId") || changed.has("app")) {
       if (this._campaignId) {

@@ -19,7 +19,8 @@
     "skipLibCheck": true,
     "lib": [
       "ESNext",
-      "dom"
+      "dom",
+      "DOM.Iterable"
     ],
     "incremental": true,
     "experimentalDecorators": true,

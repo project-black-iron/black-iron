@@ -1,7 +1,7 @@
 import { Socket } from "phoenix";
 
-import { BlackIronDB } from "./db";
 import { CampaignManager } from "./campaigns/campaign-manager";
+import { BlackIronDB } from "./db";
 
 export class BlackIronApp {
   // >> socket.enableDebug()
@@ -17,6 +17,18 @@ export class BlackIronApp {
     this.userToken = userToken;
   }
 
+  async fetch(
+    input: string | URL | Request,
+    init?: RequestInit,
+  ): Promise<Response> {
+    if (!this.#userToken) {
+      throw new Error("Cannot fetch without a user token");
+    }
+    input = input instanceof Request ? input : new Request(input, init);
+    input.headers.set("Authorization", `Bearer ${this.#userToken}`);
+    return fetch(input);
+  }
+
   disconnect() {
     this.socket?.disconnect();
     this.socket = undefined;
@@ -24,7 +36,6 @@ export class BlackIronApp {
 
   connect() {
     this.socket = new Socket("/socket", {
-      longPollFallbackMs: 2500,
       params: { token: this.#userToken },
     });
     this.socket.connect();

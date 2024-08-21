@@ -8,6 +8,10 @@ defmodule BlackIron.Repo.Migrations.CreateCampaigns do
       add :description, :text, null: false
       add :slug, :citext, null: false
 
+      add :_rev, :string, null: false
+      add :_revisions, {:array, :string}, default: [], null: false
+      add :deleted_at, :naive_datetime
+
       timestamps(type: :utc_datetime)
     end
 

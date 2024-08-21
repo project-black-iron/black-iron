@@ -19,4 +19,13 @@ defmodule BlackIronWeb.CampaignsController do
   def show(conn, params) do
     render(conn, :show, campaignId: params["campaignId"])
   end
+
+  def create(conn, params) do
+    case Campaigns.create_campaign(conn.assigns[:current_user], params["campaign"]) do
+      {:ok, campaign} ->
+        render(conn, :create, campaign: campaign)
+      {:error, changeset} ->
+        render(conn, :create, campaign: changeset.errors)
+    end
+  end
 end

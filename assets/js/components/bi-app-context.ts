@@ -1,9 +1,8 @@
-import { createContext } from "@lit/context";
+import { createContext, provide } from "@lit/context";
 import { html, isServer, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
 import { BlackIronApp } from "../black-iron-app";
-import { ssrProvide } from "../utils/ssr-context";
 
 /**
  * Sets up a `BlackIronApp` in the context to be consumed by any descendants.
@@ -25,12 +24,13 @@ export class BiAppContext extends LitElement {
   @property({ attribute: "user-token" })
   userToken?: string;
 
-  @ssrProvide({ context: BiAppContext.context })
+  @provide({ context: BiAppContext.context })
   @property({ attribute: false })
   blackIronApp?: BlackIronApp;
 
   update(changedProps: Map<string, unknown>) {
     super.update(changedProps);
+    console.log("update:", changedProps);
     if (changedProps.has("userToken")) {
       this.blackIronApp = new BlackIronApp(this.userToken);
     }

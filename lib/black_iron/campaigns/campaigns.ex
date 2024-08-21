@@ -7,16 +7,18 @@ defmodule BlackIron.Campaigns do
   alias BlackIron.Repo
 
   alias BlackIron.Accounts.User
-  alias BlackIron.Campaigns.Campaign
+  alias BlackIron.Campaigns.{Campaign, Membership}
 
-  def list_campaigns_for_user(%User{id: user_id}) do
+  def list_campaigns_for_user(%User{username: username}) do
     from(c in Campaign,
       join: m in assoc(c, :memberships),
-      where: m.user_id == ^user_id
+      where: m.username == ^username,
+      preload: [:memberships]
     )
     |> Repo.all()
   end
 
+  # TODO(@zkat): authorization
   @doc """
   Gets a single campaign.
 
@@ -45,12 +47,14 @@ defmodule BlackIron.Campaigns do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_campaign(attrs \\ %{}) do
+  def create_campaign(%User{} = user, attrs \\ %{}) do
     %Campaign{}
-    |> Campaign.changeset(attrs)
+    |> Campaign.changeset(attrs |> put_rev(%Campaign{}))
+    |> Ecto.Changeset.put_assoc(:memberships, [%Membership{username: user.username, roles: [:owner]}])
     |> Repo.insert()
   end
 
+  # TODO(@zkat): authorization
   @doc """
   Updates a campaign.
 
@@ -64,11 +68,24 @@ defmodule BlackIron.Campaigns do
 
   """
   def update_campaign(%Campaign{} = campaign, attrs) do
-    campaign
-    |> Campaign.changeset(attrs)
-    |> Repo.update()
+    {:ok, res} =
+      Repo.transaction(fn ->
+        current_rev =
+          from(c in Campaign, select: c._rev, where: c.id == ^campaign.id) |> Repo.one!()
+
+        if current_rev != campaign._rev do
+          {:error, %{conflict: current_rev}}
+        else
+          campaign
+          |> Campaign.changeset(attrs |> put_rev(campaign))
+          |> Repo.update()
+        end
+      end)
+
+    res
   end
 
+  # TODO(@zkat): authorization
   @doc """
   Deletes a campaign.
 
@@ -82,7 +99,28 @@ defmodule BlackIron.Campaigns do
 
   """
   def delete_campaign(%Campaign{} = campaign) do
-    Repo.delete(campaign)
+    {:ok, res} =
+      Repo.transaction(fn ->
+        current_rev =
+          from(c in Campaign, select: c._rev, where: c.id == ^campaign.id) |> Repo.one!()
+
+        if current_rev != campaign._rev do
+          {:error, %{conflict: current_rev}}
+        else
+          now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+
+          campaign
+          |> Campaign.deactivate_changeset(
+            %{
+              deleted_at: now
+            }
+            |> put_rev(campaign)
+          )
+          |> Repo.update()
+        end
+      end)
+
+    res
   end
 
   @doc """
@@ -96,5 +134,11 @@ defmodule BlackIron.Campaigns do
   """
   def change_campaign(%Campaign{} = campaign, attrs \\ %{}) do
     Campaign.changeset(campaign, attrs)
+  end
+
+  defp put_rev(attrs, obj) do
+    rev = Ecto.UUID.generate()
+    revs = [rev | obj._revisions]
+    attrs |> Map.put("_rev", rev) |> Map.put("_revisions", revs)
   end
 end

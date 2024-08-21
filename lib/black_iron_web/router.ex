@@ -33,10 +33,20 @@ defmodule BlackIronWeb.Router do
 
   defp put_user_token(conn, _) do
     if current_user = conn.assigns[:current_user] do
-      token = Phoenix.Token.sign(conn, "user socket", current_user.id)
+      token = Phoenix.Token.sign(conn, "black iron user token", current_user.id)
       assign(conn, :user_token, token)
     else
       conn
+    end
+  end
+
+  defp api_auth(conn, _) do
+    with ["Bearer " <> token] <- get_req_header(conn, "authorization"),
+         {:ok, user_id} <-
+           Phoenix.Token.verify(conn, "black iron user token", token, max_age: 1_209_600) do
+      assign(conn, :current_user, BlackIron.Accounts.get_user!(user_id))
+    else
+      _ -> send_resp(conn, 401, "{\"error\": \"Unauthorized\"}")
     end
   end
 
@@ -44,6 +54,8 @@ defmodule BlackIronWeb.Router do
     plug :accepts, ["json"]
   end
 
+  # This is a special pipeline used as a tag for feeding the service worker
+  # the routes we want to precache.
   pipeline :service_worker do
   end
 
@@ -69,10 +81,14 @@ defmodule BlackIronWeb.Router do
     get "/offline/app_paths", OfflineController, :app_paths
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", BlackIronWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", BlackIronWeb do
+    pipe_through [:api, :api_auth]
+
+    scope "/play" do
+      get "/campaigns", CampaignsController, :index
+      post "/campaigns", CampaignsController, :create
+    end
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:black_iron, :dev_routes) do
@@ -129,6 +145,7 @@ defmodule BlackIronWeb.Router do
 
     get "/", PlayController, :show
     get "/campaigns", CampaignsController, :index
+    post "/campaigns", CampaignsController, :create
     get "/campaigns/:campaignId", CampaignsController, :show
 
     scope "/campaigns/:campaignId" do

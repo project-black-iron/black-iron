@@ -1,6 +1,6 @@
-import { Campaign, CampaignData } from "./campaign";
-import { BlackIronApp } from "../black-iron-app";
 import { Channel } from "phoenix";
+import { BlackIronApp } from "../black-iron-app";
+import { Campaign, CampaignData } from "./campaign";
 
 export class CampaignManager {
   channel?: Channel;
@@ -35,7 +35,61 @@ export class CampaignManager {
    * remote campaign state. New remote data will not be requested.
    */
   async syncCampaigns(remoteCampaigns?: CampaignData[]) {
-    console.log("Syncing campaigns from server:", remoteCampaigns);
+    console.log("Syncing campaigns:", remoteCampaigns);
+    if (!remoteCampaigns) {
+      try {
+        console.log("Fetchin campaigns from server:", remoteCampaigns);
+        const res = await this.app.fetch("/api/campaigns");
+        if (res.ok) {
+          remoteCampaigns = await res.json();
+        } else {
+          console.error("Failed to fetch remote campaigns, skipping sync", res);
+          return;
+        }
+      } catch (e) {
+        console.error("Failed to fetch remote campaigns, skipping sync", e);
+        return;
+      }
+    }
+    if (remoteCampaigns) {
+      const allKeys: Set<string> = new Set();
+      const remotes = new Map(
+        remoteCampaigns.map((c) => {
+          allKeys.add(c.id);
+          return [c.id, c];
+        }),
+      );
+      const locals = new Map(
+        (await this.listCampaigns()).map((c) => {
+          allKeys.add(c.id);
+          return [c.id, c];
+        }),
+      );
+      for (const key of allKeys) {
+        const remote = remotes.get(key);
+        const local = locals.get(key);
+        if (remote && local) {
+          if (remote._rev !== local._rev) {
+            console.log("Need to merge/sync campaigns", key);
+            if (remote._revisions.includes(local._rev)) {
+              console.log("We can fast-forward local data");
+            } else if (local._revisions.includes(remote._rev)) {
+              console.log("We can fast-forward remote data");
+            } else {
+              console.log(
+                "Both were modified. Try to merge, otherwise ask player to resolve conflict.",
+              );
+            }
+          }
+        } else if (remote) {
+          console.log("Adding campaign to local db", key);
+        } else if (local) {
+          console.log("Uploading campaign to remote", key);
+        } else {
+          throw new Error("Unreachable");
+        }
+      }
+    }
   }
 
   async getCampaign(id?: string) {

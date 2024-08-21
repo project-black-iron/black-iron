@@ -4,7 +4,22 @@ import { CampaignSchema, campaignsDbUpgrade } from "./campaigns/campaign";
 export interface SyncableData {
   id: string;
   _rev: string;
-  _deleted: boolean;
+  _revisions: string[];
+  deleted_at: string | null;
+}
+
+export class SyncableClass {
+  id: string;
+  _rev: string;
+  _revisions: string[];
+  deleted_at: string | null;
+
+  constructor(data: SyncableData) {
+    this.id = data.id;
+    this._rev = data._rev;
+    this._revisions = data._revisions;
+    this.deleted_at = data.deleted_at;
+  }
 }
 
 type BlackIronDBSchema = DBSchema & CampaignSchema;
@@ -32,5 +47,17 @@ export class BlackIronDB {
 
   async transaction<Name extends StoreNames<BlackIronDBSchema>>(storeName: Name, mode: IDBTransactionMode) {
     return (await this.#idb).transaction(storeName, mode);
+  }
+
+  async put<Name extends StoreNames<BlackIronDBSchema>>(
+    storeName: Name,
+    value: BlackIronDBSchema[Name]["value"],
+    key?: BlackIronDBSchema[Name]["key"],
+  ) {
+    return (await this.#idb).put(storeName, value, key);
+  }
+
+  async delete<Name extends StoreNames<BlackIronDBSchema>>(storeName: Name, key: BlackIronDBSchema[Name]["key"]) {
+    return (await this.#idb).delete(storeName, key);
   }
 }

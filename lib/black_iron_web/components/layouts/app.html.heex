@@ -1,5 +1,5 @@
 <script defer phx-track-static type="module" src={~p"/assets/js/app.js"}>
 </script>
-<bi-app-context user-token>
+<bi-app-context user-token={assigns[:user_token]}>
   <%= @inner_content %>
 </bi-app-context>
