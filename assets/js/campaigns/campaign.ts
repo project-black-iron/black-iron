@@ -43,6 +43,24 @@ export class Campaign extends SyncableClass implements CampaignData {
     this.description = data.description;
     this.memberships = data.memberships;
   }
+
+  toParams() {
+    const params = new URLSearchParams({
+      "campaign[id]": this.id,
+      "campaign[name]": this.name,
+      "campaign[slug]": this.slug,
+      "campaign[description]": this.description,
+    });
+    if (this._rev) {
+      params.set("campaign[_rev]", this._rev);
+    }
+    if (this._revisions) {
+      this._revisions.forEach((rev, i) => {
+        params.set(`campaigns[_revisions][${i}]`, rev);
+      });
+    }
+    return params;
+  }
 }
 
 export function campaignsDbUpgrade(

@@ -7,13 +7,15 @@ export class BlackIronApp {
   // >> socket.enableDebug()
   // >> socket.enableLatencySim(1000)  // enabled for duration of browser session
   // >> socket.disableLatencySim()
-  db: BlackIronDB = new BlackIronDB();
   campaignManager = new CampaignManager(this);
   socket?: Socket;
   #userToken?: string;
-  username?: string;
 
-  constructor(userToken?: string) {
+  static async createApp(userToken?: string, username?: string) {
+    const db = await BlackIronDB.openDB();
+    return new BlackIronApp(db, userToken, username);
+  }
+  private constructor(public db: BlackIronDB, userToken?: string, public username?: string) {
     this.userToken = userToken;
   }
 

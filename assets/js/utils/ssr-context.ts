@@ -18,11 +18,11 @@ export function ssrProvide<ValueType>({
 }: {
   context: Context<unknown, ValueType>;
 }) {
-  const dec = isServer ? provide({ context }) : undefined;
+  const dec = !isServer ? provide({ context }) : undefined;
   // @ts-expect-error idc
   return (x, y) => {
     if (dec) {
-      dec(x, y);
+      return dec(x, y);
     }
   };
 }
@@ -34,11 +34,11 @@ export function ssrConsume<ValueType>({
   context: Context<unknown, ValueType>;
   subscribe?: boolean;
 }) {
-  const dec = isServer ? consume({ context, subscribe }) : undefined;
+  const dec = !isServer ? consume({ context, subscribe }) : undefined;
   // @ts-expect-error idc
   return (x, y) => {
     if (dec) {
-      dec(x, y);
+      return dec(x, y);
     }
   };
 }

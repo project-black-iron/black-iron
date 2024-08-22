@@ -5,7 +5,6 @@ import { BlackIronApp } from "../../black-iron-app";
 import { BiAppContext } from "../../components/bi-app-context";
 import { ssrConsume } from "../../utils/ssr-context";
 import { CampaignData } from "../campaign";
-
 @customElement("bi-campaign-list")
 export class BiCampaignList extends LitElement {
   static styles = css`
@@ -48,7 +47,7 @@ export class BiCampaignList extends LitElement {
   constructor() {
     super();
     this.addEventListener("htmx:beforeSend", (e: Event) => {
-      // TODO(@zkat): optimistically add campaign to local db and load into list.
+      console.log("TODO: create offline campaign first.");
       (e.target as HTMLFormElement).reset();
     });
   }
@@ -65,7 +64,9 @@ export class BiCampaignList extends LitElement {
 
   async #syncCampaignData() {
     await this.app?.campaignManager.syncCampaigns(this.campaigns);
-    this.campaigns = await this.app?.campaignManager.listCampaigns();
+    const campaigns = await this.app?.campaignManager.listCampaigns();
+    campaigns?.sort((a, b) => (a.name > b.name ? 1 : -1));
+    this.campaigns = campaigns;
   }
 
   render() {

@@ -11,7 +11,7 @@ defmodule BlackIronWeb.Endpoint do
     same_site: "Lax"
   ]
 
-  socket "/socket", Phoenix.LiveView.Socket,
+  socket "/socket", BlackIronWeb.UserSocket,
     websocket: [connect_info: [session: @session_options]]
 
   # Serve at "/" the static files from "priv/static" directory.

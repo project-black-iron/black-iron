@@ -30,10 +30,25 @@ defmodule BlackIron.Campaigns.Campaign do
   @doc false
   def changeset(campaign, attrs) do
     campaign
-    |> cast(attrs, [:name, :description, :slug, :_rev, :_revisions])
+    |> cast(attrs, [:id, :name, :description, :slug, :_rev, :_revisions])
     |> unique_constraint(:slug)
+    |> unique_constraint(:id)
     |> validate_format(:slug, slug_format(), message: slug_message())
     |> validate_required([:name, :description, :slug, :_rev, :_revisions])
+    |> validate_revs()
+  end
+
+  def validate_revs(changeset) do
+    changeset
+    # TODO(@zkat): More thorough UUID validation.
+    |> validate_format(:_rev, ~r/^[a-fA-F0-9-]+$/, message: "Must be a valid UUID")
+    |> validate_change(:_revisions, fn _, data ->
+      if Enum.at(data, 0) === fetch_change!(changeset, :_rev) do
+        []
+      else
+        [{:_revisions, "The latest _rev must be the head of _revisions"}]
+      end
+    end)
   end
 
   @doc false

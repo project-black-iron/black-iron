@@ -139,8 +139,12 @@ defmodule BlackIron.Campaigns do
   end
 
   defp put_rev(attrs, obj) do
-    rev = Ecto.UUID.generate()
-    revs = [rev | obj._revisions]
-    attrs |> Map.put("_rev", rev) |> Map.put("_revisions", revs)
+    if !attrs["_rev"] || !attrs["_revisions"] do
+      rev = Ecto.UUID.generate()
+      revs = [rev | obj._revisions]
+      attrs |> Map.put("_rev", rev) |> Map.put("_revisions", revs)
+    else
+      attrs
+    end
   end
 end

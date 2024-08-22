@@ -24,22 +24,25 @@ export class BiAppContext extends LitElement {
   @property({ attribute: "user-token" })
   userToken?: string;
 
+  @property()
+  username?: string;
+
   @provide({ context: BiAppContext.context })
   @property({ attribute: false })
   blackIronApp?: BlackIronApp;
 
-  update(changedProps: Map<string, unknown>) {
-    super.update(changedProps);
-    console.log("update:", changedProps);
+  async willUpdate(changedProps: Map<string, unknown>) {
     if (changedProps.has("userToken")) {
-      this.blackIronApp = new BlackIronApp(this.userToken);
+      this.blackIronApp = await BlackIronApp.createApp(this.userToken, this.username);
     }
   }
 
   constructor() {
     super();
     if (!isServer) {
-      this.blackIronApp = new BlackIronApp(this.userToken);
+      BlackIronApp.createApp(this.userToken, this.username).then((app) => {
+        this.blackIronApp = app;
+      })
     }
   }
 

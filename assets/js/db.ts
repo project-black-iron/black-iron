@@ -3,16 +3,16 @@ import { CampaignSchema, campaignsDbUpgrade } from "./campaigns/campaign";
 
 export interface SyncableData {
   id: string;
-  _rev: string;
-  _revisions: string[];
-  deleted_at: string | null;
+  _rev?: string;
+  _revisions?: string[];
+  deleted_at?: string;
 }
 
 export class SyncableClass {
   id: string;
-  _rev: string;
-  _revisions: string[];
-  deleted_at: string | null;
+  _rev?: string;
+  _revisions?: string[];
+  deleted_at?: string;
 
   constructor(data: SyncableData) {
     this.id = data.id;
@@ -28,9 +28,16 @@ const DB_NAME = "black-iron";
 const DB_VERSION = 1;
 
 export class BlackIronDB {
-  #idb: Promise<IDBPDatabase<BlackIronDBSchema>> = this.#openDB();
+  static async openDB() {
+    return new BlackIronDB(await BlackIronDB.#openDB());
+  }
+  private constructor(db: IDBPDatabase<BlackIronDBSchema>) {
+    this.#idb = db;
+  }
 
-  #openDB() {
+  #idb: IDBPDatabase<BlackIronDBSchema>;
+
+  static #openDB() {
     return openDB<BlackIronDBSchema>(DB_NAME, DB_VERSION, {
       upgrade(db) {
         campaignsDbUpgrade(db);
@@ -42,11 +49,18 @@ export class BlackIronDB {
     storeName: Name,
     query: string | IDBKeyRange,
   ) {
-    return (await this.#idb).get(storeName, query);
+    return this.#idb.get(storeName, query);
   }
 
-  async transaction<Name extends StoreNames<BlackIronDBSchema>>(storeName: Name, mode: IDBTransactionMode) {
-    return (await this.#idb).transaction(storeName, mode);
+  async getAll<Name extends StoreNames<BlackIronDBSchema>>(storeName: Name) {
+    return await this.#idb.getAll(storeName);
+  }
+
+  async transaction<Name extends StoreNames<BlackIronDBSchema>>(
+    storeName: Name,
+    mode: IDBTransactionMode,
+  ) {
+    return await this.#idb.transaction(storeName, mode);
   }
 
   async put<Name extends StoreNames<BlackIronDBSchema>>(
@@ -54,10 +68,13 @@ export class BlackIronDB {
     value: BlackIronDBSchema[Name]["value"],
     key?: BlackIronDBSchema[Name]["key"],
   ) {
-    return (await this.#idb).put(storeName, value, key);
+    return await this.#idb.put(storeName, value, key);
   }
 
-  async delete<Name extends StoreNames<BlackIronDBSchema>>(storeName: Name, key: BlackIronDBSchema[Name]["key"]) {
-    return (await this.#idb).delete(storeName, key);
+  async delete<Name extends StoreNames<BlackIronDBSchema>>(
+    storeName: Name,
+    key: BlackIronDBSchema[Name]["key"],
+  ) {
+    return await this.#idb.delete(storeName, key);
   }
 }
