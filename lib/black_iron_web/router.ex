@@ -26,7 +26,7 @@ defmodule BlackIronWeb.Router do
   end
 
   defp check_htmx_request(conn, _) do
-    if IO.inspect(get_req_header(conn, "hx-request")) == ["true"] do
+    if get_req_header(conn, "hx-request") == ["true"] do
       conn
       |> assign(:htmx, true)
       |> put_root_layout(html: false)
