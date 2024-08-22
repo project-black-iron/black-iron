@@ -52,16 +52,6 @@ defmodule BlackIronWeb.Router do
     end
   end
 
-  defp api_auth(conn, _) do
-    with ["Bearer " <> token] <- get_req_header(conn, "authorization"),
-         {:ok, user_id} <-
-           Phoenix.Token.verify(conn, "black iron user token", token, max_age: 1_209_600) do
-      assign(conn, :current_user, BlackIron.Accounts.get_user!(user_id))
-    else
-      _ -> send_resp(conn, 401, "{\"error\": \"Unauthorized\"}")
-    end
-  end
-
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -69,6 +59,15 @@ defmodule BlackIronWeb.Router do
   # This is a special pipeline used as a tag for feeding the service worker
   # the routes we want to precache.
   pipeline :service_worker do
+    plug :set_preload_flag
+  end
+
+  defp set_preload_flag(conn, _) do
+    if get_req_header(conn, "x-preload") == ["true"] do
+      assign(conn, :preload, true)
+    else
+      conn
+    end
   end
 
   pipeline :app do
@@ -93,13 +92,21 @@ defmodule BlackIronWeb.Router do
     get "/offline/app_paths", OfflineController, :app_paths
   end
 
-  scope "/api", BlackIronWeb do
-    pipe_through [:api, :api_auth]
+  # scope "/api", BlackIronWeb do
+  #   pipe_through [:api, :api_auth]
 
-    scope "/play" do
-      get "/campaigns", CampaignsController, :index
-    end
-  end
+  #   # Nothing here yet.
+  # end
+
+  # defp api_auth(conn, _) do
+  #   with ["Bearer " <> token] <- get_req_header(conn, "authorization"),
+  #        {:ok, user_id} <-
+  #          Phoenix.Token.verify(conn, "black iron user token", token, max_age: 1_209_600) do
+  #     assign(conn, :current_user, BlackIron.Accounts.get_user!(user_id))
+  #   else
+  #     _ -> send_resp(conn, 401, "{\"error\": \"Unauthorized\"}")
+  #   end
+  # end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:black_iron, :dev_routes) do
@@ -157,7 +164,6 @@ defmodule BlackIronWeb.Router do
 
     get "/", PlayController, :show
     get "/campaigns", CampaignsController, :index
-    post "/campaigns", CampaignsController, :create
     get "/campaigns/:campaignId", CampaignsController, :show
 
     scope "/campaigns/:campaignId" do
@@ -174,5 +180,11 @@ defmodule BlackIronWeb.Router do
       get "/characters", CharactersController, :index
       get "/characters/:characterId", CharactersController, :show
     end
+  end
+
+  scope "/play", BlackIronWeb do
+    pipe_through [:browser, :app, :require_authenticated_user]
+
+    post "/campaigns", CampaignsController, :create
   end
 end

@@ -23,10 +23,6 @@ export class BiCampaignList extends LitElement {
   @ssrConsume({ context: BiAppContext.context, subscribe: true })
   app?: BlackIronApp;
 
-  // We have two Campaign lists here: One for the attribute, and another for
-  // our actual internal state.
-
-  // This is the attribute one, which is what we usually get from the server.
   @property({
     type: Array,
     attribute: "campaigns",
@@ -51,50 +47,45 @@ export class BiCampaignList extends LitElement {
 
   constructor() {
     super();
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    if (!isServer) {
-      this.app?.campaignManager.joinSyncChannel();
-    }
-    this.#syncCampaignData();
+    this.addEventListener("htmx:beforeSend", (e: Event) => {
+      // TODO(@zkat): optimistically add campaign to local db and load into list.
+      (e.target as HTMLFormElement).reset();
+    });
   }
 
   willUpdate(changed: Map<string | number | symbol, unknown>) {
     if (changed.has("app") && !isServer) {
       this.app?.campaignManager.joinSyncChannel();
     }
-    if (changed.has("_campaignData") || changed.has("app")) {
+    if (changed.has("campaigns") || changed.has("app")) {
       // Fire and forget: we'll be eventually consistent here.
       this.#syncCampaignData();
     }
   }
 
-  async #syncCampaignData(data?: CampaignData[]) {
-    await this.app?.campaignManager.syncCampaigns(data);
-    // Assigning to _campaignData is idempotent, so we can do it even though
-    // `#syncCampaignData` is called on update.
+  async #syncCampaignData() {
+    await this.app?.campaignManager.syncCampaigns(this.campaigns);
     this.campaigns = await this.app?.campaignManager.listCampaigns();
   }
 
   render() {
     return html`<ul>
-      ${this.campaigns
-        ?.filter((c) => !c.deleted_at)
-        .map(
-          (campaign) =>
-            html`<li>
-              <a href="/play/campaigns/${campaign.slug}">
-                <article>
-                  <header>
-                    <h3>${campaign.name}</h3>
-                  </header>
-                  <p>${campaign.description}</p>
-                </article>
-              </a>
-            </li>`,
-        )}
-    </ul>`;
+        ${this.campaigns
+          ?.filter((c) => !c.deleted_at)
+          .map(
+            (campaign) =>
+              html`<li>
+                <a href="/play/campaigns/${campaign.slug}">
+                  <article>
+                    <header>
+                      <h3>${campaign.name}</h3>
+                    </header>
+                    <p>${campaign.description}</p>
+                  </article>
+                </a>
+              </li>`,
+          )}
+      </ul>
+      <slot></slot>`;
   }
 }

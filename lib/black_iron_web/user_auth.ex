@@ -205,11 +205,17 @@ defmodule BlackIronWeb.UserAuth do
     if conn.assigns[:current_user] do
       conn
     else
-      conn
-      |> put_flash(:error, "You must log in to access this page.")
-      |> maybe_store_return_to()
-      |> redirect(to: ~p"/users/log_in")
-      |> halt()
+      if conn.assigns[:htmx] do
+        conn
+        |> send_resp(401, "Unauthorized")
+        |> halt()
+      else
+        conn
+        |> put_flash(:error, "You must log in to access this page.")
+        |> maybe_store_return_to()
+        |> redirect(to: ~p"/users/log_in")
+        |> halt()
+      end
     end
   end
 

@@ -12,9 +12,10 @@ defmodule BlackIronWeb.CampaignsController do
 
   def index(conn, _params) do
     campaigns =
-      case conn.assigns[:current_user] do
-        nil -> []
-        user -> Campaigns.list_campaigns_for_user(user)
+      case {conn.assigns[:current_user], conn.assigns[:preload]} do
+        {_, true} -> []
+        {nil, _} -> []
+        {user, _} -> Campaigns.list_campaigns_for_user(user)
       end
 
     render(conn, :index,

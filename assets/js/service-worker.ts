@@ -38,7 +38,7 @@ async function precacheRoutes() {
       await cache.delete(key);
     }
   }
-  await cache.addAll(allPaths);
+  await cache.addAll(allPaths.map((path) => new Request(path, { headers: { "X-Preload": "true" } })));
   await routeStaticPaths(staticPaths);
   await routeAppPaths(appPaths);
   routePostRequests();
