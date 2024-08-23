@@ -35,7 +35,7 @@ export class BiAppContext extends LitElement {
   blackIronApp?: BlackIronApp;
 
   async willUpdate(changedProps: Map<string, unknown>) {
-    if (changedProps.has("userToken")) {
+    if (!isServer && changedProps.has("userToken")) {
       this.blackIronApp = await BlackIronApp.createApp(this.userToken, this.csrfToken, this.username);
     }
   }

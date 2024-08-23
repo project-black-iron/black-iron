@@ -60,7 +60,7 @@ defmodule BlackIron.LitSSRWorker do
   end
 
   def handle_info({port, {:exit_status, status}}, state) do
-    Logger.error("Lit SSR process #{self()} exited with status #{status}")
+    Logger.error("Lit SSR process #{encode_pid(self())} exited with status #{status}")
 
     {:stop, if(status == 0, do: :normal, else: :error), %{state | port: port}}
   end

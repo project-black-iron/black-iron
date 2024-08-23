@@ -54,12 +54,14 @@ export class BiCampaignList extends LitElement {
   }
 
   willUpdate(changed: Map<string | number | symbol, unknown>) {
-    if (changed.has("app") && !isServer) {
-      this.app?.campaignManager.joinSyncChannel();
-    }
-    if (changed.has("campaigns") || changed.has("app")) {
-      // Fire and forget: we'll be eventually consistent here.
-      this.#syncCampaignData();
+    if (!isServer) {
+      if (changed.has("app") && !isServer) {
+        this.app?.campaignManager.joinSyncChannel();
+      }
+      if (changed.has("campaigns") || changed.has("app")) {
+        // Fire and forget: we'll be eventually consistent here.
+        this.#syncCampaignData();
+      }
     }
   }
 
