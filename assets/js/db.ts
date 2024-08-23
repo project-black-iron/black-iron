@@ -1,20 +1,20 @@
 import { DBSchema, IDBPDatabase, openDB, StoreNames } from "idb";
-import { CampaignSchema, campaignsDbUpgrade } from "./campaigns/campaign";
+import { CampaignSchema, Campaign } from "./campaigns/campaign";
 
-export interface SyncableData {
+export interface ISyncable {
   id: string;
   _rev?: string;
   _revisions?: string[];
   deleted_at?: string;
 }
 
-export class SyncableClass {
+export abstract class AbstractSyncable implements ISyncable {
   id: string;
   _rev?: string;
   _revisions?: string[];
   deleted_at?: string;
 
-  constructor(data: SyncableData) {
+  constructor(data: ISyncable) {
     this.id = data.id;
     this._rev = data._rev;
     this._revisions = data._revisions;
@@ -40,7 +40,7 @@ export class BlackIronDB {
   static #openDB() {
     return openDB<BlackIronDBSchema>(DB_NAME, DB_VERSION, {
       upgrade(db) {
-        campaignsDbUpgrade(db);
+        Campaign.dbUpgrade(db);
       },
     });
   }

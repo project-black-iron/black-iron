@@ -1,12 +1,12 @@
 // Campaign schema, class, and database definitions.
 
 import { DBSchema, IDBPDatabase } from "idb";
-import { SyncableClass, SyncableData } from "../db";
+import { AbstractSyncable, ISyncable } from "../db";
 
 export interface CampaignSchema {
   campaigns: {
     key: string;
-    value: CampaignData;
+    value: ICampaign;
   };
 }
 
@@ -16,12 +16,10 @@ export enum CampaignRole {
   Owner = "owner",
 }
 
-export interface CampaignData extends SyncableData {
+export interface ICampaign extends ISyncable {
   name: string;
   slug: string;
   description: string;
-  // TODO(@zkat): would be nice if the server just sent us an object instead of an
-  // array...
   memberships: CampaignMembership[];
 }
 
@@ -30,18 +28,39 @@ export interface CampaignMembership {
   roles: CampaignRole[];
 }
 
-export class Campaign extends SyncableClass implements CampaignData {
+export class Campaign extends AbstractSyncable implements ICampaign {
   name: string;
   slug: string;
   description: string;
   memberships: CampaignMembership[];
 
-  constructor(public data: CampaignData) {
+  static dbUpgrade(db: IDBPDatabase<DBSchema & CampaignSchema>) {
+    db.createObjectStore("campaigns", { keyPath: "id" });
+  }
+
+  constructor(public data: ICampaign) {
     super(data);
     this.name = data.name;
     this.slug = data.slug;
     this.description = data.description;
     this.memberships = data.memberships;
+  }
+
+  eq(other: ICampaign) {
+    return (
+      this.name === other.name &&
+      this.slug === other.slug &&
+      this.description === other.description &&
+      JSON.stringify(this.memberships) === JSON.stringify(other.memberships)
+    );
+  }
+
+  merge(other: ICampaign) {
+    if (!this.eq(other)) {
+      // TODO: make this an actual class.
+      throw new Error("Conflict");
+    }
+    return new Campaign(this);
   }
 
   toParams() {
@@ -51,6 +70,7 @@ export class Campaign extends SyncableClass implements CampaignData {
       "campaign[slug]": this.slug,
       "campaign[description]": this.description,
     });
+    // TODO: sync memberships too
     if (this._rev) {
       params.set("campaign[_rev]", this._rev);
     }
@@ -61,10 +81,4 @@ export class Campaign extends SyncableClass implements CampaignData {
     }
     return params;
   }
-}
-
-export function campaignsDbUpgrade(
-  db: IDBPDatabase<DBSchema & CampaignSchema>,
-) {
-  db.createObjectStore("campaigns", { keyPath: "id" });
 }

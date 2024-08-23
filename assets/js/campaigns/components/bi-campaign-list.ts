@@ -4,7 +4,8 @@ import { customElement, property } from "lit/decorators.js";
 import { BlackIronApp } from "../../black-iron-app";
 import { BiAppContext } from "../../components/bi-app-context";
 import { ssrConsume } from "../../utils/ssr-context";
-import { CampaignData } from "../campaign";
+import { ICampaign } from "../campaign";
+
 @customElement("bi-campaign-list")
 export class BiCampaignList extends LitElement {
   static styles = css`
@@ -26,8 +27,8 @@ export class BiCampaignList extends LitElement {
     type: Array,
     attribute: "campaigns",
     hasChanged(
-      newVal: CampaignData[] | undefined,
-      oldVal: CampaignData[] | undefined,
+      newVal: ICampaign[] | undefined,
+      oldVal: ICampaign[] | undefined,
     ) {
       if ((newVal?.length ?? 0) !== (oldVal?.length ?? 0)) {
         return true;
@@ -42,7 +43,7 @@ export class BiCampaignList extends LitElement {
       return false;
     },
   })
-  campaigns?: CampaignData[];
+  campaigns?: ICampaign[];
 
   constructor() {
     super();
@@ -66,7 +67,9 @@ export class BiCampaignList extends LitElement {
     await this.app?.campaignManager.syncCampaigns(this.campaigns);
     const campaigns = await this.app?.campaignManager.listCampaigns();
     campaigns?.sort((a, b) => (a.name > b.name ? 1 : -1));
-    this.campaigns = campaigns;
+    if (campaigns) {
+      this.campaigns = campaigns;
+    }
   }
 
   render() {

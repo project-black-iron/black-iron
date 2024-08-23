@@ -1,6 +1,6 @@
 import { Channel } from "phoenix";
 import { BlackIronApp } from "../black-iron-app";
-import { Campaign, CampaignData } from "./campaign";
+import { Campaign, ICampaign } from "./campaign";
 
 export class CampaignManager {
   channel?: Channel;
@@ -27,12 +27,10 @@ export class CampaignManager {
       });
   }
 
-  async saveCampaign(campaign: FormData | CampaignData) {
+  async saveCampaign(campaign: FormData | ICampaign) {
     // TODO(@zkat): Validation
     if (campaign instanceof FormData) {
-      campaign = Object.fromEntries(
-        campaign.entries(),
-      ) as unknown as CampaignData;
+      campaign = Object.fromEntries(campaign.entries()) as unknown as ICampaign;
     }
     if (!campaign.id) {
       campaign.id = crypto.randomUUID();
@@ -40,12 +38,12 @@ export class CampaignManager {
     await this.app?.db.put("campaigns", campaign);
   }
 
-  async uploadCampaign(campaign: CampaignData) {
+  async uploadCampaign(campaign: ICampaign) {
     if (!(campaign instanceof Campaign)) {
       campaign = new Campaign(campaign);
     }
     const url = new URL(window.location.href);
-    url.pathname = "/play/campaigns"
+    url.pathname = "/play/campaigns";
     url.search = (campaign as Campaign).toParams().toString();
     // TODO(@zkat): csrf token
     const res = await this.app.fetch(url, {
@@ -56,44 +54,28 @@ export class CampaignManager {
     }
   }
 
-  async syncCampaign(remote?: CampaignData, local?: CampaignData) {
-    console.log("syncing campaign:", remote, local);
+  async syncCampaign(remote?: ICampaign, local?: ICampaign) {
+    remote = remote && new Campaign(remote);
+    local = local && new Campaign(local);
     if (remote && local) {
       if (remote._rev !== local._rev) {
-        console.log("Need to merge/sync campaigns", remote.id, local.id);
         if (local._rev && remote._revisions?.includes(local._rev)) {
-          console.log("fast-forward from remote campaign");
           await this.saveCampaign(remote);
         } else if (local._rev && local._revisions?.includes(remote._rev!)) {
-          console.log("fast-forward from local campaign");
           await this.uploadCampaign(local);
-        } else if (
-          remote.slug === local.slug &&
-          remote.name === local.name &&
-          remote.description === local.description
-        ) {
+        } else if ((remote as Campaign).eq(local)) {
           // Both are effectively the same. Overwrite the local DB's copy of
           // the campaign to save the sync props.
-          console.log("clobber local campaign because equal");
           await this.saveCampaign(remote);
         } else {
-          console.log(
-            "Both were modified. Try to merge, otherwise ask player to resolve conflict.",
-          );
-          if (remote.slug !== local.slug || remote.name !== local.name) {
-            throw new Error("Conflict");
-          }
-          local.description = `${remote.description}\n\n${local.description}`;
-          await this.uploadCampaign(local);
+          await this.uploadCampaign((local as Campaign).merge(remote));
         }
       } else {
         console.log("_rev were both the same. Already synced");
       }
     } else if (remote) {
-      console.log("saving remote campaign");
       await this.saveCampaign(remote);
     } else if (local) {
-      console.log("uploading local campaign");
       await this.uploadCampaign(local);
     } else {
       throw new Error("Must give at least one campaign to sync.");
@@ -107,9 +89,9 @@ export class CampaignManager {
    * @param remoteCampaigns - If present, interpreted as the most recent
    * remote campaign state. New remote data will not be requested.
    */
-  async syncCampaigns(remoteCampaigns: CampaignData[] = []) {
+  async syncCampaigns(remoteCampaigns?: ICampaign[]) {
     console.log("Syncing campaigns:", remoteCampaigns);
-    if (!remoteCampaigns.length) {
+    if (!remoteCampaigns) {
       console.log("No remote campaigns to sync");
       // try {
       //   console.log("Fetchin campaigns from server:", remoteCampaigns);
@@ -128,7 +110,7 @@ export class CampaignManager {
     }
     const allKeys: Set<string> = new Set();
     const remotes = new Map(
-      remoteCampaigns.map((c) => {
+      (remoteCampaigns ?? []).map((c) => {
         allKeys.add(c.id);
         return [c.id, c];
       }),

@@ -11,11 +11,16 @@ export class BlackIronApp {
   socket?: Socket;
   #userToken?: string;
 
-  static async createApp(userToken?: string, username?: string) {
+  static async createApp(userToken?: string, csrfToken?: string, username?: string) {
     const db = await BlackIronDB.openDB();
-    return new BlackIronApp(db, userToken, username);
+    return new BlackIronApp(db, userToken, csrfToken, username);
   }
-  private constructor(public db: BlackIronDB, userToken?: string, public username?: string) {
+  private constructor(
+    public db: BlackIronDB,
+    userToken?: string,
+    private csrfToken?: string,
+    public username?: string,
+  ) {
     this.userToken = userToken;
   }
 
@@ -28,6 +33,9 @@ export class BlackIronApp {
     }
     input = input instanceof Request ? input : new Request(input, init);
     input.headers.set("Authorization", `Bearer ${this.#userToken}`);
+    if (this.csrfToken) {
+      input.headers.set("x-csrf-token", this.csrfToken);
+    }
     return fetch(input);
   }
 
