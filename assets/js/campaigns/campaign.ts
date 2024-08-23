@@ -1,7 +1,7 @@
 // Campaign schema, class, and database definitions.
 
-import { DBSchema, IDBPDatabase } from "idb";
-import { AbstractSyncable, ISyncable } from "../db";
+import { IDBPDatabase } from "idb";
+import { AbstractSyncable, BlackIronDBSchema, ISyncable } from "../db";
 
 export interface CampaignSchema {
   campaigns: {
@@ -34,7 +34,7 @@ export class Campaign extends AbstractSyncable implements ICampaign {
   description: string;
   memberships: CampaignMembership[];
 
-  static dbUpgrade(db: IDBPDatabase<DBSchema & CampaignSchema>) {
+  static dbUpgrade(db: IDBPDatabase<BlackIronDBSchema>) {
     db.createObjectStore("campaigns", { keyPath: "id" });
   }
 
@@ -48,10 +48,10 @@ export class Campaign extends AbstractSyncable implements ICampaign {
 
   eq(other: ICampaign) {
     return (
-      this.name === other.name &&
-      this.slug === other.slug &&
-      this.description === other.description &&
-      JSON.stringify(this.memberships) === JSON.stringify(other.memberships)
+      this.name === other.name
+      && this.slug === other.slug
+      && this.description === other.description
+      && JSON.stringify(this.memberships) === JSON.stringify(other.memberships)
     );
   }
 

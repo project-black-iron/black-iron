@@ -12,11 +12,15 @@ export class BlackIronApp {
   #userToken?: string;
 
   static async createApp(userToken?: string, csrfToken?: string, username?: string) {
-    const db = await BlackIronDB.openDB();
-    return new BlackIronApp(db, userToken, csrfToken, username);
+    const app = new BlackIronApp(userToken, csrfToken, username);
+    const db = await BlackIronDB.openDB(app);
+    app.db = db;
+    return app;
   }
+
+  db!: BlackIronDB;
+
   private constructor(
-    public db: BlackIronDB,
     userToken?: string,
     private csrfToken?: string,
     public username?: string,

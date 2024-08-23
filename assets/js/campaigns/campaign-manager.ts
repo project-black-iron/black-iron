@@ -27,61 +27,6 @@ export class CampaignManager {
       });
   }
 
-  async saveCampaign(campaign: FormData | ICampaign) {
-    // TODO(@zkat): Validation
-    if (campaign instanceof FormData) {
-      campaign = Object.fromEntries(campaign.entries()) as unknown as ICampaign;
-    }
-    if (!campaign.id) {
-      campaign.id = crypto.randomUUID();
-    }
-    await this.app?.db.put("campaigns", campaign);
-  }
-
-  async uploadCampaign(campaign: ICampaign) {
-    if (!(campaign instanceof Campaign)) {
-      campaign = new Campaign(campaign);
-    }
-    const url = new URL(window.location.href);
-    url.pathname = "/play/campaigns";
-    url.search = (campaign as Campaign).toParams().toString();
-    // TODO(@zkat): csrf token
-    const res = await this.app.fetch(url, {
-      method: "POST",
-    });
-    if (!res.ok) {
-      throw new Error("Failed to upload campaign");
-    }
-  }
-
-  async syncCampaign(remote?: ICampaign, local?: ICampaign) {
-    remote = remote && new Campaign(remote);
-    local = local && new Campaign(local);
-    if (remote && local) {
-      if (remote._rev !== local._rev) {
-        if (local._rev && remote._revisions?.includes(local._rev)) {
-          await this.saveCampaign(remote);
-        } else if (local._rev && local._revisions?.includes(remote._rev!)) {
-          await this.uploadCampaign(local);
-        } else if ((remote as Campaign).eq(local)) {
-          // Both are effectively the same. Overwrite the local DB's copy of
-          // the campaign to save the sync props.
-          await this.saveCampaign(remote);
-        } else {
-          await this.uploadCampaign((local as Campaign).merge(remote));
-        }
-      } else {
-        console.log("_rev were both the same. Already synced");
-      }
-    } else if (remote) {
-      await this.saveCampaign(remote);
-    } else if (local) {
-      await this.uploadCampaign(local);
-    } else {
-      throw new Error("Must give at least one campaign to sync.");
-    }
-  }
-
   /**
    * Synchronizes local campaign state with a remote server, updating local
    * offline database state and uploading any differences back to the server.
@@ -125,12 +70,12 @@ export class CampaignManager {
       Array.from(allKeys).map((key) => {
         const remote = remotes.get(key);
         const local = locals.get(key);
-        return this.syncCampaign(remote, local);
+        return this.app.db.sync(remote && new Campaign(remote), local);
       }),
     );
   }
 
-  async getCampaign(id?: string) {
+  async getCampaign(id: string) {
     const cdata = id ? await this.app.db.get("campaigns", id) : undefined;
     return cdata ? new Campaign(cdata) : undefined;
   }

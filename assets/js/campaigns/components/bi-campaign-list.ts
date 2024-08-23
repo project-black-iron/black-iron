@@ -74,11 +74,12 @@ export class BiCampaignList extends LitElement {
 
   render() {
     return html`<ul>
-        ${this.campaigns
-          ?.filter((c) => !c.deleted_at)
-          .map(
-            (campaign) =>
-              html`<li>
+        ${
+      this.campaigns
+        ?.filter((c) => !c.deleted_at)
+        .map(
+          (campaign) =>
+            html`<li>
                 <a href="/play/campaigns/${campaign.slug}">
                   <article>
                     <header>
@@ -88,7 +89,8 @@ export class BiCampaignList extends LitElement {
                   </article>
                 </a>
               </li>`,
-          )}
+        )
+    }
       </ul>
       <slot></slot>`;
   }

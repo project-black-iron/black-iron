@@ -4,7 +4,8 @@ defmodule BlackIron.Campaigns.Campaign do
 
   @primary_key {:id, :binary_id, autogenerate: true}
 
-  @derive {Jason.Encoder, only: [:id, :name, :description, :slug, :_rev, :_revisions, :deleted_at]}
+  @derive {Jason.Encoder,
+           only: [:id, :name, :description, :slug, :_rev, :_revisions, :deleted_at]}
 
   schema "campaigns" do
     field :name, :string
