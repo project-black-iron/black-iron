@@ -35,15 +35,26 @@ export class BiAppContext extends LitElement {
   blackIronApp?: BlackIronApp;
 
   async willUpdate(changedProps: Map<string, unknown>) {
-    if (!isServer && changedProps.has("userToken")) {
-      this.blackIronApp = await BlackIronApp.createApp(this.userToken, this.csrfToken, this.username);
+    if (
+      !isServer
+      && (changedProps.has("userToken") || changedProps.has("csrfToken"))
+    ) {
+      this.blackIronApp = await BlackIronApp.createApp(
+        this.userToken,
+        this.csrfToken,
+        this.username,
+      );
     }
   }
 
   constructor() {
     super();
     if (!isServer) {
-      BlackIronApp.createApp(this.userToken, this.csrfToken, this.username).then((app) => {
+      BlackIronApp.createApp(
+        this.userToken,
+        this.csrfToken,
+        this.username,
+      ).then((app) => {
         this.blackIronApp = app;
       });
     }
