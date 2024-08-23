@@ -12,7 +12,9 @@
 
 - [Elixir](https://elixir-lang.org/install.html) and Erlang (Typically auto-installs with Elixir)
   - [Check versions here](https://github.com/project-black-iron/black-iron/blob/main/.tool-versions)
-- [Postgresql v13 or later](https://wiki.postgresql.org/wiki/Detailed_installation_guides) ATM the tests require a postgres/postgres user/password to run. Check [this doc](https://academind.com/tutorials/postgresql-start-stop-uninstall-upgrade-server#resetting-the-root-user-password  ) for info on how to reset your postgres password.
+- [Postgresql v13 or later](https://wiki.postgresql.org/wiki/Detailed_installation_guides) ATM the tests require a postgres/postgres user/password to run. Check [this doc](https://academind.com/tutorials/postgresql-start-stop-uninstall-upgrade-server#resetting-the-root-user-password) for info on how to reset your postgres password.
+  - A [docker-compose](./docker-compose.yaml) file is provided that will run postgres configured
+    appropriately
 - [NodeJS](https://nodejs.org/en/download/)
 - `inotify-tools` (Linux only) - Install through your preferred package manager
   - [Check versions here](https://github.com/project-black-iron/black-iron/blob/main/.tool-versions)
@@ -25,12 +27,26 @@
 
 > Note: If postgresql installed via homebrew, make sure to run `/usr/local/opt/postgres/bin/createuser -s postgres`.
 
+You can use asdf to install elixir and erlang (ensure
+[the necessary build deps](https://github.com/asdf-vm/asdf-erlang?tab=readme-ov-file#before-asdf-install)
+are installed first):
+
+```shell
+asdf plugin add nodejs
+asdf plugin add erlang
+asdf plugin add elixir
+KERL_BUILD_DOCS=yes asdf install # will install erlang (w/ docs), elixir, and nodejs
+```
+
 ### Application setup
 
 Just a couple more commands and we're all set:
 
-* `mix local.hex` to install hex package manager
-* `mix archive.install hex phx_new`
+- `mix local.hex` to install hex package manager
+- `mix archive.install hex phx_new`
+- If using docker postgres: `docker compose up -d`
+- `mix setup` to install deps, create the database, install JS deps, and build JS assets
+- `mix phx.server` to run the server
 
 ## Architecture
 
@@ -128,15 +144,15 @@ layers:
    regular light DOM as possible. This content can be styled with our global
    CSS styles, and does not require JS to render/function.
    - This uses [`Phoenix HEEx templates and
-   Components`](https://hexdocs.pm/phoenix/components.html).
+Components`](https://hexdocs.pm/phoenix/components.html).
    - Within these templates, we can insert `Lit` components for things that
-   will absolutely need dynamic, client-side/JS behavior or will otherwise
-   have to do something special to function while offline.
+     will absolutely need dynamic, client-side/JS behavior or will otherwise
+     have to do something special to function while offline.
 2. Once `Phoenix` renders these templates, they're passed through the
    [`Plug`](https://hexdocs.pm/plug/readme.html) system, which eventually
    invokes a `Lit` server-side renderer.
    - This renderer takes the template, loads all existing components, and
-   pre-renders `Lit` components as far as server-side work will allow.
+     pre-renders `Lit` components as far as server-side work will allow.
    - In components, this behavior can be controlled with
      [`isServer`](https://lit.dev/docs/api/misc/#isServer).
 3. Finally, all this server-side-rendered content is sent to the client, and
