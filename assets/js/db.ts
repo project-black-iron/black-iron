@@ -122,7 +122,7 @@ export class BlackIronDB {
       method: "POST",
     });
     if (!res.ok) {
-      throw new Error("Failed to upload campaign");
+      throw new Error("Failed to upload syncable entity");
     }
   }
 
@@ -135,7 +135,7 @@ export class BlackIronDB {
           await this.uploadSyncable(local);
         } else if (remote.eq(local)) {
           // Both are effectively the same. Overwrite the local DB's copy of
-          // the campaign to save the sync props.
+          // the syncable to save the sync props.
           await this.saveSyncable(remote);
         } else {
           await this.uploadSyncable(local.merge(remote));
@@ -148,20 +148,7 @@ export class BlackIronDB {
     } else if (local) {
       await this.uploadSyncable(local);
     } else {
-      throw new Error("Must give at least one campaign to sync.");
+      throw new Error("Must give at least one syncable to sync.");
     }
-  }
-
-  async mapCampaigns(
-    mode: IDBTransactionMode,
-    callback: (campaign: Campaign) => void,
-  ) {
-    const txn = await this.app.db.transaction("campaigns", mode);
-    let cursor = await txn.store.openCursor();
-    while (cursor) {
-      callback(new Campaign(cursor.value));
-      cursor = await cursor.continue();
-    }
-    await txn.done;
   }
 }
