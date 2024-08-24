@@ -64,7 +64,11 @@ defmodule BlackIronWeb.Router do
 
   defp set_preload_flag(conn, _) do
     if get_req_header(conn, "x-preload") == ["true"] do
-      assign(conn, :preload, true)
+      conn
+      |> assign(:preload, true)
+      # Also remove session stuff
+      |> assign(:current_user, nil)
+      |> assign(:user_token, nil)
     else
       conn
     end

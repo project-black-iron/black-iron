@@ -102,7 +102,7 @@ async function routeAppPaths(appPaths: string[]) {
       .split("/")
       .map((x) => (x.startsWith("__") ? "[^/]+" : x))
       .join("/");
-    const regex = new RegExp(`^(:?https?://[^/]+)?${match}$`);
+    const regex = new RegExp(`^(:?https?://[^/]+)?${match}/?$`);
     registerRoute(
       ({ url }) => {
         return regex.test(url.href);
