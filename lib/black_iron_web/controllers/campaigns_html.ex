@@ -40,11 +40,6 @@ defmodule BlackIronWeb.CampaignsHTML do
         />
         <.input field={f[:description]} type="textarea" label="Description" required />
 
-        <.inputs_for :let={fp} field={f[:memberships]}>
-          <.input field={fp[:role]} type="text" label="Role" required />
-          <.input field={fp[:username]} type="text" label="Username" required />
-        </.inputs_for>
-
         <:actions>
           <.button phx-disable-with="Creating new campaign...">
             <%= gettext("Create campaign") %>

@@ -60,7 +60,7 @@ export class BiCampaignList extends LitElement {
         description: formData.get("data[description]") as string,
         memberships: [
           {
-            username: this.app?.username ?? "",
+            userId: this.app?.userId ?? "",
             roles: [CampaignRole.Owner],
           },
         ],

@@ -14,7 +14,13 @@ defmodule BlackIron.CampaignsTest do
 
     test "list_campaigns/1 returns all campaigns" do
       campaign = campaign_fixture() |> Repo.preload(:memberships)
-      user = campaign.memberships |> List.first() |> Map.get(:username) |> Accounts.get_user_by_username()
+
+      user =
+        campaign.memberships
+        |> List.first()
+        |> Map.get(:username)
+        |> Accounts.get_user_by_username()
+
       assert Campaigns.list_campaigns(user) == [campaign]
     end
 
@@ -40,7 +46,12 @@ defmodule BlackIron.CampaignsTest do
 
     test "update_campaign/3 with valid data updates the campaign" do
       campaign = campaign_fixture() |> Repo.preload(:memberships)
-      user = campaign.memberships |> List.first() |> Map.get(:username) |> Accounts.get_user_by_username()
+
+      user =
+        campaign.memberships
+        |> List.first()
+        |> Map.get(:username)
+        |> Accounts.get_user_by_username()
 
       update_attrs = %{
         name: "some updated name",
@@ -48,7 +59,9 @@ defmodule BlackIron.CampaignsTest do
         description: "some updated description"
       }
 
-      assert {:ok, %Campaign{} = campaign} = Campaigns.update_campaign(user, campaign, update_attrs)
+      assert {:ok, %Campaign{} = campaign} =
+               Campaigns.update_campaign(user, campaign, update_attrs)
+
       assert campaign.name == "some updated name"
       assert campaign.slug == "some updated slug"
       assert campaign.description == "some updated description"
@@ -56,14 +69,28 @@ defmodule BlackIron.CampaignsTest do
 
     test "update_campaign/3 with invalid data returns error changeset" do
       campaign = campaign_fixture() |> Repo.preload(:memberships)
-      user = campaign.memberships |> List.first() |> Map.get(:username) |> Accounts.get_user_by_username()
-      assert {:error, %Ecto.Changeset{}} = Campaigns.update_campaign(user, campaign, @invalid_attrs)
+
+      user =
+        campaign.memberships
+        |> List.first()
+        |> Map.get(:username)
+        |> Accounts.get_user_by_username()
+
+      assert {:error, %Ecto.Changeset{}} =
+               Campaigns.update_campaign(user, campaign, @invalid_attrs)
+
       assert campaign == Campaigns.get_campaign!(campaign.id)
     end
 
     test "delete_campaign/2 deletes the campaign" do
       campaign = campaign_fixture() |> Repo.preload(:memberships)
-      user = campaign.memberships |> List.first() |> Map.get(:username) |> Accounts.get_user_by_username()
+
+      user =
+        campaign.memberships
+        |> List.first()
+        |> Map.get(:username)
+        |> Accounts.get_user_by_username()
+
       assert {:ok, %Campaign{}} = Campaigns.delete_campaign(user, campaign)
       assert_raise Ecto.NoResultsError, fn -> Campaigns.get_campaign!(campaign.id) end
     end

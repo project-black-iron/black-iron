@@ -2,14 +2,10 @@ defmodule BlackIron.Campaigns.Membership do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @derive {Jason.Encoder, only: [:username, :roles]}
+  @derive {Jason.Encoder, only: [:user_id, :roles]}
 
   schema "campaign_memberships" do
-    belongs_to :user, BlackIron.Accounts.User,
-      references: :username,
-      foreign_key: :username,
-      type: :string
-
+    belongs_to :user, BlackIron.Accounts.User, type: :binary_id
     belongs_to :campaign, BlackIron.Campaigns.Campaign, type: :binary_id
     field :roles, {:array, Ecto.Enum}, values: [:owner, :guide, :player], default: [:player]
 

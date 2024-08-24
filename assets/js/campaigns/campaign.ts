@@ -24,7 +24,7 @@ export interface ICampaign extends ISyncable {
 }
 
 export interface CampaignMembership {
-  username: string;
+  userId: string;
   roles: CampaignRole[];
 }
 

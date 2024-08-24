@@ -18,8 +18,7 @@ defmodule BlackIron.Repo.Migrations.CreateCampaigns do
     create unique_index(:campaigns, [:slug])
 
     create table(:campaign_memberships) do
-      add :username, references(:users, column: :username, type: :citext, on_delete: :delete_all),
-        null: false
+      add :user_id, references(:users, type: :uuid, on_delete: :delete_all), null: false
 
       add :campaign_id, references(:campaigns, type: :uuid, on_delete: :delete_all), null: false
       add :roles, {:array, :string}, default: ["player"], null: false
@@ -27,6 +26,6 @@ defmodule BlackIron.Repo.Migrations.CreateCampaigns do
       timestamps(type: :utc_datetime)
     end
 
-    create unique_index(:campaign_memberships, [:username, :campaign_id])
+    create unique_index(:campaign_memberships, [:user_id, :campaign_id])
   end
 end

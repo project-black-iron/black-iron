@@ -4,7 +4,8 @@ defmodule BlackIron.Repo.Migrations.CreateUsersAuthTables do
   def change do
     execute "CREATE EXTENSION IF NOT EXISTS citext", ""
 
-    create table(:users) do
+    create table(:users, primary_key: false) do
+      add :id, :uuid, primary_key: true
       add :email, :citext, null: false
       add :username, :citext, null: false
       add :hashed_password, :string, null: false
@@ -17,7 +18,7 @@ defmodule BlackIron.Repo.Migrations.CreateUsersAuthTables do
     create unique_index(:users, [:username])
 
     create table(:users_tokens) do
-      add :user_id, references(:users, on_delete: :delete_all), null: false
+      add :user_id, references(:users, type: :uuid, on_delete: :delete_all), null: false
       add :token, :binary, null: false
       add :context, :string, null: false
       add :sent_to, :string

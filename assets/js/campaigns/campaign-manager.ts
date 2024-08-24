@@ -13,8 +13,11 @@ export class CampaignManager {
   }
 
   joinSyncChannel() {
+    if (!this.app.userId) {
+      return;
+    }
     this.channel = this.app.socket?.channel(
-      "campaign_sync:" + this.app.username,
+      "campaign_sync:" + this.app.userId,
       {},
     );
     this.channel
@@ -68,7 +71,11 @@ export class CampaignManager {
       Array.from(allKeys).map((key) => {
         const remote = remotes.get(key);
         const local = locals.get(key);
-        return this.app.db.sync("campaigns", remote && new Campaign(remote), local);
+        return this.app.db.sync(
+          "campaigns",
+          remote && new Campaign(remote),
+          local,
+        );
       }),
     );
   }

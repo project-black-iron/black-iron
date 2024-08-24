@@ -24,8 +24,8 @@ export class BiAppContext extends LitElement {
   @property({ attribute: "user-token" })
   userToken?: string;
 
-  @property()
-  username?: string;
+  @property({ attribute: "user-id" })
+  userId?: string;
 
   @property({ attribute: "csrf-token" })
   csrfToken?: string;
@@ -42,7 +42,7 @@ export class BiAppContext extends LitElement {
       this.blackIronApp = await BlackIronApp.createApp(
         this.userToken,
         this.csrfToken,
-        this.username,
+        this.userId,
       );
     }
   }
@@ -53,7 +53,7 @@ export class BiAppContext extends LitElement {
       BlackIronApp.createApp(
         this.userToken,
         this.csrfToken,
-        this.username,
+        this.userId,
       ).then((app) => {
         this.blackIronApp = app;
       });

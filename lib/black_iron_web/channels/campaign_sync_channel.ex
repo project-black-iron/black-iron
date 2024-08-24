@@ -5,8 +5,8 @@ defmodule BlackIronWeb.CampaignSyncChannel do
   use BlackIronWeb, :channel
 
   @impl true
-  def join("campaign_sync:" <> username, _payload, socket) do
-    if socket.assigns[:user].username == username do
+  def join("campaign_sync:" <> user_id, _payload, socket) do
+    if socket.assigns[:user].id == user_id do
       {:ok, socket}
     else
       {:error, %{reason: "unauthorized"}}
