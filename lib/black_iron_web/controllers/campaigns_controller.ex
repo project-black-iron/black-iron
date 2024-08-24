@@ -25,7 +25,7 @@ defmodule BlackIronWeb.CampaignsController do
   end
 
   def create(conn, params) do
-    res = Campaigns.create_campaign(conn.assigns[:current_user], params["campaign"])
+    res = Campaigns.create_campaign(conn.assigns[:current_user], params["data"])
     campaigns = Campaigns.list_campaigns_for_user(conn.assigns[:current_user])
 
     case res do

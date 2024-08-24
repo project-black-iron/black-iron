@@ -14,11 +14,11 @@ defmodule BlackIronWeb.CampaignsHTML do
     <bi-campaign-list
       id="campaign-list"
       hx-swap-oob="true"
-      foo="bar"
       campaigns={Jason.encode!(assigns[:campaigns])}
     >
       <.simple_form
         :let={f}
+        as={:data}
         for={@changeset}
         action={~p"/play/campaigns/"}
         hx-post={~p"/play/campaigns"}
@@ -37,6 +37,11 @@ defmodule BlackIronWeb.CampaignsHTML do
           required
         />
         <.input field={f[:description]} type="textarea" label="Description" required />
+
+        <.inputs_for :let={fp} field={f[:memberships]}>
+          <.input field={fp[:role]} type="text" label="Role" required />
+          <.input field={fp[:username]} type="text" label="Username" required />
+        </.inputs_for>
 
         <:actions>
           <.button phx-disable-with="">

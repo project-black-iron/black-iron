@@ -63,22 +63,13 @@ export class Campaign extends AbstractSyncable implements ICampaign {
     return new Campaign(this);
   }
 
-  toParams() {
-    const params = new URLSearchParams({
-      "campaign[id]": this.id,
-      "campaign[name]": this.name,
-      "campaign[slug]": this.slug,
-      "campaign[description]": this.description,
-    });
-    // TODO: sync memberships too
-    if (this._rev) {
-      params.set("campaign[_rev]", this._rev);
-    }
-    if (this._revisions) {
-      this._revisions.forEach((rev, i) => {
-        params.set(`campaigns[_revisions][${i}]`, rev);
-      });
-    }
-    return params;
+  toSyncable() {
+    return {
+      ...super.toSyncable(),
+      name: this.name,
+      slug: this.slug,
+      description: this.description,
+      memberships: this.memberships,
+    };
   }
 }

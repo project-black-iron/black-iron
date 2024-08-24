@@ -44,8 +44,15 @@ export abstract class AbstractSyncable implements ISyncable {
     throw new Error("Not implemented");
   }
 
-  toParams(): URLSearchParams {
-    return new URLSearchParams({});
+  toSyncable(): ISyncable {
+    const syncable: ISyncable = { id: this.id };
+    if (this._rev) {
+      syncable._rev = this._rev;
+    }
+    if (this._revisions) {
+      syncable._revisions = this._revisions;
+    }
+    return syncable;
   }
 }
 
@@ -128,9 +135,9 @@ export class BlackIronDB {
   async uploadSyncable(syncable: AbstractSyncable) {
     const url = new URL(window.location.href);
     url.pathname = syncable.route;
-    url.search = syncable.toParams().toString();
     const res = await this.app.fetch(url, {
       method: "POST",
+      body: JSON.stringify({ data: syncable.toSyncable() }),
     });
     if (!res.ok) {
       if (res.status === 409) {
