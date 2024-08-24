@@ -86,16 +86,18 @@ export class CampaignManager {
     );
   }
 
-  async mapCampaigns(
+  async mapCampaigns<T>(
     mode: IDBTransactionMode,
-    callback: (campaign: Campaign) => void,
+    callback: (campaign: Campaign) => T,
   ) {
     const txn = await this.app.db.transaction("campaigns", mode);
     let cursor = await txn.store.openCursor();
+    const vals: T[] = [];
     while (cursor) {
-      callback(new Campaign(cursor.value));
+      vals.push(callback(new Campaign(cursor.value)));
       cursor = await cursor.continue();
     }
     await txn.done;
+    return vals;
   }
 }
