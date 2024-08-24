@@ -27,6 +27,8 @@ defmodule BlackIronWeb.CampaignsHTML do
           <%= gettext("Oops, something went wrong! Please check the errors below.") %>
         </.error>
 
+        <.input field={f[:id]} type="hidden" value={Ecto.UUID.generate()} />
+
         <.input field={f[:name]} type="text" label="Name" required />
         <.input
           field={f[:slug]}

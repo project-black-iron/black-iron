@@ -24,7 +24,6 @@ export class BiCampaignContext extends LitElement {
   async willUpdate(changed: PropertyValues<this>) {
     if (changed.has("_campaignId") || changed.has("app")) {
       if (this._campaignId) {
-        console.log("loading campaign", this._campaignId);
         this.campaign = this._campaignId == null
           ? undefined
           : await this.app?.campaignManager.getCampaign(this._campaignId);

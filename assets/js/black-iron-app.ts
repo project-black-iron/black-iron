@@ -32,11 +32,10 @@ export class BlackIronApp {
     input: string | URL | Request,
     init?: RequestInit,
   ): Promise<Response> {
-    if (!this.#userToken) {
-      throw new Error("Cannot fetch without a user token");
-    }
     input = input instanceof Request ? input : new Request(input, init);
-    input.headers.set("Authorization", `Bearer ${this.#userToken}`);
+    if (this.#userToken) {
+      input.headers.set("Authorization", `Bearer ${this.#userToken}`);
+    }
     if (this.csrfToken) {
       input.headers.set("x-csrf-token", this.csrfToken);
     }

@@ -35,9 +35,7 @@ export class CampaignManager {
    * remote campaign state. New remote data will not be requested.
    */
   async syncCampaigns(remoteCampaigns?: ICampaign[]) {
-    console.log("Syncing campaigns:", remoteCampaigns);
     if (!remoteCampaigns) {
-      console.log("No remote campaigns to sync");
       // try {
       //   console.log("Fetchin campaigns from server:", remoteCampaigns);
       //   // TODO(@zkat): Still need JSON I guess :<
@@ -78,6 +76,10 @@ export class CampaignManager {
   async getCampaign(id: string) {
     const cdata = id ? await this.app.db.get("campaigns", id) : undefined;
     return cdata ? new Campaign(cdata) : undefined;
+  }
+
+  async saveCampaign(campaign: ICampaign) {
+    return this.app.db.put("campaigns", campaign);
   }
 
   async listCampaigns() {

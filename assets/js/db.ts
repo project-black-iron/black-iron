@@ -36,7 +36,7 @@ export abstract class AbstractSyncable implements ISyncable {
   }
 
   eq(other: ISyncable): boolean {
-    return this.id === other.id && this.deleted_at === other.deleted_at;
+    return this.id === other.id && this.deleted_at == other.deleted_at;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -137,6 +137,9 @@ export class BlackIronDB {
     url.pathname = syncable.route;
     const res = await this.app.fetch(url, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ data: syncable.toSyncable() }),
     });
     if (!res.ok) {

@@ -38,6 +38,10 @@ export class Campaign extends AbstractSyncable implements ICampaign {
     db.createObjectStore("campaigns", { keyPath: "id" });
   }
 
+  get route() {
+    return "/play/campaigns";
+  }
+
   constructor(public data: ICampaign) {
     super(data);
     this.name = data.name;
@@ -48,7 +52,8 @@ export class Campaign extends AbstractSyncable implements ICampaign {
 
   eq(other: ICampaign) {
     return (
-      this.name === other.name
+      super.eq(other)
+      && this.name === other.name
       && this.slug === other.slug
       && this.description === other.description
       && JSON.stringify(this.memberships) === JSON.stringify(other.memberships)

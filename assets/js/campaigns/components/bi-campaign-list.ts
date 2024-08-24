@@ -4,7 +4,7 @@ import { customElement, property } from "lit/decorators.js";
 import { BlackIronApp } from "../../black-iron-app";
 import { BiAppContext } from "../../components/bi-app-context";
 import { ssrConsume } from "../../utils/ssr-context";
-import { ICampaign } from "../campaign";
+import { CampaignRole, ICampaign } from "../campaign";
 
 @customElement("bi-campaign-list")
 export class BiCampaignList extends LitElement {
@@ -47,9 +47,30 @@ export class BiCampaignList extends LitElement {
 
   constructor() {
     super();
-    this.addEventListener("htmx:beforeSend", (e: Event) => {
-      console.log("TODO: create offline campaign first.");
-      (e.target as HTMLFormElement).reset();
+    this.addEventListener("htmx:beforeRequest", async (e: Event) => {
+      const form = e.target as HTMLFormElement;
+      const formData = new FormData(form);
+      // TODO(@zkat): validate this! TODO(@zkat): Maybe do this in two stages?
+      // do an `htmx:beforeRequest` that will cancel the request if the
+      // validation fails?
+      const campaign: ICampaign = {
+        id: formData.get("data[id]") as string,
+        name: formData.get("data[name]") as string,
+        slug: formData.get("data[slug]") as string,
+        description: formData.get("data[description]") as string,
+        memberships: [
+          {
+            username: this.app?.username ?? "",
+            roles: [CampaignRole.Owner],
+          },
+        ],
+      };
+      await this.app?.campaignManager.saveCampaign(campaign);
+      await this.#setFromLocalCampaigns();
+    });
+    this.addEventListener("htmx:afterRequest", (e: Event) => {
+      const form = e.target as HTMLFormElement;
+      form.reset();
     });
   }
 
@@ -65,8 +86,7 @@ export class BiCampaignList extends LitElement {
     }
   }
 
-  async #syncCampaignData() {
-    await this.app?.campaignManager.syncCampaigns(this.campaigns);
+  async #setFromLocalCampaigns() {
     const campaigns = await this.app?.campaignManager.listCampaigns();
     campaigns?.sort((a, b) => (a.name > b.name ? 1 : -1));
     if (campaigns) {
@@ -74,7 +94,17 @@ export class BiCampaignList extends LitElement {
     }
   }
 
+  async #syncCampaignData() {
+    try {
+      await this.app?.campaignManager.syncCampaigns(this.campaigns);
+    } catch (e) {
+      console.error("Failed to sync campaigns", e);
+    }
+    await this.#setFromLocalCampaigns();
+  }
+
   render() {
+    // TODO(@zkat): only show campaigns for the current account, if we're logged in.
     return html`<ul>
         ${
       this.campaigns
