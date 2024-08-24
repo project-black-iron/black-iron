@@ -16,18 +16,17 @@ export interface ISyncable {
   _rev?: string;
   _revisions?: string[];
   deleted_at?: string;
-  _storeName: StoreNames<BlackIronDBSchema>;
-  _route: string;
 }
 
 export abstract class AbstractSyncable implements ISyncable {
+  get route() {
+    return "/";
+  }
+
   id: string;
   _rev?: string;
   _revisions?: string[];
   deleted_at?: string;
-  _storeName: StoreNames<BlackIronDBSchema> =
-    "abstract" as StoreNames<BlackIronDBSchema>;
-  _route: string = "/";
 
   constructor(data: ISyncable) {
     this.id = data.id;
@@ -93,10 +92,11 @@ export class BlackIronDB {
   }
 
   async put<Name extends StoreNames<BlackIronDBSchema>>(
+    storeName: Name,
     value: BlackIronDBSchema[Name]["value"],
     key?: BlackIronDBSchema[Name]["key"],
   ) {
-    return this.#idb.put(value._storeName, value, key);
+    return this.#idb.put(storeName, value, key);
   }
 
   async delete<Name extends StoreNames<BlackIronDBSchema>>(
@@ -109,7 +109,7 @@ export class BlackIronDB {
   async saveSyncable<
     Name extends StoreNames<BlackIronDBSchema>,
     T extends BlackIronDBSchema[Name]["value"],
-  >(syncable: T, bumpRev: boolean = true): Promise<T> {
+  >(storeName: Name, syncable: T, bumpRev: boolean = true): Promise<T> {
     const ret = { ...syncable }; // TODO(@zkat): deep clone?
     if (!ret.id) {
       ret.id = crypto.randomUUID();
@@ -121,13 +121,13 @@ export class BlackIronDB {
       }
       ret._revisions.unshift(ret._rev);
     }
-    await this.#idb.put(ret._storeName, ret);
+    await this.#idb.put(storeName, ret);
     return ret;
   }
 
   async uploadSyncable(syncable: AbstractSyncable) {
     const url = new URL(window.location.href);
-    url.pathname = syncable._route;
+    url.pathname = syncable.route;
     url.search = syncable.toParams().toString();
     const res = await this.app.fetch(url, {
       method: "POST",
@@ -142,19 +142,23 @@ export class BlackIronDB {
     }
   }
 
-  async sync(remote?: AbstractSyncable, local?: AbstractSyncable) {
+  async sync<Name extends StoreNames<BlackIronDBSchema>>(
+    storeName: Name,
+    remote?: AbstractSyncable,
+    local?: AbstractSyncable,
+  ) {
     if (remote && local) {
       if (remote._rev !== local._rev) {
         if (local._rev && remote._revisions?.includes(local._rev)) {
           // Remote has local version. Fast-forward local and save.
-          await this.saveSyncable(remote, false);
+          await this.saveSyncable(storeName, remote, false);
         } else if (local._rev && local._revisions?.includes(remote._rev!)) {
           // Local has remote version. Fast-forward remote by uploading.
           await this.uploadSyncable(local);
         } else if (remote.eq(local)) {
           // Both are effectively the same. Overwrite the local DB's copy of
           // the syncable to save the remote sync props.
-          await this.saveSyncable(remote, false);
+          await this.saveSyncable(storeName, remote, false);
         } else {
           await this.uploadSyncable(local.merge(remote));
         }
@@ -162,7 +166,7 @@ export class BlackIronDB {
         // _revs were both the same. Already synced
       }
     } else if (remote) {
-      await this.saveSyncable(remote, false);
+      await this.saveSyncable(storeName, remote, false);
     } else if (local) {
       await this.uploadSyncable(local);
     } else {

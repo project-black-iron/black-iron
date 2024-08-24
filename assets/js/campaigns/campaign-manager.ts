@@ -70,7 +70,7 @@ export class CampaignManager {
       Array.from(allKeys).map((key) => {
         const remote = remotes.get(key);
         const local = locals.get(key);
-        return this.app.db.sync(remote && new Campaign(remote), local);
+        return this.app.db.sync("campaigns", remote && new Campaign(remote), local);
       }),
     );
   }
