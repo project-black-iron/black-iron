@@ -46,7 +46,7 @@ defmodule BlackIronWeb.CampaignsHTML do
         </.inputs_for>
 
         <:actions>
-          <.button phx-disable-with="">
+          <.button phx-disable-with="Creating new campaign...">
             <%= gettext("Create campaign") %>
           </.button>
         </:actions>
