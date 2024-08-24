@@ -10,7 +10,7 @@ defmodule BlackIronWeb.UserSocket do
 
   ## Channels
 
-  channel "campaign_list_sync:*", BlackIronWeb.CampaignListSyncChannel
+  channel "campaign_sync:*", BlackIronWeb.CampaignSyncChannel
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After

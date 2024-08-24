@@ -1,8 +1,11 @@
-defmodule BlackIronWeb.CampaignListSyncChannel do
+defmodule BlackIronWeb.CampaignSyncChannel do
+  @moduledoc """
+  Syncs campaign data.
+  """
   use BlackIronWeb, :channel
 
   @impl true
-  def join("campaign_list_sync:" <> username, _payload, socket) do
+  def join("campaign_sync:" <> username, _payload, socket) do
     if socket.assigns[:user].username == username do
       {:ok, socket}
     else

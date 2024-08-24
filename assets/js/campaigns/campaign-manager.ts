@@ -14,7 +14,7 @@ export class CampaignManager {
 
   joinSyncChannel() {
     this.channel = this.app.socket?.channel(
-      "campaign_list_sync:" + this.app.username,
+      "campaign_sync:" + this.app.username,
       {},
     );
     this.channel
