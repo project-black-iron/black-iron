@@ -123,10 +123,7 @@ export class BlackIronDB {
     }
     if (!ret._rev || bumpRev) {
       ret._rev = crypto.randomUUID();
-      if (!ret._revisions) {
-        ret._revisions = [];
-      }
-      ret._revisions.unshift(ret._rev);
+      ret._revisions = [ret._rev, ...(ret._revisions || [])];
     }
     await this.#idb.put(storeName, ret);
     return ret;
