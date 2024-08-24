@@ -4,7 +4,7 @@ import { customElement, property } from "lit/decorators.js";
 import { BlackIronApp } from "../../black-iron-app";
 import { BiAppContext } from "../../components/bi-app-context";
 import { ssrConsume } from "../../utils/ssr-context";
-import { CampaignRole, ICampaign } from "../campaign";
+import { ICampaign } from "../campaign";
 
 @customElement("bi-campaign-list")
 export class BiCampaignList extends LitElement {
@@ -58,12 +58,7 @@ export class BiCampaignList extends LitElement {
         name: formData.get("data[name]") as string,
         slug: formData.get("data[slug]") as string,
         description: formData.get("data[description]") as string,
-        memberships: [
-          {
-            userId: this.app?.userId ?? "",
-            roles: [CampaignRole.Owner],
-          },
-        ],
+        memberships: [],
       };
       await this.app?.campaignManager.saveCampaign(campaign);
       await this.#setFromLocalCampaigns();

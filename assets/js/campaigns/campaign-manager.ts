@@ -90,9 +90,16 @@ export class CampaignManager {
   }
 
   async listCampaigns() {
-    return (await this.app.db.getAll("campaigns")).map(
-      (cdata) => new Campaign(cdata),
-    );
+    return (await this.app.db.getAll("campaigns"))
+      .filter((cdata) => {
+        return (
+          // Return both offline-only and online campaigns for the current
+          // account.
+          !cdata.memberships.length
+          || cdata.memberships.find((m) => m.userId == this.app.userId)
+        );
+      })
+      .map((cdata) => new Campaign(cdata));
   }
 
   async mapCampaigns<T>(
