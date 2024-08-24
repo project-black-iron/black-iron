@@ -1,4 +1,4 @@
-import { DBSchema, IDBPDatabase, IndexKey, IndexNames, openDB, StoreNames } from "idb";
+import { DBSchema, IDBPDatabase, openDB, StoreNames } from "idb";
 import { BlackIronApp } from "./black-iron-app";
 import { Campaign, CampaignSchema } from "./campaigns/campaign";
 
