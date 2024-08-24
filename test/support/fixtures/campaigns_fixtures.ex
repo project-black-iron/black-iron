@@ -8,14 +8,18 @@ defmodule BlackIron.CampaignsFixtures do
   Generate a campaign.
   """
   def campaign_fixture(attrs \\ %{}) do
+    user = BlackIron.AccountsFixtures.user_fixture()
+
     {:ok, campaign} =
-      attrs
-      |> Enum.into(%{
-        name: "some name",
-        description: "some description",
-        slug: "some slug"
-      })
-      |> BlackIron.Campaigns.create_campaign()
+      BlackIron.Campaigns.create_campaign(
+        user,
+        attrs
+        |> Enum.into(%{
+          name: "some name",
+          description: "some description",
+          slug: "some slug"
+        })
+      )
 
     campaign
   end
