@@ -25,7 +25,8 @@ export abstract class AbstractSyncable implements ISyncable {
   _rev?: string;
   _revisions?: string[];
   deleted_at?: string;
-  _storeName: StoreNames<BlackIronDBSchema> = "abstract" as StoreNames<BlackIronDBSchema>;
+  _storeName: StoreNames<BlackIronDBSchema> =
+    "abstract" as StoreNames<BlackIronDBSchema>;
   _route: string = "/";
 
   constructor(data: ISyncable) {
@@ -36,7 +37,7 @@ export abstract class AbstractSyncable implements ISyncable {
   }
 
   eq(other: ISyncable): boolean {
-    return this === other;
+    return this.id === other.id && this.deleted_at === other.deleted_at;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -81,37 +82,47 @@ export class BlackIronDB {
   }
 
   async getAll<Name extends StoreNames<BlackIronDBSchema>>(storeName: Name) {
-    return await this.#idb.getAll(storeName);
+    return this.#idb.getAll(storeName);
   }
 
   async transaction<Name extends StoreNames<BlackIronDBSchema>>(
     storeName: Name,
     mode: IDBTransactionMode,
   ) {
-    return await this.#idb.transaction(storeName, mode);
+    return this.#idb.transaction(storeName, mode);
   }
 
   async put<Name extends StoreNames<BlackIronDBSchema>>(
     value: BlackIronDBSchema[Name]["value"],
     key?: BlackIronDBSchema[Name]["key"],
   ) {
-    return await this.#idb.put(value._storeName, value, key);
+    return this.#idb.put(value._storeName, value, key);
   }
 
   async delete<Name extends StoreNames<BlackIronDBSchema>>(
     storeName: Name,
     key: BlackIronDBSchema[Name]["key"],
   ) {
-    return await this.#idb.delete(storeName, key);
+    return this.#idb.delete(storeName, key);
   }
 
-  async saveSyncable<Name extends StoreNames<BlackIronDBSchema>>(
-    syncable: BlackIronDBSchema[Name]["value"],
-  ) {
-    if (!syncable.id) {
-      syncable.id = crypto.randomUUID();
+  async saveSyncable<
+    Name extends StoreNames<BlackIronDBSchema>,
+    T extends BlackIronDBSchema[Name]["value"],
+  >(syncable: T, bumpRev: boolean = true): Promise<T> {
+    const ret = { ...syncable }; // TODO(@zkat): deep clone?
+    if (!ret.id) {
+      ret.id = crypto.randomUUID();
     }
-    await this.#idb.put(syncable._storeName, syncable);
+    if (!ret._rev || bumpRev) {
+      ret._rev = crypto.randomUUID();
+      if (!ret._revisions) {
+        ret._revisions = [];
+      }
+      ret._revisions.unshift(ret._rev);
+    }
+    await this.#idb.put(ret._storeName, ret);
+    return ret;
   }
 
   async uploadSyncable(syncable: AbstractSyncable) {
@@ -122,7 +133,12 @@ export class BlackIronDB {
       method: "POST",
     });
     if (!res.ok) {
-      throw new Error("Failed to upload syncable entity");
+      if (res.status === 409) {
+        // TODO(@zkat): fetch the remote version and add it as a `_conflict`
+        throw new Error("Conflict");
+      } else {
+        throw new Error("Failed to upload syncable entity");
+      }
     }
   }
 
@@ -130,13 +146,15 @@ export class BlackIronDB {
     if (remote && local) {
       if (remote._rev !== local._rev) {
         if (local._rev && remote._revisions?.includes(local._rev)) {
-          await this.saveSyncable(remote);
+          // Remote has local version. Fast-forward local and save.
+          await this.saveSyncable(remote, false);
         } else if (local._rev && local._revisions?.includes(remote._rev!)) {
+          // Local has remote version. Fast-forward remote by uploading.
           await this.uploadSyncable(local);
         } else if (remote.eq(local)) {
           // Both are effectively the same. Overwrite the local DB's copy of
-          // the syncable to save the sync props.
-          await this.saveSyncable(remote);
+          // the syncable to save the remote sync props.
+          await this.saveSyncable(remote, false);
         } else {
           await this.uploadSyncable(local.merge(remote));
         }
@@ -144,7 +162,7 @@ export class BlackIronDB {
         // _revs were both the same. Already synced
       }
     } else if (remote) {
-      await this.saveSyncable(remote);
+      await this.saveSyncable(remote, false);
     } else if (local) {
       await this.uploadSyncable(local);
     } else {
