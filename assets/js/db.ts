@@ -79,6 +79,10 @@ export class BlackIronDB {
   }
 
   async uploadSyncable(syncable: AbstractSyncable) {
+    if (!this.app.userId) {
+      // Skip uploading if we're not logged in.
+      return;
+    }
     const url = new URL(window.location.href);
     url.pathname = syncable.baseRoute;
     const res = await this.app.fetch(url, {

@@ -15,8 +15,8 @@ defmodule BlackIron.Campaigns.Membership do
   @doc false
   def changeset(campaign, attrs) do
     campaign
-    |> cast(attrs, [:roles])
-    |> validate_required([:roles])
+    |> cast(attrs, [:user_id, :roles])
+    |> validate_required([:user_id, :roles])
     |> validate_length(:roles, min: 1, max: 3)
   end
 end

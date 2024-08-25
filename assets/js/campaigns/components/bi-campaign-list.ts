@@ -88,11 +88,11 @@ export class BiCampaignList extends LitElement {
         description: formData.get("data[description]") as string,
         memberships: this.app?.userId
           ? [
-              {
-                user_id: this.app.userId,
-                roles: [CampaignRole.Owner],
-              },
-            ]
+            {
+              user_id: this.app.userId,
+              roles: [CampaignRole.Owner],
+            },
+          ]
           : [],
       };
       await this.app?.campaignManager.saveCampaign(campaign);
@@ -145,30 +145,34 @@ export class BiCampaignList extends LitElement {
   render() {
     // TODO(@zkat): only show campaigns for the current account, if we're logged in.
     return html`<ul>
-        ${this.campaigns
-          ?.filter((c) => !c.deleted_at)
-          .map(
-            (campaign) =>
-              html`<li>
+        ${
+      this.campaigns
+        ?.filter((c) => !c.deleted_at)
+        .map(
+          (campaign) =>
+            html`<li>
                 <a href=${new Campaign(campaign).route}>
                   <article>
                     <header>
                       <h3>${campaign.name}</h3>
                     </header>
                     <p>${campaign.description}</p>
-                    ${campaign._conflict
-                      ? html`<p class=conflict>
+                    ${
+              campaign._conflict
+                ? html`<p class=conflict>
                           HAS CONFLICT WITH REMOTE VERSION
                           <pre>
                           ${JSON.stringify(campaign, null, 2)}
                           </pre>
                         </p>
                         `
-                      : ""}
+                : ""
+            }
                   </article>
                 </a>
               </li>`,
-          )}
+        )
+    }
       </ul>
       <slot></slot>`;
   }

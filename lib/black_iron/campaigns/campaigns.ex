@@ -37,6 +37,9 @@ defmodule BlackIron.Campaigns do
   """
   def get_campaign!(id), do: Repo.get!(Campaign, id)
 
+  # TODO(@zkat): authorization (don't really want others to be able to add
+  # campaigns into someone else's account without going through the
+  # invitaion process)
   @doc """
   Creates a campaign.
 
@@ -50,11 +53,15 @@ defmodule BlackIron.Campaigns do
 
   """
   def create_campaign(%User{} = user, attrs \\ %{}) do
+    attrs =
+      if !attrs["memberships"] || Enum.empty?(attrs["memberships"]) do
+        attrs |> Map.put("memberships", [%{"user_id" => user.pid, "roles" => ["owner"]}])
+      else
+        attrs
+      end
+
     %Campaign{}
     |> Campaign.changeset(attrs |> put_rev(%Campaign{}))
-    |> Ecto.Changeset.put_assoc(:memberships, [
-      %Membership{user_id: user.pid, roles: [:owner]}
-    ])
     |> Repo.insert()
   end
 

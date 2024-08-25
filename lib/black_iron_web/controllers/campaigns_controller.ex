@@ -20,10 +20,22 @@ defmodule BlackIronWeb.CampaignsController do
 
     render(conn, :index,
       campaigns: campaigns,
-      changeset: Campaigns.change_campaign(%Campaigns.Campaign{}, %{"memberships" => [%{
-        "user_id" => conn.assigns[:current_user].pid,
-        "roles" => ["owner"]
-      }]})
+      changeset:
+        Campaigns.change_campaign(
+          %Campaigns.Campaign{},
+          if conn.assigns[:current_user] do
+            %{
+              "memberships" => [
+                %{
+                  "user_id" => conn.assigns[:current_user].pid,
+                  "roles" => ["owner"]
+                }
+              ]
+            }
+          else
+            %{}
+          end
+        )
     )
   end
 
@@ -35,10 +47,22 @@ defmodule BlackIronWeb.CampaignsController do
       {:ok, _campaign} ->
         render(conn, :index,
           campaigns: campaigns,
-          changeset: Campaigns.change_campaign(%Campaigns.Campaign{}, %{"memberships" => [%{
-            "user_id" => conn.assigns[:current_user].pid,
-            "roles" => ["owner"]
-          }]})
+          changeset:
+            Campaigns.change_campaign(
+              %Campaigns.Campaign{},
+              if conn.assigns[:current_user] do
+                %{
+                  "memberships" => [
+                    %{
+                      "user_id" => conn.assigns[:current_user].pid,
+                      "roles" => ["owner"]
+                    }
+                  ]
+                }
+              else
+                %{}
+              end
+            )
         )
 
       {:error, changeset} ->
