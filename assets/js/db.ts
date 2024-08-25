@@ -1,60 +1,14 @@
 import { DBSchema, IDBPDatabase, openDB, StoreNames } from "idb";
 import { BlackIronApp } from "./black-iron-app";
 import { Campaign, CampaignSchema } from "./campaigns/campaign";
+import {
+  AbstractSyncable,
+  ISyncable,
+  SyncableConflictError,
+  SyncableSchema,
+} from "./sync";
 
 export type BlackIronDBSchema = DBSchema & SyncableSchema & CampaignSchema;
-
-export interface SyncableSchema {
-  _abstract: {
-    key: string;
-    value: ISyncable;
-  };
-}
-
-export interface ISyncable {
-  id: string;
-  _rev?: string;
-  _revisions?: string[];
-  deleted_at?: string;
-}
-
-export abstract class AbstractSyncable implements ISyncable {
-  get route() {
-    return "/";
-  }
-
-  id: string;
-  _rev?: string;
-  _revisions?: string[];
-  deleted_at?: string;
-
-  constructor(data: ISyncable) {
-    this.id = data.id;
-    this._rev = data._rev;
-    this._revisions = data._revisions;
-    this.deleted_at = data.deleted_at;
-  }
-
-  eq(other: ISyncable): boolean {
-    return this.id === other.id && this.deleted_at == other.deleted_at;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  merge(other: ISyncable): AbstractSyncable {
-    throw new Error("Not implemented");
-  }
-
-  toSyncable(): ISyncable {
-    const syncable: ISyncable = { id: this.id };
-    if (this._rev) {
-      syncable._rev = this._rev;
-    }
-    if (this._revisions) {
-      syncable._revisions = this._revisions;
-    }
-    return syncable;
-  }
-}
 
 const DB_NAME = "black-iron";
 const DB_VERSION = 1;
@@ -141,12 +95,22 @@ export class BlackIronDB {
     });
     if (!res.ok) {
       if (res.status === 409) {
-        // TODO(@zkat): fetch the remote version and add it as a `_conflict`
-        throw new Error("Conflict");
+        throw new SyncableConflictError();
       } else {
         throw new Error("Failed to upload syncable entity");
       }
     }
+  }
+
+  async getRemote(syncable: AbstractSyncable) {
+    const url = new URL(window.location.href);
+    url.pathname = `${syncable.route}/${syncable.id}`;
+    const res = await this.app.fetch(url);
+    if (!res.ok) {
+      throw new Error("Failed to fetch remote entity");
+    }
+    // TODO(@zkat): validate this!
+    return (await res.json()) as ISyncable;
   }
 
   async sync<Name extends StoreNames<BlackIronDBSchema>>(
@@ -154,30 +118,71 @@ export class BlackIronDB {
     remote?: AbstractSyncable,
     local?: AbstractSyncable,
   ) {
-    if (remote && local) {
-      if (remote._rev !== local._rev) {
-        if (local._rev && remote._revisions?.includes(local._rev)) {
-          // Remote has local version. Fast-forward local and save.
-          await this.saveSyncable(storeName, remote, false);
-        } else if (local._rev && local._revisions?.includes(remote._rev!)) {
-          // Local has remote version. Fast-forward remote by uploading.
-          await this.uploadSyncable(local);
-        } else if (remote.eq(local)) {
-          // Both are effectively the same. Overwrite the local DB's copy of
-          // the syncable to save the remote sync props.
-          await this.saveSyncable(storeName, remote, false);
+    try {
+      if (remote && local) {
+        if (remote._rev !== local._rev) {
+          if (local._rev && remote._revisions?.includes(local._rev)) {
+            // Remote has local version. Fast-forward local and save.
+            await this.saveSyncable(storeName, remote, false);
+          } else if (local._rev && local._revisions?.includes(remote._rev!)) {
+            // Local has remote version. Fast-forward remote by uploading.
+            await this.uploadSyncable(local);
+          } else if (remote.eq(local)) {
+            // Both are effectively the same. Overwrite the local DB's copy of
+            // the syncable to save the remote sync props.
+            await this.saveSyncable(storeName, remote, false);
+          } else {
+            await this.uploadSyncable(local.merge(remote));
+          }
         } else {
-          await this.uploadSyncable(local.merge(remote));
+          // _revs were both the same. Already synced
         }
+      } else if (remote) {
+        await this.saveSyncable(storeName, remote, false);
+      } else if (local) {
+        await this.uploadSyncable(local);
       } else {
-        // _revs were both the same. Already synced
+        throw new Error("Must give at least one syncable to sync.");
       }
-    } else if (remote) {
-      await this.saveSyncable(storeName, remote, false);
-    } else if (local) {
-      await this.uploadSyncable(local);
-    } else {
-      throw new Error("Must give at least one syncable to sync.");
+    } catch (e) {
+      if (
+        (e instanceof DOMException ||
+        // @ts-expect-error - DOMError is deprecated, but it's what Safari
+        // throws, because fuck Safari.
+          (window.DOMError && e instanceof DOMError)) &&
+        // @ts-expect-error - DOMError is deprecated, but it's what Safari
+        // throws, because fuck Safari.
+        e.name === "ConstraintError"
+      ) {
+        if (!remote) {
+          throw new Error(
+            "This should never happen? Why is there a constraint error if there's no remote data?",
+          );
+        }
+        // TODO(@zkat): We can't just save the remote version, because our
+        // _local_ db has some constraint error (like a unique index
+        // violation). We'll have to figure out where to save the remote
+        // version to so players are aware this came down.
+
+        // let's let someone else deal with the conflict.
+        throw new SyncableConflictError();
+      } else if (e instanceof SyncableConflictError) {
+        if (!local) {
+          throw new Error(
+            "This should never happen? Why is there a conflict if there's no local data?",
+          );
+        }
+        await this.saveSyncable(
+          storeName,
+          {
+            ...local,
+            _conflict: remote || (await this.getRemote(local)),
+          },
+          false,
+        );
+      } else {
+        throw e;
+      }
     }
   }
 }

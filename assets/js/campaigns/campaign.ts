@@ -1,12 +1,14 @@
 // Campaign schema, class, and database definitions.
 
 import { IDBPDatabase } from "idb";
-import { AbstractSyncable, BlackIronDBSchema, ISyncable } from "../db";
+import { BlackIronDBSchema } from "../db";
+import { AbstractSyncable, ISyncable, SyncableConflictError } from "../sync";
 
 export interface CampaignSchema {
   campaigns: {
     key: string;
     value: ICampaign;
+    indexes: { slug: string };
   };
 }
 
@@ -24,7 +26,7 @@ export interface ICampaign extends ISyncable {
 }
 
 export interface CampaignMembership {
-  userId: string;
+  user_id: string;
   roles: CampaignRole[];
 }
 
@@ -35,7 +37,8 @@ export class Campaign extends AbstractSyncable implements ICampaign {
   memberships: CampaignMembership[];
 
   static dbUpgrade(db: IDBPDatabase<BlackIronDBSchema>) {
-    db.createObjectStore("campaigns", { keyPath: "id" });
+    const store = db.createObjectStore("campaigns", { keyPath: "id" });
+    store.createIndex("slug", "slug", { unique: true });
   }
 
   get route() {
@@ -56,16 +59,18 @@ export class Campaign extends AbstractSyncable implements ICampaign {
       && this.name === other.name
       && this.slug === other.slug
       && this.description === other.description
+      // TODO(@zkat): this is technically incorrect because key and membership
+      // order might be different.
       && JSON.stringify(this.memberships) === JSON.stringify(other.memberships)
     );
   }
 
   merge(other: ICampaign) {
+    const campaign = new Campaign(this);
     if (!this.eq(other)) {
-      // TODO: make this an actual class.
-      throw new Error("Conflict");
+      throw new SyncableConflictError();
     }
-    return new Campaign(this);
+    return campaign;
   }
 
   toSyncable() {

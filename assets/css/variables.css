@@ -24,8 +24,10 @@ Non-theme variables
   --text-hover: var(--theme-text-soft-color);
   --text-on-accent: var(--theme-special-text-color);
   --shadow: var(--theme-shadow-color);
-  --text-success: var(--theme-text-success);
-  --text-success: var(--theme-text-success);
-  --text-warning: var(--theme-text-warning);
-  --text-error: var(--theme-text-error);
+  --text-success: var(--theme-success, green);
+  --text-warning: var(--theme-warning, orange);
+  --text-error: var(--theme-error, red);
+  --text-on-success: var(--theme-text-success, green);
+  --text-on-warning: var(--theme-text-warning, orange);
+  --text-on-error: var(--theme-text-error, red);
 }

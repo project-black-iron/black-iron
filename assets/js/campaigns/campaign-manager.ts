@@ -1,6 +1,7 @@
 import { Channel } from "phoenix";
 import { BlackIronApp } from "../black-iron-app";
 import { Campaign, ICampaign } from "./campaign";
+import { SyncableConflictError } from "../sync";
 
 export class CampaignManager {
   channel?: Channel;
@@ -37,7 +38,7 @@ export class CampaignManager {
    * @param remoteCampaigns - If present, interpreted as the most recent
    * remote campaign state. New remote data will not be requested.
    */
-  async syncCampaigns(remoteCampaigns?: ICampaign[]) {
+  async syncCampaigns(remoteCampaigns?: ICampaign[]): Promise<ICampaign[]> {
     if (!remoteCampaigns) {
       // try {
       //   console.log("Fetchin campaigns from server:", remoteCampaigns);
@@ -54,6 +55,7 @@ export class CampaignManager {
       //   return;
       // }
     }
+    const conflicts: ICampaign[] = [];
     const allKeys: Set<string> = new Set();
     const remotes = new Map(
       (remoteCampaigns ?? []).map((c) => {
@@ -68,16 +70,25 @@ export class CampaignManager {
       }),
     );
     await Promise.all(
-      Array.from(allKeys).map((key) => {
+      Array.from(allKeys).map(async (key) => {
         const remote = remotes.get(key);
         const local = locals.get(key);
-        return this.app.db.sync(
-          "campaigns",
-          remote && new Campaign(remote),
-          local,
-        );
+        try {
+          return await this.app.db.sync(
+            "campaigns",
+            remote && new Campaign(remote),
+            local,
+          );
+        } catch (e) {
+          if (remote && e instanceof SyncableConflictError) {
+            conflicts.push(remote!);
+          } else {
+            throw e;
+          }
+        }
       }),
     );
+    return conflicts;
   }
 
   async getCampaign(id: string) {
@@ -96,7 +107,7 @@ export class CampaignManager {
           // Return both offline-only and online campaigns for the current
           // account.
           !cdata.memberships.length
-          || cdata.memberships.find((m) => m.userId == this.app.userId)
+          || cdata.memberships.find((m) => m.user_id === this.app.userId)
         );
       })
       .map((cdata) => new Campaign(cdata));

@@ -1,5 +1,5 @@
 import { css, html, isServer, LitElement } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
 
 import { BlackIronApp } from "../../black-iron-app";
 import { BiAppContext } from "../../components/bi-app-context";
@@ -14,7 +14,34 @@ export class BiCampaignList extends LitElement {
         list-style: none;
         padding: 0;
         display: flex;
+        gap: 0.5rem;
         flex-flow: column nowrap;
+        & li {
+          margin: 0;
+          padding: 0;
+          border: 1px solid var(--border-color, #ccc);
+          border-radius: var(--border-radius, 10px);
+          & a {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            padding: 1em;
+            & article {
+              & header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                & h3 {
+                  margin: 0;
+                  font-size: 1.5em;
+                }
+              }
+            }
+          }
+        }
+      }
+      & .conflict {
+        color: var(--text-error, red);
       }
     }
   `;
@@ -44,6 +71,9 @@ export class BiCampaignList extends LitElement {
     },
   })
   campaigns?: ICampaign[];
+
+  @state()
+  conflicted: ICampaign[] = [];
 
   constructor() {
     super();
@@ -91,7 +121,8 @@ export class BiCampaignList extends LitElement {
 
   async #syncCampaignData() {
     try {
-      await this.app?.campaignManager.syncCampaigns(this.campaigns);
+      this.conflicted =
+        (await this.app?.campaignManager.syncCampaigns(this.campaigns)) ?? [];
     } catch (e) {
       console.error("Failed to sync campaigns", e);
     }
@@ -101,23 +132,47 @@ export class BiCampaignList extends LitElement {
   render() {
     // TODO(@zkat): only show campaigns for the current account, if we're logged in.
     return html`<ul>
-        ${
-      this.campaigns
-        ?.filter((c) => !c.deleted_at)
-        .map(
-          (campaign) =>
-            html`<li>
+        ${this.campaigns
+          ?.filter((c) => !c.deleted_at)
+          .map(
+            (campaign) =>
+              html`<li>
                 <a href="/play/campaigns/${campaign.slug}">
                   <article>
                     <header>
                       <h3>${campaign.name}</h3>
                     </header>
                     <p>${campaign.description}</p>
+                    ${campaign._conflict
+                      ? html`<p class="conflict">
+                          HAS CONFLICT WITH REMOTE VERSION
+                        </p>`
+                      : ""}
                   </article>
                 </a>
               </li>`,
-        )
-    }
+          )}
+        ${this.conflicted
+          ?.filter((c) => !c.deleted_at)
+          .map(
+            (campaign) =>
+              html`<li class="conflict">
+                <article>
+                  <header>
+                    <h3>${campaign.name}</h3>
+                  </header>
+                  <p>${campaign.description}</p>
+                  <p>
+                    Unable to download campaign because a local one exists with
+                    the same slug.
+                    <a href="/play/campaigns/${campaign.slug}"
+                      >Change its slug</a
+                    >
+                    to resolve the conflict.
+                  </p>
+                </article>
+              </li>`,
+          )}
       </ul>
       <slot></slot>`;
   }
