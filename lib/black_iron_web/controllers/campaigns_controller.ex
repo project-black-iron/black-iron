@@ -20,13 +20,14 @@ defmodule BlackIronWeb.CampaignsController do
 
     render(conn, :index,
       campaigns: campaigns,
-      changeset: Campaigns.change_campaign(%Campaigns.Campaign{})
+      changeset: Campaigns.change_campaign(%Campaigns.Campaign{}, %{"memberships" => [%{
+        "user_id" => conn.assigns[:current_user].pid,
+        "roles" => ["owner"]
+      }]})
     )
   end
 
   def create(conn, params) do
-    IO.puts("params:")
-    IO.inspect(params)
     res = Campaigns.create_campaign(conn.assigns[:current_user], params["data"])
     campaigns = Campaigns.list_campaigns_for_user(conn.assigns[:current_user])
 
@@ -34,7 +35,10 @@ defmodule BlackIronWeb.CampaignsController do
       {:ok, _campaign} ->
         render(conn, :index,
           campaigns: campaigns,
-          changeset: Campaigns.change_campaign(%Campaigns.Campaign{})
+          changeset: Campaigns.change_campaign(%Campaigns.Campaign{}, %{"memberships" => [%{
+            "user_id" => conn.assigns[:current_user].pid,
+            "roles" => ["owner"]
+          }]})
         )
 
       {:error, changeset} ->

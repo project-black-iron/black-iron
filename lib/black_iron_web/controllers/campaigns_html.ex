@@ -26,6 +26,10 @@ defmodule BlackIronWeb.CampaignsHTML do
         </.error>
 
         <.input field={f[:pid]} type="hidden" value={BlackIron.Utils.gen_pid()} />
+        <.inputs_for :let={membership} field={f[:memberships]}>
+          <.input field={membership[:user_id]} type="hidden" value={@current_user.pid} />
+          <.input field={membership[:roles]} type="hidden" value="owner" />
+        </.inputs_for>
 
         <.input field={f[:name]} type="text" label="Name" required />
         <.input field={f[:description]} type="textarea" label="Description" required />

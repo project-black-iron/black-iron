@@ -3,9 +3,9 @@ import { customElement, property, state } from "lit/decorators.js";
 
 import { BlackIronApp } from "../../black-iron-app";
 import { BiAppContext } from "../../components/bi-app-context";
-import { ssrConsume } from "../../utils/ssr-context";
-import { Campaign, ICampaign } from "../campaign";
 import { genPid } from "../../utils/pid";
+import { ssrConsume } from "../../utils/ssr-context";
+import { Campaign, CampaignRole, ICampaign } from "../campaign";
 
 @customElement("bi-campaign-list")
 export class BiCampaignList extends LitElement {
@@ -86,7 +86,14 @@ export class BiCampaignList extends LitElement {
         pid: formData.get("data[pid]") as string,
         name: formData.get("data[name]") as string,
         description: formData.get("data[description]") as string,
-        memberships: [],
+        memberships: this.app?.userId
+          ? [
+              {
+                user_id: this.app.userId,
+                roles: [CampaignRole.Owner],
+              },
+            ]
+          : [],
       };
       await this.app?.campaignManager.saveCampaign(campaign);
       await this.#setFromLocalCampaigns();
@@ -150,10 +157,13 @@ export class BiCampaignList extends LitElement {
                     </header>
                     <p>${campaign.description}</p>
                     ${campaign._conflict
-                      ? html`<p class="conflict">
+                      ? html`<p class=conflict>
                           HAS CONFLICT WITH REMOTE VERSION
-                          ${JSON.stringify(campaign._conflict, null, 2)}
-                        </p>`
+                          <pre>
+                          ${JSON.stringify(campaign, null, 2)}
+                          </pre>
+                        </p>
+                        `
                       : ""}
                   </article>
                 </a>

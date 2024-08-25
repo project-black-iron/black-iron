@@ -24,15 +24,14 @@ export class BiCampaignContext extends LitElement {
   async willUpdate(changed: PropertyValues<this>) {
     if (changed.has("_campaignId") || changed.has("app")) {
       if (this._campaignId) {
-        this.campaign =
-          this._campaignId == null
-            ? undefined
-            : await this.app?.campaignManager.getCampaign(this._campaignId);
+        this.campaign = this._campaignId == null
+          ? undefined
+          : await this.app?.campaignManager.getCampaign(this._campaignId);
       }
     }
     if (
-      changed.has("campaign") &&
-      changed.get("campaign")?.pid !== this.campaign?.pid
+      changed.has("campaign")
+      && changed.get("campaign")?.pid !== this.campaign?.pid
     ) {
       this._campaignId = this.campaign?.pid;
     }

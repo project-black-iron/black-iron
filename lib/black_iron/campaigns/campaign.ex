@@ -30,6 +30,7 @@ defmodule BlackIron.Campaigns.Campaign do
   def changeset(campaign, attrs) do
     campaign
     |> cast(attrs, [:pid, :name, :description, :_rev, :_revisions])
+    |> cast_assoc(:memberships, with: &BlackIron.Campaigns.Membership.changeset/2, required: true)
     |> unique_constraint(:pid)
     |> validate_required([:name, :description, :_rev, :_revisions])
     |> validate_revs()

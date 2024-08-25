@@ -97,8 +97,8 @@ export class CampaignManager {
         return (
           // Return both offline-only and online campaigns for the current
           // account.
-          !cdata.memberships.length ||
-          cdata.memberships.find((m) => m.user_id === this.app.userId)
+          !cdata.memberships.length
+          || cdata.memberships.find((m) => m.user_id === this.app.userId)
         );
       })
       .map((cdata) => new Campaign(cdata));

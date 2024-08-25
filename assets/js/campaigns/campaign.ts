@@ -57,12 +57,12 @@ export class Campaign extends AbstractSyncable implements ICampaign {
 
   eq(other: ICampaign) {
     return (
-      super.eq(other) &&
-      this.name === other.name &&
-      this.description === other.description &&
+      super.eq(other)
+      && this.name === other.name
+      && this.description === other.description
       // TODO(@zkat): this is technically incorrect because key and membership
       // order might be different.
-      JSON.stringify(this.memberships) === JSON.stringify(other.memberships)
+      && JSON.stringify(this.memberships) === JSON.stringify(other.memberships)
     );
   }
 

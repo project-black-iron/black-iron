@@ -1,12 +1,7 @@
 import { DBSchema, IDBPDatabase, openDB, StoreNames } from "idb";
 import { BlackIronApp } from "./black-iron-app";
 import { Campaign, CampaignSchema } from "./campaigns/campaign";
-import {
-  AbstractSyncable,
-  ISyncable,
-  SyncableConflictError,
-  SyncableSchema,
-} from "./sync";
+import { AbstractSyncable, ISyncable, SyncableConflictError, SyncableSchema } from "./sync";
 
 export type BlackIronDBSchema = DBSchema & SyncableSchema & CampaignSchema;
 
@@ -146,13 +141,13 @@ export class BlackIronDB {
       }
     } catch (e) {
       if (
-        (e instanceof DOMException ||
+        (e instanceof DOMException
           // @ts-expect-error - DOMError is deprecated, but it's what Safari
           // throws, because fuck Safari.
-          (window.DOMError && e instanceof DOMError)) &&
+          || (window.DOMError && e instanceof DOMError))
         // @ts-expect-error - DOMError is deprecated, but it's what Safari
         // throws, because fuck Safari.
-        e.name === "ConstraintError"
+        && e.name === "ConstraintError"
       ) {
         if (!remote) {
           throw new Error(
