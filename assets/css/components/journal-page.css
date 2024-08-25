@@ -13,9 +13,7 @@ article.journal-page {
   }
 
   & .sidebar {
-    border: 1px solid var(--background-primary-alt);
-    border-right: none;
-    border-top: none;
+    border-left: 1px solid var(--background-primary-alt);
     padding: 0.3rem;
     & iframe {
       border: none;

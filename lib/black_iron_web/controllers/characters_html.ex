@@ -8,7 +8,7 @@ defmodule BlackIronWeb.CharactersHTML do
     <h3>Characters list</h3>
     <ul class="character-list">
       <!-- Campaigns go here -->
-      <li><a href="/play/campaigns/1/characters/1">Character 1</a></li>
+      <li><a href="/play/campaigns/1/slug/characters/1/slug">Character 1</a></li>
     </ul>
     """
   end

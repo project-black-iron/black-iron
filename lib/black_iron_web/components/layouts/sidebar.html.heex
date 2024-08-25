@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" class="[scrollbar-gutter:stable]">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <!-- Yeah fuck you -->
+    <meta name="CCBot" content="nofollow" />
+    <meta name="robots" content="noai, noimageai" />
+    <script>
+      const theme = localStorage.getItem("bi-theme") ||
+        (matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light");
+      const linkEl = document.createElement("link");
+      linkEl.rel = "stylesheet";
+      linkEl.id = "theme";
+      linkEl.href = `/assets/css/theme-${theme}.css`;
+      document.head.appendChild(linkEl);
+    </script>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
+    <!-- Styles imported by JS source files -->
+    <link phx-track-static rel="stylesheet" href={~p"/assets/js/app.css"} />
+  </head>
+  <body>
+    <main class="sidebar">
+      <%= if !assigns[:sidebar_marker] do %>
+        <a href={~p"/play/campaigns/#{@campaignId}/#{@cslug}/sidebar"}>←</a>
+      <% end %>
+      <%= @inner_content %>
+    </main>
+  </body>
+</html>

@@ -7,7 +7,6 @@ defmodule BlackIronWeb.Router do
     plug :accepts, ["html", "json"]
     plug :fetch_session
     plug :fetch_live_flash
-    plug :put_iframe
     plug :put_root_layout, html: {BlackIronWeb.Layouts, :root}
     plug :check_htmx_request
     plug :protect_from_forgery
@@ -53,8 +52,8 @@ defmodule BlackIronWeb.Router do
     end
   end
 
-  defp put_iframe(conn, _) do
-    assign(conn, :iframe, conn.params["iframe"])
+  defp put_sidebar_layout(conn, _) do
+    put_root_layout(conn, html: {BlackIronWeb.Layouts, :sidebar})
   end
 
   pipeline :api do
@@ -176,18 +175,24 @@ defmodule BlackIronWeb.Router do
     get "/campaigns/:campaignId/:slug", CampaignsController, :show
 
     scope "/campaigns/:campaignId/:cslug" do
-      get "/worlds", WorldsController, :index
-      get "/worlds/:worldId/:slug", WorldsController, :show
-      get "/npcs", NPCsController, :index
-      get "/npcs/:npcId/:slug", NPCsController, :show
-      get "/lore", LoreController, :index
-      get "/lore/:loreId/:slug", LoreController, :show
-      get "/tracks", TracksController, :index
-      get "/tracks/:trackId/:slug", TracksController, :show
-      get "/journals", JournalsController, :index
       get "/journals/:journalId/:slug", JournalsController, :show
-      get "/characters", CharactersController, :index
-      get "/characters/:characterId/:slug", CharactersController, :show
+
+      scope "/" do
+        pipe_through [:put_sidebar_layout]
+
+        get "/journals", JournalsController, :index
+        get "/sidebar", SidebarController, :show
+        get "/worlds", WorldsController, :index
+        get "/worlds/:worldId/:slug", WorldsController, :show
+        get "/npcs", NPCsController, :index
+        get "/npcs/:npcId/:slug", NPCsController, :show
+        get "/lore", LoreController, :index
+        get "/lore/:loreId/:slug", LoreController, :show
+        get "/tracks", TracksController, :index
+        get "/tracks/:trackId/:slug", TracksController, :show
+        get "/characters", CharactersController, :index
+        get "/characters/:characterId/:slug", CharactersController, :show
+      end
     end
   end
 
