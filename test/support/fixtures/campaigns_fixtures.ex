@@ -17,7 +17,7 @@ defmodule BlackIron.CampaignsFixtures do
         |> Enum.into(%{
           name: "some name",
           description: "some description",
-          slug: "some slug"
+          slug: BlackIron.Utils.gen_pid()
         })
       )
 

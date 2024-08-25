@@ -72,8 +72,8 @@ export class BlackIronDB {
     T extends BlackIronDBSchema[Name]["value"],
   >(storeName: Name, syncable: T, bumpRev: boolean = true): Promise<T> {
     const ret = { ...syncable }; // TODO(@zkat): deep clone?
-    if (!ret.id) {
-      ret.id = crypto.randomUUID();
+    if (!ret.pid) {
+      ret.pid = crypto.randomUUID();
     }
     if (!ret._rev || bumpRev) {
       ret._rev = crypto.randomUUID();
@@ -85,7 +85,7 @@ export class BlackIronDB {
 
   async uploadSyncable(syncable: AbstractSyncable) {
     const url = new URL(window.location.href);
-    url.pathname = syncable.route;
+    url.pathname = syncable.baseRoute;
     const res = await this.app.fetch(url, {
       method: "POST",
       headers: {
@@ -104,7 +104,7 @@ export class BlackIronDB {
 
   async getRemote(syncable: AbstractSyncable) {
     const url = new URL(window.location.href);
-    url.pathname = `${syncable.route}/${syncable.id}`;
+    url.pathname = syncable.route;
     const res = await this.app.fetch(url);
     if (!res.ok) {
       throw new Error("Failed to fetch remote entity");
@@ -147,8 +147,8 @@ export class BlackIronDB {
     } catch (e) {
       if (
         (e instanceof DOMException ||
-        // @ts-expect-error - DOMError is deprecated, but it's what Safari
-        // throws, because fuck Safari.
+          // @ts-expect-error - DOMError is deprecated, but it's what Safari
+          // throws, because fuck Safari.
           (window.DOMError && e instanceof DOMError)) &&
         // @ts-expect-error - DOMError is deprecated, but it's what Safari
         // throws, because fuck Safari.
@@ -159,10 +159,9 @@ export class BlackIronDB {
             "This should never happen? Why is there a constraint error if there's no remote data?",
           );
         }
-        // TODO(@zkat): We can't just save the remote version, because our
+        // NB(@zkat): We can't just save the remote version, because our
         // _local_ db has some constraint error (like a unique index
-        // violation). We'll have to figure out where to save the remote
-        // version to so players are aware this came down.
+        // violation). Each entity will have to deal with this in its own way.
 
         // let's let someone else deal with the conflict.
         throw new SyncableConflictError();

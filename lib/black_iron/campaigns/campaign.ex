@@ -2,15 +2,13 @@ defmodule BlackIron.Campaigns.Campaign do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @primary_key {:id, :binary_id, autogenerate: true}
-
   @derive {Jason.Encoder,
-           only: [:id, :name, :description, :slug, :_rev, :_revisions, :deleted_at, :memberships]}
+           only: [:pid, :name, :description, :_rev, :_revisions, :deleted_at, :memberships]}
 
   schema "campaigns" do
     field :name, :string
     field :description, :string
-    field :slug, :string
+    field :pid, :string, autogenerate: {BlackIron.Utils, :gen_pid, []}
     field :_rev, :string
     field :_revisions, {:array, :string}, default: []
     field :deleted_at, :naive_datetime
@@ -31,11 +29,9 @@ defmodule BlackIron.Campaigns.Campaign do
   @doc false
   def changeset(campaign, attrs) do
     campaign
-    |> cast(attrs, [:id, :name, :description, :slug, :_rev, :_revisions])
-    |> unique_constraint(:slug)
-    |> unique_constraint(:id)
-    |> validate_format(:slug, slug_format(), message: slug_message())
-    |> validate_required([:name, :description, :slug, :_rev, :_revisions])
+    |> cast(attrs, [:pid, :name, :description, :_rev, :_revisions])
+    |> unique_constraint(:pid)
+    |> validate_required([:name, :description, :_rev, :_revisions])
     |> validate_revs()
   end
 
@@ -50,14 +46,5 @@ defmodule BlackIron.Campaigns.Campaign do
         [{:_revisions, "The latest _rev must be the head of _revisions"}]
       end
     end)
-  end
-
-  @doc false
-  def slug_format do
-    ~r/^[a-z0-9\-_]+$/
-  end
-
-  def slug_message do
-    "must be lowercase, alphanumeric, and may contain dashes and underscores"
   end
 end

@@ -3,7 +3,7 @@
 <bi-app-context
   user-token={assigns[:user_token]}
   csrf-token={get_csrf_token()}
-  user-id={assigns[:current_user] && assigns[:current_user].id}
+  user-id={assigns[:current_user] && assigns[:current_user].pid}
 >
   <%= @inner_content %>
 </bi-app-context>

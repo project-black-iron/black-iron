@@ -2,9 +2,8 @@ defmodule BlackIron.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @primary_key {:id, :binary_id, autogenerate: true}
-
   schema "users" do
+    field :pid, :string, autogenerate: {BlackIron.Utils, :gen_pid, []}
     field :email, :string
     field :username, :string
     field :password, :string, virtual: true, redact: true

@@ -5,8 +5,8 @@ defmodule BlackIron.Campaigns.Membership do
   @derive {Jason.Encoder, only: [:user_id, :roles]}
 
   schema "campaign_memberships" do
-    belongs_to :user, BlackIron.Accounts.User, type: :binary_id
-    belongs_to :campaign, BlackIron.Campaigns.Campaign, type: :binary_id
+    belongs_to :user, BlackIron.Accounts.User, type: :string, references: :pid
+    belongs_to :campaign, BlackIron.Campaigns.Campaign
     field :roles, {:array, Ecto.Enum}, values: [:owner, :guide, :player], default: [:player]
 
     timestamps(type: :utc_datetime)

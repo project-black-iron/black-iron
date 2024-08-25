@@ -40,6 +40,7 @@ export class BlackIronApp {
     if (this.#userToken) {
       input.headers.set("Authorization", `Bearer ${this.#userToken}`);
     }
+    console.log("csrf token:", this.csrfToken);
     if (this.csrfToken) {
       input.headers.set("x-csrf-token", this.csrfToken);
     }

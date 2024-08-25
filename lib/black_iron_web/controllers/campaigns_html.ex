@@ -4,8 +4,6 @@ defmodule BlackIronWeb.CampaignsHTML do
   """
   use BlackIronWeb, :html
 
-  alias BlackIron.Campaigns.Campaign
-
   def index(assigns) do
     ~H"""
     <%= if !assigns[:htmx] do %>
@@ -27,17 +25,9 @@ defmodule BlackIronWeb.CampaignsHTML do
           <%= gettext("Oops, something went wrong! Please check the errors below.") %>
         </.error>
 
-        <.input field={f[:id]} type="hidden" value={Ecto.UUID.generate()} />
+        <.input field={f[:pid]} type="hidden" value={BlackIron.Utils.gen_pid()} />
 
         <.input field={f[:name]} type="text" label="Name" required />
-        <.input
-          field={f[:slug]}
-          type="text"
-          pattern={Regex.source(Campaign.slug_format())}
-          title={Campaign.slug_message()}
-          label="Slug"
-          required
-        />
         <.input field={f[:description]} type="textarea" label="Description" required />
 
         <:actions>

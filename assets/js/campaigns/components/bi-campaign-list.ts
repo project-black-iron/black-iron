@@ -4,7 +4,8 @@ import { customElement, property, state } from "lit/decorators.js";
 import { BlackIronApp } from "../../black-iron-app";
 import { BiAppContext } from "../../components/bi-app-context";
 import { ssrConsume } from "../../utils/ssr-context";
-import { ICampaign } from "../campaign";
+import { Campaign, ICampaign } from "../campaign";
+import { genPid } from "../../utils/pid";
 
 @customElement("bi-campaign-list")
 export class BiCampaignList extends LitElement {
@@ -61,7 +62,7 @@ export class BiCampaignList extends LitElement {
         return true;
       }
       for (let i = 0; i < (newVal?.length ?? 0); i++) {
-        if (newVal?.[i]?.id !== oldVal?.[i]?.id) {
+        if (newVal?.[i]?.pid !== oldVal?.[i]?.pid) {
           return true;
         } else if (newVal?.[i]?._rev !== oldVal?.[i]?._rev) {
           return true;
@@ -80,18 +81,24 @@ export class BiCampaignList extends LitElement {
     this.addEventListener("htmx:beforeRequest", async (e: Event) => {
       const form = e.target as HTMLFormElement;
       const formData = new FormData(form);
-      // TODO(@zkat): validate this! TODO(@zkat): Maybe do this in two stages?
-      // do an `htmx:beforeRequest` that will cancel the request if the
-      // validation fails?
+      // TODO(@zkat): validate this! htmx:beforeRequest can cancel requests (if validation fails).
       const campaign: ICampaign = {
-        id: formData.get("data[id]") as string,
+        pid: formData.get("data[pid]") as string,
         name: formData.get("data[name]") as string,
-        slug: formData.get("data[slug]") as string,
         description: formData.get("data[description]") as string,
         memberships: [],
       };
       await this.app?.campaignManager.saveCampaign(campaign);
       await this.#setFromLocalCampaigns();
+    });
+    this.addEventListener("htmx:beforeSend", (e: Event) => {
+      const form = e.target as HTMLFormElement;
+      const input = form.querySelector(
+        "input[name='data[pid]']",
+      ) as HTMLInputElement;
+      // Generate a new pid for the next campaign, in case we're in offline
+      // mode (online, htmx will swap in a new pid for us).
+      input.value = genPid();
     });
     this.addEventListener("htmx:afterRequest", (e: Event) => {
       const form = e.target as HTMLFormElement;
@@ -121,8 +128,7 @@ export class BiCampaignList extends LitElement {
 
   async #syncCampaignData() {
     try {
-      this.conflicted =
-        (await this.app?.campaignManager.syncCampaigns(this.campaigns)) ?? [];
+      await this.app?.campaignManager.syncCampaigns(this.campaigns);
     } catch (e) {
       console.error("Failed to sync campaigns", e);
     }
@@ -137,7 +143,7 @@ export class BiCampaignList extends LitElement {
           .map(
             (campaign) =>
               html`<li>
-                <a href="/play/campaigns/${campaign.slug}">
+                <a href=${new Campaign(campaign).route}>
                   <article>
                     <header>
                       <h3>${campaign.name}</h3>
@@ -146,31 +152,11 @@ export class BiCampaignList extends LitElement {
                     ${campaign._conflict
                       ? html`<p class="conflict">
                           HAS CONFLICT WITH REMOTE VERSION
+                          ${JSON.stringify(campaign._conflict, null, 2)}
                         </p>`
                       : ""}
                   </article>
                 </a>
-              </li>`,
-          )}
-        ${this.conflicted
-          ?.filter((c) => !c.deleted_at)
-          .map(
-            (campaign) =>
-              html`<li class="conflict">
-                <article>
-                  <header>
-                    <h3>${campaign.name}</h3>
-                  </header>
-                  <p>${campaign.description}</p>
-                  <p>
-                    Unable to download campaign because a local one exists with
-                    the same slug.
-                    <a href="/play/campaigns/${campaign.slug}"
-                      >Change its slug</a
-                    >
-                    to resolve the conflict.
-                  </p>
-                </article>
               </li>`,
           )}
       </ul>

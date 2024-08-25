@@ -9,10 +9,10 @@ defmodule BlackIron.Campaigns do
   alias BlackIron.Accounts.User
   alias BlackIron.Campaigns.{Campaign, Membership}
 
-  def list_campaigns_for_user(%User{id: user_id}) do
+  def list_campaigns_for_user(%User{pid: pid}) do
     from(c in Campaign,
       join: m in assoc(c, :memberships),
-      where: m.user_id == ^user_id,
+      where: m.user_id == ^pid,
       preload: [:memberships]
     )
     |> Repo.all()
@@ -51,7 +51,7 @@ defmodule BlackIron.Campaigns do
     %Campaign{}
     |> Campaign.changeset(attrs |> put_rev(%Campaign{}))
     |> Ecto.Changeset.put_assoc(:memberships, [
-      %Membership{user_id: user.id, roles: [:owner]}
+      %Membership{user_id: user.pid, roles: [:owner]}
     ])
     |> Repo.insert()
   end

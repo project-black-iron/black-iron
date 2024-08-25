@@ -1,4 +1,3 @@
-
 export interface SyncableSchema {
   _abstract: {
     key: string;
@@ -7,7 +6,7 @@ export interface SyncableSchema {
 }
 
 export interface ISyncable {
-  id: string;
+  pid: string;
   _rev?: string;
   _revisions?: string[];
   _conflict?: ISyncable;
@@ -15,18 +14,21 @@ export interface ISyncable {
 }
 
 export class AbstractSyncable implements ISyncable {
-  get route() {
+  get baseRoute() {
     return "/";
   }
+  get route() {
+    return "/_abstract";
+  }
 
-  id: string;
+  pid: string;
   _rev?: string;
   _revisions?: string[];
   _conflict?: ISyncable;
   deleted_at?: string;
 
   constructor(data: ISyncable) {
-    this.id = data.id;
+    this.pid = data.pid;
     this._rev = data._rev;
     this._revisions = data._revisions;
     this._conflict = data._conflict;
@@ -34,7 +36,7 @@ export class AbstractSyncable implements ISyncable {
   }
 
   eq(other: ISyncable): boolean {
-    return this.id === other.id && this.deleted_at == other.deleted_at;
+    return this.pid === other.pid && this.deleted_at == other.deleted_at;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -43,7 +45,7 @@ export class AbstractSyncable implements ISyncable {
   }
 
   toSyncable(): ISyncable {
-    const syncable: ISyncable = { id: this.id };
+    const syncable: ISyncable = { pid: this.pid };
     if (this._rev) {
       syncable._rev = this._rev;
     }

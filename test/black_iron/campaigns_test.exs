@@ -10,7 +10,7 @@ defmodule BlackIron.CampaignsTest do
 
     import BlackIron.CampaignsFixtures
 
-    @invalid_attrs %{name: nil, slug: nil, description: nil}
+    @invalid_attrs %{name: nil, pid: nil, description: nil}
 
     test "list_campaigns/1 returns all campaigns" do
       campaign = campaign_fixture() |> Repo.preload(:memberships)
@@ -30,12 +30,13 @@ defmodule BlackIron.CampaignsTest do
     end
 
     test "create_campaign/2 with valid data creates a campaign" do
-      valid_attrs = %{name: "some name", slug: "some slug", description: "some description"}
+      pid = BlackIron.Utils.gen_pid()
+      valid_attrs = %{name: "some name", pid: pid, description: "some description"}
 
       user = AccountsFixtures.user_fixture()
       assert {:ok, %Campaign{} = campaign} = Campaigns.create_campaign(user, valid_attrs)
       assert campaign.name == "some name"
-      assert campaign.slug == "some slug"
+      assert campaign.pid == pid
       assert campaign.description == "some description"
     end
 
@@ -53,9 +54,11 @@ defmodule BlackIron.CampaignsTest do
         |> Map.get(:username)
         |> Accounts.get_user_by_username()
 
+      newpid = BlackIron.Utils.gen_pid()
+
       update_attrs = %{
         name: "some updated name",
-        slug: "some updated slug",
+        pid: newpid,
         description: "some updated description"
       }
 
@@ -63,7 +66,7 @@ defmodule BlackIron.CampaignsTest do
                Campaigns.update_campaign(user, campaign, update_attrs)
 
       assert campaign.name == "some updated name"
-      assert campaign.slug == "some updated slug"
+      assert campaign.pid == newpid
       assert campaign.description == "some updated description"
     end
 
