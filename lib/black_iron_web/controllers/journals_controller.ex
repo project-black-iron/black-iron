@@ -8,7 +8,13 @@ defmodule BlackIronWeb.JournalsController do
     render(conn, :index)
   end
 
-  def show(conn, _params) do
-    render(conn, :show)
+  def show(conn, params) do
+    # TODO(@zkat): Obviously, fetch the actual thing and all that
+    title = if conn.assigns[:preload] do
+      ""
+    else
+      params["slug"]
+    end
+    render(conn, :show, title: title)
   end
 end

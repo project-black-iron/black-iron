@@ -1,0 +1,5 @@
+bi-app-context {
+  display: flex;
+  flex: 1 1 auto;
+  flex-flow: column nowrap;
+}

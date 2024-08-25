@@ -7,6 +7,7 @@ defmodule BlackIronWeb.Router do
     plug :accepts, ["html", "json"]
     plug :fetch_session
     plug :fetch_live_flash
+    plug :put_iframe
     plug :put_root_layout, html: {BlackIronWeb.Layouts, :root}
     plug :check_htmx_request
     plug :protect_from_forgery
@@ -50,6 +51,10 @@ defmodule BlackIronWeb.Router do
     else
       conn
     end
+  end
+
+  defp put_iframe(conn, _) do
+    assign(conn, :iframe, conn.params["iframe"])
   end
 
   pipeline :api do

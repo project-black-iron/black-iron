@@ -1,0 +1,26 @@
+article.journal-page {
+  flex: 1 1 auto;
+  /* TODO(@zkat): This should be a grid layout with proportions. Or maybe look
+  into how to make things resizable? */
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 0.4rem;
+
+  & .journal {
+    margin: 0 auto;
+    max-width: 800px;
+    padding: 0 20px;
+  }
+
+  & .sidebar {
+    border: 1px solid var(--background-primary-alt);
+    border-right: none;
+    border-top: none;
+    padding: 0.3rem;
+    & iframe {
+      border: none;
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
