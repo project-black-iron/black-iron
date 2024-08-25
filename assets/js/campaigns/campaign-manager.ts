@@ -72,6 +72,10 @@ export class CampaignManager {
       Array.from(allKeys).map(async (key) => {
         const remote = remotes.get(key);
         const local = locals.get(key);
+        if (!remote && local && !local.memberships.length) {
+          // Don't sync offline campaigns that aren't associated with any account.
+          return;
+        }
         return await this.app.db.sync(
           "campaigns",
           remote && new Campaign(remote),
@@ -88,7 +92,7 @@ export class CampaignManager {
   }
 
   async saveCampaign(campaign: ICampaign) {
-    return this.app.db.put("campaigns", campaign);
+    return this.app.db.saveSyncable("campaigns", campaign);
   }
 
   async listCampaigns() {

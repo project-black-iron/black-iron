@@ -22,6 +22,9 @@ export class BiCampaignList extends LitElement {
           padding: 0;
           border: 1px solid var(--border-color, #ccc);
           border-radius: var(--border-radius, 10px);
+          &:has(.offline) {
+            opacity: 0.5;
+          }
           & a {
             text-decoration: none;
             color: inherit;
@@ -88,11 +91,11 @@ export class BiCampaignList extends LitElement {
         description: formData.get("data[description]") as string,
         memberships: this.app?.userId
           ? [
-            {
-              user_id: this.app.userId,
-              roles: [CampaignRole.Owner],
-            },
-          ]
+              {
+                user_id: this.app.userId,
+                roles: [CampaignRole.Owner],
+              },
+            ]
           : [],
       };
       await this.app?.campaignManager.saveCampaign(campaign);
@@ -142,37 +145,63 @@ export class BiCampaignList extends LitElement {
     await this.#setFromLocalCampaigns();
   }
 
+  async #addToAccount(e: MouseEvent, campaign: ICampaign) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!this.app?.userId) {
+      return;
+    }
+    const newC: ICampaign = {
+      ...campaign,
+      memberships: [
+        {
+          user_id: this.app.userId,
+          roles: [CampaignRole.Owner],
+        },
+      ],
+    };
+    await this.app?.campaignManager.saveCampaign(newC);
+    await this.#syncCampaignData();
+  }
+
   render() {
     // TODO(@zkat): only show campaigns for the current account, if we're logged in.
     return html`<ul>
-        ${
-      this.campaigns
-        ?.filter((c) => !c.deleted_at)
-        .map(
-          (campaign) =>
-            html`<li>
+        ${this.campaigns
+          ?.filter((c) => !c.deleted_at)
+          .map(
+            (campaign) =>
+              html`<li>
                 <a href=${new Campaign(campaign).route}>
                   <article>
                     <header>
                       <h3>${campaign.name}</h3>
                     </header>
                     <p>${campaign.description}</p>
-                    ${
-              campaign._conflict
-                ? html`<p class=conflict>
+                    ${!campaign.memberships.length
+                      ? html`<p class="offline">
+                          This campaign is only available locally and not
+                          associated with any account. It is not saved on the
+                          server.
+                          ${this.app?.userId
+                            ? html`<button
+                                type="button"
+                                @click=${(e: MouseEvent) => this.#addToAccount(e, campaign)}
+                              >
+                                Add to current account
+                              </button>`
+                            : ""}
+                        </p>`
+                      : ""}
+                    ${campaign._conflict
+                      ? html`<p class="conflict">
                           HAS CONFLICT WITH REMOTE VERSION
-                          <pre>
-                          ${JSON.stringify(campaign, null, 2)}
-                          </pre>
-                        </p>
-                        `
-                : ""
-            }
+                        </p> `
+                      : ""}
                   </article>
                 </a>
               </li>`,
-        )
-    }
+          )}
       </ul>
       <slot></slot>`;
   }

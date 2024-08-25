@@ -7,7 +7,7 @@ defmodule BlackIron.Campaigns do
   alias BlackIron.Repo
 
   alias BlackIron.Accounts.User
-  alias BlackIron.Campaigns.{Campaign, Membership}
+  alias BlackIron.Campaigns.Campaign
 
   def list_campaigns_for_user(%User{pid: pid}) do
     from(c in Campaign,
@@ -53,13 +53,6 @@ defmodule BlackIron.Campaigns do
 
   """
   def create_campaign(%User{} = user, attrs \\ %{}) do
-    attrs =
-      if !attrs["memberships"] || Enum.empty?(attrs["memberships"]) do
-        attrs |> Map.put("memberships", [%{"user_id" => user.pid, "roles" => ["owner"]}])
-      else
-        attrs
-      end
-
     %Campaign{}
     |> Campaign.changeset(attrs |> put_rev(%Campaign{}))
     |> Repo.insert()
