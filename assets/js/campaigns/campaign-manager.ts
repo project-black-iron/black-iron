@@ -92,7 +92,7 @@ export class CampaignManager {
   }
 
   async listCampaigns() {
-    return (await this.app.db.getAll("campaigns"))
+    const campaigns = (await this.app.db.getAll("campaigns"))
       .filter((cdata) => {
         return (
           // Return both offline-only and online campaigns for the current
@@ -102,6 +102,8 @@ export class CampaignManager {
         );
       })
       .map((cdata) => new Campaign(cdata));
+    campaigns.sort((a, b) => (a.name > b.name ? 1 : -1));
+    return campaigns;
   }
 
   async mapCampaigns<T>(

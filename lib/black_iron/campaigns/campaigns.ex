@@ -13,6 +13,8 @@ defmodule BlackIron.Campaigns do
     from(c in Campaign,
       join: m in assoc(c, :memberships),
       where: m.user_id == ^pid,
+      # TODO(@zkat): order by an actual, manually-manageable sort.
+      order_by: [asc: c.name],
       preload: [:memberships]
     )
     |> Repo.all()
