@@ -17,7 +17,7 @@ import { BlackIronApp } from "../black-iron-app";
  *
  * And you'll have the latest available BlackIronApp, if the user_token ever changes.
  *
- * @usage `<bi-app-context-provider usertoken="<%= assigns[:user_token] %>">Rest of your app here</bi-app-context-provider>`
+ * @usage `<bi-app-context-provider user-token="<%= assigns[:user_token] %>" user-pid="...." csrf-token="...">Rest of your app here</bi-app-context-provider>`
  */
 @customElement("bi-app-context")
 export class BiAppContext extends LitElement {
@@ -26,8 +26,8 @@ export class BiAppContext extends LitElement {
   @property({ attribute: "user-token" })
   userToken?: string;
 
-  @property({ attribute: "user-id" })
-  userId?: string;
+  @property({ attribute: "user-pid" })
+  userPid?: string;
 
   @property({ attribute: "csrf-token" })
   csrfToken?: string;
@@ -44,7 +44,7 @@ export class BiAppContext extends LitElement {
       this.blackIronApp = await BlackIronApp.createApp(
         this.userToken,
         this.csrfToken,
-        this.userId,
+        this.userPid,
       );
     }
   }
@@ -55,7 +55,7 @@ export class BiAppContext extends LitElement {
       BlackIronApp.createApp(
         this.userToken,
         this.csrfToken,
-        this.userId,
+        this.userPid,
       ).then((app) => {
         this.blackIronApp = app;
       });
