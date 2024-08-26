@@ -9,7 +9,7 @@ defmodule BlackIronWeb.NPCsHTML do
     <h3>NPCs list</h3>
     <ul class="npcs-list">
       <!-- NPCs go here -->
-      <li><a href="/play/campaigns/1/my-campaign/npcs/1/npc-1">NPC 1</a></li>
+      <li><a href="1/npc-1">NPC 1</a></li>
     </ul>
     """
   end

@@ -9,7 +9,7 @@ defmodule BlackIronWeb.WorldsHTML do
     <h3>Worlds list</h3>
     <ul class="worlds-list">
       <!-- Worlds go here -->
-      <li><a href="/play/campaigns/1/my-campaign/worlds/1/my-world">World 1</a></li>
+      <li><a href="1/my-world">World 1</a></li>
     </ul>
     """
   end

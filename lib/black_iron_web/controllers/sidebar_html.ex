@@ -10,32 +10,32 @@ defmodule BlackIronWeb.SidebarHTML do
       <ul>
         <li><a target="_top" href={~p"/play/campaigns"}>Campaigns</a></li>
         <li>
-          <a href={~p"/play/campaigns/#{assigns[:campaignId]}/#{assigns[:cslug]}/journals"}>
+          <a href={~p"/play/campaigns/#{assigns[:campaignId]}/#{assigns[:cslug]}/sidebar/journals"}>
             Journals
           </a>
         </li>
         <li>
-          <a href={~p"/play/campaigns/#{assigns[:campaignId]}/#{assigns[:cslug]}/characters"}>
+          <a href={~p"/play/campaigns/#{assigns[:campaignId]}/#{assigns[:cslug]}/sidebar/characters"}>
             Characters
           </a>
         </li>
         <li>
-          <a href={~p"/play/campaigns/#{assigns[:campaignId]}/#{assigns[:cslug]}/npcs"}>
+          <a href={~p"/play/campaigns/#{assigns[:campaignId]}/#{assigns[:cslug]}/sidebar/npcs"}>
             NPCs
           </a>
         </li>
         <li>
-          <a href={~p"/play/campaigns/#{assigns[:campaignId]}/#{assigns[:cslug]}/lore"}>
+          <a href={~p"/play/campaigns/#{assigns[:campaignId]}/#{assigns[:cslug]}/sidebar/lore"}>
             Lore
           </a>
         </li>
         <li>
-          <a href={~p"/play/campaigns/#{assigns[:campaignId]}/#{assigns[:cslug]}/tracks"}>
+          <a href={~p"/play/campaigns/#{assigns[:campaignId]}/#{assigns[:cslug]}/sidebar/tracks"}>
             Tracks and Clocks
           </a>
         </li>
         <li>
-          <a href={~p"/play/campaigns/#{assigns[:campaignId]}/#{assigns[:cslug]}/worlds"}>Worlds</a>
+          <a href={~p"/play/campaigns/#{assigns[:campaignId]}/#{assigns[:cslug]}/sidebar/worlds"}>Worlds</a>
         </li>
       </ul>
     </nav>

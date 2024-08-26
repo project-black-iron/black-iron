@@ -9,7 +9,7 @@ defmodule BlackIronWeb.LoreHTML do
     <h3>Lore list</h3>
     <ul class="lore-list">
       <!-- Lore goes here -->
-      <li><a href="/play/campaigns/1/my-campaign/lore/1/lore-1">Lore 1</a></li>
+      <li><a href="1/lore-1">Lore 1</a></li>
     </ul>
     """
   end

@@ -52,7 +52,7 @@ defmodule BlackIron.Campaigns do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_campaign(%User{} = user, attrs \\ %{}) do
+  def create_campaign(%User{}, attrs \\ %{}) do
     %Campaign{}
     |> Campaign.changeset(attrs |> put_rev(%Campaign{}))
     |> Repo.insert()

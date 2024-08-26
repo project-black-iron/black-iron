@@ -5,6 +5,7 @@ defmodule BlackIronWeb.Router do
 
   pipeline :browser do
     plug :accepts, ["html", "json"]
+    plug :ensure_trailing_slash
     plug :fetch_session
     plug :fetch_live_flash
     plug :put_root_layout, html: {BlackIronWeb.Layouts, :root}
@@ -43,6 +44,17 @@ defmodule BlackIronWeb.Router do
     end)
   end
 
+  defp ensure_trailing_slash(conn, _) do
+    if String.ends_with?(conn.request_path, "/") do
+      conn
+    else
+      conn
+      |> put_status(:moved_permanently)
+      |> redirect(to: conn.request_path <> "/")
+      |> halt()
+    end
+  end
+
   defp put_user_token(conn, _) do
     if current_user = conn.assigns[:current_user] do
       token = Phoenix.Token.sign(conn, "black iron user token", current_user.id)
@@ -52,7 +64,7 @@ defmodule BlackIronWeb.Router do
     end
   end
 
-  defp put_sidebar_layout(conn, _) do
+  defp sidebar(conn, _) do
     put_root_layout(conn, html: {BlackIronWeb.Layouts, :sidebar})
   end
 
@@ -176,12 +188,23 @@ defmodule BlackIronWeb.Router do
 
     scope "/campaigns/:campaignId/:cslug" do
       get "/journals/:journalId/:slug", JournalsController, :show
+      get "/journals", JournalsController, :index
+      get "/worlds", WorldsController, :index
+      get "/worlds/:worldId/:slug", WorldsController, :show
+      get "/npcs", NPCsController, :index
+      get "/npcs/:npcId/:slug", NPCsController, :show
+      get "/lore", LoreController, :index
+      get "/lore/:loreId/:slug", LoreController, :show
+      get "/tracks", TracksController, :index
+      get "/tracks/:trackId/:slug", TracksController, :show
+      get "/characters", CharactersController, :index
+      get "/characters/:characterId/:slug", CharactersController, :show
 
-      scope "/" do
-        pipe_through [:put_sidebar_layout]
+      scope "/sidebar" do
+        pipe_through [:sidebar]
 
+        get "/", SidebarController, :show
         get "/journals", JournalsController, :index
-        get "/sidebar", SidebarController, :show
         get "/worlds", WorldsController, :index
         get "/worlds/:worldId/:slug", WorldsController, :show
         get "/npcs", NPCsController, :index
