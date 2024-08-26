@@ -37,6 +37,13 @@ export class BiThemePicker extends LitElement {
       : (localStorage.getItem(THEME_STORAGE_KEY) as Theme);
   }
 
+  reload() {}
+
+  notifySidebar(): void {
+    const iframe = document.querySelector(".sidebar > iframe") as HTMLIFrameElement | null;
+    iframe?.contentWindow?.postMessage("reloadTheme", window.location.origin);
+  }
+
   willUpdate(changedProps: Map<string, unknown>) {
     if (changedProps.has("theme")) {
       const themeLink = document.getElementById("theme");
@@ -48,6 +55,7 @@ export class BiThemePicker extends LitElement {
         }
         themeLink.href = `/assets/css/theme-${this.theme || this.systemTheme()}.css`;
       }
+      this.notifySidebar();
     }
   }
 

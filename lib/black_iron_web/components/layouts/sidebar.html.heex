@@ -8,15 +8,24 @@
     <meta name="CCBot" content="nofollow" />
     <meta name="robots" content="noai, noimageai" />
     <script>
-      const theme = localStorage.getItem("bi-theme") ||
-        (matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light");
+      function getThemeHref() {
+        const theme = localStorage.getItem("bi-theme") ||
+          (matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light");
+        return `/assets/css/theme-${theme}.css`;
+      }
       const linkEl = document.createElement("link");
       linkEl.rel = "stylesheet";
       linkEl.id = "theme";
-      linkEl.href = `/assets/css/theme-${theme}.css`;
+      linkEl.href = getThemeHref();
       document.head.appendChild(linkEl);
+      window.addEventListener("message", (e) => {
+        if (e.origin !== window.location.origin) { return; }
+        if (e.data === "reloadTheme") {
+          document.getElementById("theme").href = getThemeHref();
+        }
+      });
     </script>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
     <!-- Styles imported by JS source files -->
