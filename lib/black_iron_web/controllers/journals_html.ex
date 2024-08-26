@@ -10,7 +10,7 @@ defmodule BlackIronWeb.JournalsHTML do
     <ul class="journals-list">
       <!-- Journals go here -->
       <li>
-        <!-- No relative URLs here. We _always_ want to go to top -->
+        <!-- No relative URLs here. We _always_ want to go to top. We also use an absolute URL to bypass relative shenanigans. -->
         <a
           target="_top"
           href={
