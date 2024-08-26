@@ -3,6 +3,24 @@ defmodule BlackIronWeb.Router do
 
   import BlackIronWeb.UserAuth
 
+  @host Application.compile_env!(:black_iron, [BlackIronWeb.Endpoint, :url, :host])
+
+  @content_security_policy (case Application.compile_env!(:black_iron, :env) do
+                              :prod ->
+                                "default-src 'self' 'unsafe-eval' 'unsafe-inline';" <>
+                                  "child-src 'self';" <>
+                                  "connect-src wss://#{@host} https://#{@host} blob:;" <>
+                                  "img-src 'self' blob: data:;" <>
+                                  "font-src data:;"
+
+                              _ ->
+                                "default-src 'self' 'unsafe-eval' 'unsafe-inline';" <>
+                                  "child-src 'self';" <>
+                                  "connect-src ws://#{@host}:* http://#{@host}:* blob:;" <>
+                                  "img-src 'self' blob: data:;" <>
+                                  "font-src data:;"
+                            end)
+
   pipeline :browser do
     plug :accepts, ["html", "json"]
     plug :ensure_trailing_slash
@@ -11,7 +29,9 @@ defmodule BlackIronWeb.Router do
     plug :put_root_layout, html: {BlackIronWeb.Layouts, :root}
     plug :check_htmx_request
     plug :protect_from_forgery
-    plug :put_secure_browser_headers
+    plug :put_secure_browser_headers, %{
+      "content-security-policy" => @content_security_policy
+    }
     plug :fetch_current_user
     plug :put_current_route
     plug BlackIronWeb.Plugs.Locale, "en"

@@ -8,6 +8,7 @@
 import Config
 
 config :black_iron,
+  env: config_env(),
   ecto_repos: [BlackIron.Repo],
   generators: [timestamp_type: :utc_datetime]
 
