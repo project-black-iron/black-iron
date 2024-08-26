@@ -109,9 +109,6 @@ export class BiCampaignList extends LitElement {
       // Generate a new pid for the next campaign, in case we're in offline
       // mode (online, htmx will swap in a new pid for us).
       input.value = genPid();
-    });
-    this.addEventListener("htmx:afterRequest", (e: Event) => {
-      const form = e.target as HTMLFormElement;
       form.reset();
     });
   }

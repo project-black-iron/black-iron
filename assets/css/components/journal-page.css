@@ -22,3 +22,13 @@ article.journal-page {
     }
   }
 }
+
+main.sidebar {
+  a {
+    color: var(--text-primary);
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
