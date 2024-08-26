@@ -8,6 +8,16 @@
     <meta name="CCBot" content="nofollow" />
     <meta name="robots" content="noai, noimageai" />
     <script>
+      if (window.self === window.top) {
+        // If the sidebar page is being requested at the top level,
+        // redirect to the full layout version.
+        window.location.href = window.location.href.replace(
+          /(\/play\/campaigns\/[^/]+\/[^/]+)\/sidebar(\/.*)/,
+          "$1$2"
+        );
+      }
+    </script>
+    <script>
       function getThemeHref() {
         const theme = localStorage.getItem("bi-theme") ||
           (matchMedia("(prefers-color-scheme: dark)").matches
@@ -34,7 +44,11 @@
   <body>
     <main class="sidebar">
       <%= if !assigns[:sidebar_marker] do %>
-        <a href={~p"/play/campaigns/#{@campaignId}/#{@cslug}/sidebar"}>←</a>
+        <a href={
+          ~p"/play/campaigns/#{assigns.conn.params["campaignId"]}/#{assigns.conn.params["cslug"]}/sidebar"
+        }>
+          ←
+        </a>
       <% end %>
       <%= @inner_content %>
     </main>

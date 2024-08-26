@@ -29,9 +29,11 @@ defmodule BlackIronWeb.Router do
     plug :put_root_layout, html: {BlackIronWeb.Layouts, :root}
     plug :check_htmx_request
     plug :protect_from_forgery
+
     plug :put_secure_browser_headers, %{
       "content-security-policy" => @content_security_policy
     }
+
     plug :fetch_current_user
     plug :put_current_route
     plug BlackIronWeb.Plugs.Locale, "en"
@@ -85,7 +87,8 @@ defmodule BlackIronWeb.Router do
   end
 
   defp sidebar(conn, _) do
-    put_root_layout(conn, html: {BlackIronWeb.Layouts, :sidebar})
+    conn
+    |> put_root_layout(html: {BlackIronWeb.Layouts, :sidebar})
   end
 
   pipeline :api do

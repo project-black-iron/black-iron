@@ -1,8 +1,8 @@
 defmodule BlackIronWeb.CharactersController do
   use BlackIronWeb, :controller
 
-  def index(conn, params) do
-    render(conn, :index, campaignId: params["campaignId"], cslug: params["cslug"])
+  def index(conn, _params) do
+    render(conn, :index)
   end
 
   def show(conn, params) do

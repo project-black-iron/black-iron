@@ -11,7 +11,7 @@ defmodule BlackIronWeb.JournalsHTML do
       <!-- Journals go here -->
       <li>
         <!-- No relative URLs here. We _always_ want to go to top -->
-        <a target="_top" href="/play/campaigns/1/campaign-name/journals/1/chapter-1">Chapter 1</a>
+        <a target="_top" href="1/chapter-1">Chapter 1</a>
       </li>
     </ul>
     """

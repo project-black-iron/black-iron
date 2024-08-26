@@ -10,32 +10,32 @@ defmodule BlackIronWeb.SidebarHTML do
       <ul>
         <li><a target="_top" href={~p"/play/campaigns"}>Campaigns</a></li>
         <li>
-          <a href={~p"/play/campaigns/#{assigns[:campaignId]}/#{assigns[:cslug]}/sidebar/journals"}>
+          <a href="journals">
             Journals
           </a>
         </li>
         <li>
-          <a href={~p"/play/campaigns/#{assigns[:campaignId]}/#{assigns[:cslug]}/sidebar/characters"}>
+          <a href="characters">
             Characters
           </a>
         </li>
         <li>
-          <a href={~p"/play/campaigns/#{assigns[:campaignId]}/#{assigns[:cslug]}/sidebar/npcs"}>
+          <a href="npcs">
             NPCs
           </a>
         </li>
         <li>
-          <a href={~p"/play/campaigns/#{assigns[:campaignId]}/#{assigns[:cslug]}/sidebar/lore"}>
+          <a href="lore">
             Lore
           </a>
         </li>
         <li>
-          <a href={~p"/play/campaigns/#{assigns[:campaignId]}/#{assigns[:cslug]}/sidebar/tracks"}>
+          <a href="tracks">
             Tracks and Clocks
           </a>
         </li>
         <li>
-          <a href={~p"/play/campaigns/#{assigns[:campaignId]}/#{assigns[:cslug]}/sidebar/worlds"}>Worlds</a>
+          <a href="worlds">Worlds</a>
         </li>
       </ul>
     </nav>

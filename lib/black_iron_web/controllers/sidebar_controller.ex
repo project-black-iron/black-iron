@@ -4,11 +4,7 @@ defmodule BlackIronWeb.SidebarController do
   """
   use BlackIronWeb, :controller
 
-  def show(conn, params) do
-    render(conn, :show,
-      campaignId: params["campaignId"],
-      cslug: params["cslug"],
-      sidebar_marker: true
-    )
+  def show(conn, _params) do
+    render(conn, :show, sidebar_marker: true)
   end
 end
