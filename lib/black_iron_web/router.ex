@@ -71,7 +71,7 @@ defmodule BlackIronWeb.Router do
       conn
     else
       conn
-      |> put_status(:moved_permanently)
+      |> put_status(:permanent_redirect)
       |> redirect(to: conn.request_path <> "/")
       |> halt()
     end
