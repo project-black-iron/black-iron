@@ -67,7 +67,7 @@ defmodule BlackIronWeb.Router do
   end
 
   defp ensure_trailing_slash(conn, _) do
-    if String.ends_with?(conn.request_path, "/") do
+    if String.ends_with?(conn.request_path, "/") || conn.method != "GET" do
       conn
     else
       conn
