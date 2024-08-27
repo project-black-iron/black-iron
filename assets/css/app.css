@@ -31,6 +31,10 @@ body {
     flex: 1 1 auto;
     display: flex;
     flex-flow: column nowrap;
+    padding: 0 1rem;
+    &.sidebar {
+      padding: 0;
+    }
   }
   & > footer {
     flex: 0 1 auto;

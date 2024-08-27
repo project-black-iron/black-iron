@@ -15,7 +15,7 @@ defmodule BlackIronWeb.CharactersHTML do
 
   def show(assigns) do
     ~H"""
-    <bi-character-context character-data={Jason.encode!(assigns[:character])}>
+    <bi-character-context character={Jason.encode!(assigns[:character])}>
       <article>
         <header><%= gettext("Character Sheet") %></header>
         <.character_info {assigns} />
@@ -30,35 +30,36 @@ defmodule BlackIronWeb.CharactersHTML do
   end
 
   defp character_info(assigns) do
+    char = assigns[:character] || %{}
+
     ~H"""
     <section class="info">
       <header>
-        <bi-character-portrait href={assigns[:character] && assigns[:character][:portrait]} />
-        <bi-character-name name={assigns[:character] && assigns[:character][:name]} />
+        <bi-character-portrait href={char[:portrait]} />
+        <bi-character-name name={char[:name]} />
       </header>
-      <bi-character-initiative initiative={assigns[:character] && assigns[:character][:initiative]} />
+      <bi-character-initiative initiative={char[:initiative]} />
       <dl>
         <dt>
-          <bi-character-alias-label label={assigns[:campaign] && assigns[:campaign][:alias_label]} />
+          <bi-character-alias-label label={char[:alias_label]} />
         </dt>
-        <dd><bi-character-alias alias={assigns[:character] && assigns[:character][:alias]} /></dd>
+        <dd><bi-character-alias alias={char[:alias]} /></dd>
         <dt><%= gettext("Pronouns") %></dt>
         <dd>
-          <bi-character-pronouns pronouns={assigns[:character] && assigns[:character][:pronouns]} />
+          <bi-character-pronouns pronouns={char[:pronouns]} />
         </dd>
         <dt><%= gettext("Description") %></dt>
         <dd>
-          <bi-character-description description={
-            assigns[:character] && assigns[:character][:description]
-          } />
+          <bi-character-description description={char[:description]} />
         </dd>
         <dt><%= gettext("Player") %></dt>
-        <dd><bi-character-player player={assigns[:character] && assigns[:character][:player]} /></dd>
+        <dd><bi-character-player player={char[:player]} /></dd>
         <dt><%= gettext("Experience") %></dt>
         <dd>
           <bi-character-xp
-            added={assigns[:character] && assigns[:character][:xp_added]}
-            spent={assigns[:character] && assigns[:character][:xp_spent]}
+            tracks={Jason.encode!(char[:special_tracks])}
+            added={char[:xp_added]}
+            spent={char[:xp_spent]}
           />
         </dd>
       </dl>
