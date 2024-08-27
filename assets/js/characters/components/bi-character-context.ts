@@ -35,7 +35,6 @@ export class BiCharacterContext extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    console.log("character:", this.character);
     this.#updateCharacterFromUrl();
   }
 

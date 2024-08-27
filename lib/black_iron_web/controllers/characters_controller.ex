@@ -24,14 +24,14 @@ defmodule BlackIronWeb.CharactersController do
       if campaign && params["characterId"] != "__characterId" do
         %{
           pid: params["characterId"],
-          name: "Character #{params["characterId"]}",
+          name: "Kiara Doe",
           description: "This is a description for Character #{params["characterId"]}",
           campaign_id: campaign.pid,
-          player: "Player #{params["characterId"]}",
+          player: "Kat",
           xp_added: 0,
           xp_spent: 0,
           pronouns: "they/them",
-          alias: "Callsign #{params["characterId"]}",
+          alias: "Bumpkin",
           portrait: @portrait_data_uri,
           initiative: "Out of combat",
           stats: %{

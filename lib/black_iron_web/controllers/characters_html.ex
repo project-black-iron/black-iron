@@ -31,29 +31,30 @@ defmodule BlackIronWeb.CharactersHTML do
 
   defp character_info(assigns) do
     char = assigns[:character] || %{}
+    campaign = assigns[:campaign] || %{}
 
     ~H"""
     <section class="info">
       <header>
-        <bi-character-portrait href={char[:portrait]} />
-        <bi-character-name name={char[:name]} />
+        <bi-character-portrait src={char[:portrait]} />
+        <bi-character-text-field text={char[:name]} field="name" />
       </header>
       <bi-character-initiative initiative={char[:initiative]} />
       <dl>
         <dt>
-          <bi-character-alias-label label={char[:alias_label]} />
+          <bi-campaign-text-field text={campaign[:alias_label]} field="alias_label" />
         </dt>
-        <dd><bi-character-alias alias={char[:alias]} /></dd>
+        <dd><bi-character-text-field text={char[:alias]} field="alias" /></dd>
         <dt><%= gettext("Pronouns") %></dt>
         <dd>
-          <bi-character-pronouns pronouns={char[:pronouns]} />
+          <bi-character-text-field text={char[:pronouns]} field="pronouns" />
         </dd>
         <dt><%= gettext("Description") %></dt>
         <dd>
-          <bi-character-description description={char[:description]} />
+          <bi-character-text-field text={char[:description]} field="description" />
         </dd>
         <dt><%= gettext("Player") %></dt>
-        <dd><bi-character-player player={char[:player]} /></dd>
+        <dd><bi-character-text-field text={char[:player]} field="player" /></dd>
         <dt><%= gettext("Experience") %></dt>
         <dd>
           <bi-character-xp
