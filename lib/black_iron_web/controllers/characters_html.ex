@@ -30,57 +30,54 @@ defmodule BlackIronWeb.CharactersHTML do
   end
 
   defp character_info(assigns) do
-    char = assigns[:character] || %{}
-    campaign = assigns[:campaign] || %{}
-
     ~H"""
     <fieldset class="info">
-      <bi-sync-field entity="character" field="portrait" attr="src">
+      <bi-sync-field context="character" field="portrait" attr="src">
         <!-- TODO: File upload input -->
-        <img src={char[:portrait]}>
+        <img src={@char[:portrait]}>
       </bi-sync-field>
-      <bi-sync-field entity="character" field="name">
-        <.input field={char[:name]} />
+      <bi-sync-field context="character" field="name">
+        <.input field={@char[:name]} />
       </bi-sync-field>
-      <bi-sync-field entity="character" field="initiative">
-        <.input type="select" field={char[:initiative]} options={campaign[:initiative_options]} />
+      <bi-sync-field context="character" field="initiative">
+        <.input type="select" field={@char[:initiative]} options={@campaign[:initiative_options]} />
       </bi-sync-field>
       <dl>
         <dt>
-          <bi-sync-field entity="campaign" field="alias_label" prop="textContent">
-            <span><%= campaign[:alias_label] %></span>
+          <bi-sync-field context="campaign" field="alias_label" prop="textContent">
+            <span><%= @campaign[:alias_label] %></span>
           </bi-sync-field>
         </dt>
         <dd>
-          <bi-sync-field entity="character" field="alias">
-            <.input field={char[:alias]} />
+          <bi-sync-field context="character" field="alias">
+            <.input field={@char[:alias]} />
           </bi-sync-field>
         </dd>
         <dt><%= gettext("Pronouns") %></dt>
         <dd>
-          <bi-sync-field entity="character" field="pronouns">
-            <.input field={char[:pronouns]} />
+          <bi-sync-field context="character" field="pronouns">
+            <.input field={@char[:pronouns]} />
           </bi-sync-field>
         </dd>
         <dt><%= gettext("Description") %></dt>
         <dd>
-          <bi-sync-field entity="character" field="description">
-            <.input type="textarea" field={char[:description]} />
+          <bi-sync-field context="character" field="description">
+            <.input type="textarea" field={@char[:description]} />
           </bi-sync-field>
         </dd>
         <dt><%= gettext("Player") %></dt>
         <dd>
-          <bi-sync-field entity="character" field="player">
-            <.input field={char[:player]} />
+          <bi-sync-field context="character" field="player">
+            <.input field={@char[:player]} />
           </bi-sync-field>
         </dd>
         <dt><%= gettext("Experience") %></dt>
         <dd>
           <!-- TODO(@zkat): Can we make this more generic?... -->
           <bi-character-xp
-            tracks={Jason.encode!(char[:special_tracks])}
-            added={char[:xp_added]}
-            spent={char[:xp_spent]}
+            tracks={Jason.encode!(@char[:special_tracks])}
+            added={@char[:xp_added]}
+            spent={@char[:xp_spent]}
           />
         </dd>
       </dl>
