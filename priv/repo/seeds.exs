@@ -10,9 +10,9 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-alias BlackIron.Repo
-alias BlackIron.Entities
 alias BlackIron.Accounts
+alias BlackIron.Campaigns
+alias BlackIron.Repo
 
 if Application.fetch_env!(:black_iron, :env) == :dev do
   {:ok, user} =
@@ -26,13 +26,12 @@ if Application.fetch_env!(:black_iron, :env) == :dev do
   {:ok, _} = Repo.transaction(Accounts.confirm_user_multi(user))
 
   user = user |> Repo.reload()
-  
-  {:ok, _campaign} = Entities.create_entity(BlackIron.Campaigns.Campaign, %{
-    "data" => %{
-      "__type__" => "campaign",
-      "name" => "Sample Campaign",
-      "description" => "This is a sample campaign",
-      "memberships" => [%{"user_id" => user.pid, "role" => "owner"}]
-    }
-  })
+
+  {:ok, _campaign} =
+    Campaigns.create_campaign(user, %{
+      "data" => %{
+        "name" => "Sample Campaign",
+        "description" => "This is a sample campaign"
+      }
+    })
 end

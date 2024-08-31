@@ -2,7 +2,7 @@ defmodule BlackIron.Campaigns.Campaign do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @derive {Jason.Encoder, only: [:__type__, :name, :description, :memberships]}
+  @derive {Jason.Encoder, only: [:name, :description, :memberships]}
 
   embedded_schema do
     field :__type__, :string
@@ -16,10 +16,6 @@ defmodule BlackIron.Campaigns.Campaign do
   def changeset(campaign, attrs) do
     campaign
     |> cast(attrs, [:name, :description])
-    |> cast_embed(:memberships,
-      with: &BlackIron.Campaigns.Membership.changeset/2,
-      required: true
-    )
     |> validate_required([:name, :description])
     |> put_change(:__type__, "campaign")
   end

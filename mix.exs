@@ -62,9 +62,9 @@ defmodule BlackIron.MixProject do
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      "test.elixir": ["ecto.drop --quiet", "ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      test: ["ecto.drop --quiet", "ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "test.js": ["cmd --cd assets npm run test"],
-      test: ["test.elixir", "test.js"],
+      testall: ["test", "test.js"],
       "assets.setup": ["cmd --cd assets npm install"],
       "assets.build": ["cmd --cd assets npm run build:dev"],
       "assets.deploy": [

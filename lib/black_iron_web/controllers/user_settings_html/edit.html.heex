@@ -31,12 +31,7 @@
     </.simple_form>
   </div>
   <div>
-    <.simple_form
-      :let={f}
-      for={@handle_changeset}
-      action={~p"/users/settings"}
-      id="update_handle"
-    >
+    <.simple_form :let={f} for={@handle_changeset} action={~p"/users/settings"} id="update_handle">
       <.error :if={@handle_changeset.action}>
         <%= gettext("Oops, something went wrong! Please check the errors below.") %>
       </.error>

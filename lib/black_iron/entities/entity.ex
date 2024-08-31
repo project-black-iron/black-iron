@@ -1,6 +1,7 @@
 defmodule BlackIron.Entities.Entity do
   use Ecto.Schema
   import Ecto.Changeset
+  
   import PolymorphicEmbed
 
   @derive {Jason.Encoder, only: [:pid, :data, :rev, :revisions, :deleted_at]}
@@ -31,22 +32,22 @@ defmodule BlackIron.Entities.Entity do
   end
 
   @doc false
-  def changeset(entity, attrs, type) do
+  def changeset(entity, enstruct, attrs \\ %{}) do
+    attrs = attrs
+    |> Map.put(
+      "data",
+      Map.get(attrs, "data", %{})
+      |> Map.put("__type__", to_string(get_polymorphic_type(__MODULE__, :data, enstruct)))
+    )
     entity
     |> cast(attrs, [:pid, :rev, :revisions, :deleted_at])
-    |> cast_polymorphic_embed(:data, required: true, with: [
-      character: &BlackIron.Characters.Character.changeset/2,
-      campaign: &BlackIron.Campaigns.Campaign.changeset/2
-    ])
-    |> validate_change(:data, fn _, data ->
-      IO.inspect(data.__struct__)
-      IO.inspect(type)
-      if data.__struct__ == type do
-        []
-      else
-        [{:data, "Invalid data type"}]
-      end
-    end)
+    |> cast_polymorphic_embed(:data,
+      required: true,
+      with: [
+        character: &BlackIron.Characters.Character.changeset/2,
+        campaign: &BlackIron.Campaigns.Campaign.changeset/2
+      ]
+    )
     |> validate_required([:rev, :revisions])
     |> validate_revs()
   end

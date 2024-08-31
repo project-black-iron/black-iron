@@ -15,9 +15,12 @@ defmodule BlackIron.CampaignsFixtures do
         user,
         attrs
         |> Enum.into(%{
-          name: "some name",
-          description: "some description",
-          slug: BlackIron.Utils.gen_pid()
+          "data" =>
+            Map.get(attrs, "data", %{})
+            |> Enum.into(%{
+              "name" => "some name",
+              "description" => "some description"
+            })
         })
       )
 
