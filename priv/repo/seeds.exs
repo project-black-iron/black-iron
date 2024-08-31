@@ -27,7 +27,7 @@ if Application.fetch_env!(:black_iron, :env) == :dev do
 
   user = user |> Repo.reload()
   
-  {:ok, _campaign} = Entities.create_entity(%{
+  {:ok, _campaign} = Entities.create_entity(BlackIron.Campaigns.Campaign, %{
     "data" => %{
       "__type__" => "campaign",
       "name" => "Sample Campaign",

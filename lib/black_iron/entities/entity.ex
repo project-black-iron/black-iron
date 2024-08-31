@@ -31,13 +31,22 @@ defmodule BlackIron.Entities.Entity do
   end
 
   @doc false
-  def changeset(entity, attrs) do
+  def changeset(entity, attrs, type) do
     entity
     |> cast(attrs, [:pid, :rev, :revisions, :deleted_at])
     |> cast_polymorphic_embed(:data, required: true, with: [
       character: &BlackIron.Characters.Character.changeset/2,
       campaign: &BlackIron.Campaigns.Campaign.changeset/2
     ])
+    |> validate_change(:data, fn _, data ->
+      IO.inspect(data.__struct__)
+      IO.inspect(type)
+      if data.__struct__ == type do
+        []
+      else
+        [{:data, "Invalid data type"}]
+      end
+    end)
     |> validate_required([:rev, :revisions])
     |> validate_revs()
   end

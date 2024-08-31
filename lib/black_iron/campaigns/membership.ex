@@ -4,6 +4,8 @@ defmodule BlackIron.Campaigns.Membership do
 
   @derive {Jason.Encoder, only: [:user_id, :roles]}
 
+  @primary_key false
+  
   embedded_schema do
     belongs_to :user, BlackIron.Accounts.User, type: :string, references: :pid
     field :roles, {:array, Ecto.Enum}, values: [:owner, :guide, :player], default: [:player]

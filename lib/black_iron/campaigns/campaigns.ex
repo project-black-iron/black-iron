@@ -141,8 +141,8 @@ defmodule BlackIron.Campaigns do
       %Ecto.Changeset{data: %Campaign{}}
 
   """
-  def change_campaign(%Campaign{} = campaign, attrs \\ %{}) do
-    Campaign.changeset(campaign, attrs)
+  def change_campaign(%Entity{} = campaign, attrs \\ %{}) do
+    Entity.changeset(campaign, attrs, Campaign)
   end
 
   defp put_rev(attrs, obj) do

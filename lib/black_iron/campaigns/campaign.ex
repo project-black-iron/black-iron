@@ -21,5 +21,6 @@ defmodule BlackIron.Campaigns.Campaign do
       required: true
     )
     |> validate_required([:name, :description])
+    |> put_change(:__type__, "campaign")
   end
 end
