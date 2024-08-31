@@ -3,7 +3,7 @@
 import { IDBPDatabase } from "idb";
 import { convert } from "url-slug";
 import { BlackIronDBSchema } from "../db";
-import { AbstractSyncable, ISyncable, SyncableConflictError } from "../sync";
+import { AbstractEntity, IEntity, EntityConflictError } from "../entity";
 
 export interface CampaignSchema {
   campaigns: {
@@ -18,10 +18,12 @@ export enum CampaignRole {
   Owner = "owner",
 }
 
-export interface ICampaign extends ISyncable {
-  name: string;
-  description: string;
-  memberships: CampaignMembership[];
+export interface ICampaign extends IEntity {
+  data: {
+    name: string;
+    description: string;
+    memberships: CampaignMembership[];
+  };
 }
 
 export interface CampaignMembership {
@@ -29,10 +31,13 @@ export interface CampaignMembership {
   roles: CampaignRole[];
 }
 
-export class Campaign extends AbstractSyncable implements ICampaign {
-  name: string;
-  description: string;
-  memberships: CampaignMembership[];
+export class Campaign extends AbstractEntity implements ICampaign {
+  // NB(@zkat): initialized by AbstractEntity.
+  data!: {
+    name: string;
+    description: string;
+    memberships: CampaignMembership[];
+  };
 
   static dbUpgrade(db: IDBPDatabase<BlackIronDBSchema>) {
     db.createObjectStore("campaigns", {
@@ -45,41 +50,36 @@ export class Campaign extends AbstractSyncable implements ICampaign {
   }
 
   get route() {
-    return `${this.baseRoute}/${this.pid}/${convert(this.name)}`;
-  }
-
-  constructor(data: ICampaign) {
-    super(data);
-    this.name = data.name;
-    this.description = data.description;
-    this.memberships = data.memberships;
+    return `${this.baseRoute}/${this.pid}/${convert(this.data.name)}`;
   }
 
   eq(other: ICampaign) {
     return (
       super.eq(other)
-      && this.name === other.name
-      && this.description === other.description
-      // TODO(@zkat): this is technically incorrect because key and membership
-      // order might be different.
-      && JSON.stringify(this.memberships) === JSON.stringify(other.memberships)
+      && this.data.name === other.data.name
+      && this.data.description === other.data.description
+      && cmpMemberships(this.data.memberships, other.data.memberships)
     );
+
+    function cmpMemberships(a: CampaignMembership[], b: CampaignMembership[]) {
+      if (a.length !== b.length) {
+        return false;
+      }
+      return a.every((membership) =>
+        b.some((otherMembership) =>
+          membership.user_id === otherMembership.user_id
+          && membership.roles.length === otherMembership.roles.length
+          && membership.roles.every((role) => otherMembership.roles.includes(role))
+        )
+      );
+    }
   }
 
   merge(other: ICampaign) {
     const campaign = new Campaign(this);
     if (!this.eq(other)) {
-      throw new SyncableConflictError();
+      throw new EntityConflictError();
     }
     return campaign;
-  }
-
-  toSyncable() {
-    return {
-      ...super.toSyncable(),
-      name: this.name,
-      description: this.description,
-      memberships: this.memberships,
-    };
   }
 }

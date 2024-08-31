@@ -20,7 +20,7 @@ export class BiCharacterContext extends LitElement {
       value: ICharacter | undefined,
       oldValue: ICharacter | undefined,
     ) {
-      return value?._rev !== oldValue?._rev;
+      return value?.rev !== oldValue?.rev;
     },
   })
   character?: Character;

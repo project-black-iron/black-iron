@@ -29,11 +29,11 @@ defmodule BlackIron.CampaignsTest do
       assert campaign.data.name == "some name"
       assert campaign.data.description == "some description"
     end
-    
+
     test "create_campaign/2 with valid entity fields creates a campaign" do
       pid = BlackIron.Utils.gen_pid()
       rev = Ecto.UUID.generate()
-      
+
       valid_attrs = %{
         "pid" => pid,
         "rev" => rev,

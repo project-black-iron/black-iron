@@ -1,7 +1,7 @@
 defmodule BlackIron.Entities.Entity do
   use Ecto.Schema
   import Ecto.Changeset
-  
+
   import PolymorphicEmbed
 
   @derive {Jason.Encoder, only: [:pid, :data, :rev, :revisions, :deleted_at]}
@@ -33,12 +33,14 @@ defmodule BlackIron.Entities.Entity do
 
   @doc false
   def changeset(entity, enstruct, attrs \\ %{}) do
-    attrs = attrs
-    |> Map.put(
-      "data",
-      Map.get(attrs, "data", %{})
-      |> Map.put("__type__", to_string(get_polymorphic_type(__MODULE__, :data, enstruct)))
-    )
+    attrs =
+      attrs
+      |> Map.put(
+        "data",
+        Map.get(attrs, "data", %{})
+        |> Map.put("__type__", to_string(get_polymorphic_type(__MODULE__, :data, enstruct)))
+      )
+
     entity
     |> cast(attrs, [:pid, :rev, :revisions, :deleted_at])
     |> cast_polymorphic_embed(:data,

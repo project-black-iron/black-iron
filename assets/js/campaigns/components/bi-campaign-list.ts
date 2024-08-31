@@ -67,7 +67,7 @@ export class BiCampaignList extends LitElement {
       for (let i = 0; i < (newVal?.length ?? 0); i++) {
         if (newVal?.[i]?.pid !== oldVal?.[i]?.pid) {
           return true;
-        } else if (newVal?.[i]?._rev !== oldVal?.[i]?._rev) {
+        } else if (newVal?.[i]?.rev !== oldVal?.[i]?.rev) {
           return true;
         }
       }
@@ -86,17 +86,19 @@ export class BiCampaignList extends LitElement {
       const formData = new FormData(form);
       // TODO(@zkat): validate this! htmx:beforeRequest can cancel requests (if validation fails).
       const campaign: ICampaign = {
-        pid: formData.get("data[pid]") as string,
-        name: formData.get("data[name]") as string,
-        description: formData.get("data[description]") as string,
-        memberships: this.app?.userId
-          ? [
-            {
-              user_id: this.app.userId,
-              roles: [CampaignRole.Owner],
-            },
-          ]
-          : [],
+        pid: formData.get("entity[pid]") as string,
+        data: {
+          name: formData.get("entity[data][name]") as string,
+          description: formData.get("entity[data][description]") as string,
+          memberships: this.app?.userId
+            ? [
+              {
+                user_id: this.app.userId,
+                roles: [CampaignRole.Owner],
+              },
+            ]
+            : [],
+        },
       };
       await this.app?.campaignManager.saveCampaign(campaign);
       await this.#setFromLocalCampaigns();
@@ -127,7 +129,7 @@ export class BiCampaignList extends LitElement {
 
   async #setFromLocalCampaigns() {
     const campaigns = await this.app?.campaignManager.listCampaigns();
-    campaigns?.sort((a, b) => (a.name > b.name ? 1 : -1));
+    campaigns?.sort((a, b) => (a.data.name > b.data.name ? 1 : -1));
     if (campaigns) {
       this.campaigns = campaigns;
     }
@@ -150,12 +152,15 @@ export class BiCampaignList extends LitElement {
     }
     const newC: ICampaign = {
       ...campaign,
-      memberships: [
-        {
-          user_id: this.app.userId,
-          roles: [CampaignRole.Owner],
-        },
-      ],
+      data: {
+        ...campaign.data,
+        memberships: [
+          {
+            user_id: this.app.userId,
+            roles: [CampaignRole.Owner],
+          },
+        ],
+      },
     };
     await this.app?.campaignManager.saveCampaign(newC);
     await this.#syncCampaignData();
@@ -173,11 +178,11 @@ export class BiCampaignList extends LitElement {
                 <a href=${new Campaign(campaign).route}>
                   <article>
                     <header>
-                      <h3>${campaign.name}</h3>
+                      <h3>${campaign.data.name}</h3>
                     </header>
-                    <p>${campaign.description}</p>
+                    <p>${campaign.data.description}</p>
                     ${
-              !campaign.memberships.length
+              !campaign.data.memberships.length
                 ? html`<p class="offline">
                           This campaign is only available locally and not
                           associated with any account. It is not saved on the
@@ -196,7 +201,7 @@ export class BiCampaignList extends LitElement {
                 : ""
             }
                     ${
-              campaign._conflict
+              campaign.conflict
                 ? html`<p class="conflict">
                           HAS CONFLICT WITH REMOTE VERSION
                         </p> `

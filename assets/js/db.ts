@@ -1,9 +1,9 @@
 import { DBSchema, IDBPDatabase, openDB, StoreNames } from "idb";
 import { BlackIronApp } from "./black-iron-app";
 import { Campaign, CampaignSchema } from "./campaigns/campaign";
-import { AbstractSyncable, ISyncable, SyncableConflictError, SyncableSchema } from "./sync";
+import { AbstractEntity, IEntity, EntityConflictError, EntitySchema } from "./entity";
 
-export type BlackIronDBSchema = DBSchema & SyncableSchema & CampaignSchema;
+export type BlackIronDBSchema = DBSchema & EntitySchema & CampaignSchema;
 
 const DB_NAME = "black-iron";
 const DB_VERSION = 1;
@@ -62,86 +62,86 @@ export class BlackIronDB {
     return this.#idb.delete(storeName, key);
   }
 
-  async saveSyncable<
+  async saveEntity<
     Name extends StoreNames<BlackIronDBSchema>,
     T extends BlackIronDBSchema[Name]["value"],
-  >(storeName: Name, syncable: T, bumpRev: boolean = true): Promise<T> {
-    const ret = { ...syncable }; // TODO(@zkat): deep clone?
+  >(storeName: Name, entity: T, bumpRev: boolean = true): Promise<T> {
+    const ret = { ...entity }; // TODO(@zkat): deep clone?
     if (!ret.pid) {
       ret.pid = crypto.randomUUID();
     }
-    if (!ret._rev || bumpRev) {
-      ret._rev = crypto.randomUUID();
-      ret._revisions = [ret._rev, ...(ret._revisions || [])];
+    if (!ret.rev || bumpRev) {
+      ret.rev = crypto.randomUUID();
+      ret.revisions = [ret.rev, ...(ret.revisions || [])];
     }
     await this.#idb.put(storeName, ret);
     return ret;
   }
 
-  async uploadSyncable(syncable: AbstractSyncable) {
+  async uploadEntity(entity: AbstractEntity) {
     if (!this.app.userId) {
       // Skip uploading if we're not logged in.
       return;
     }
     const url = new URL(window.location.href);
-    url.pathname = syncable.baseRoute;
+    url.pathname = entity.baseRoute;
     const res = await this.app.fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ data: syncable.toSyncable() }),
+      body: JSON.stringify({ data: entity.toEntity() }),
     });
     if (!res.ok) {
       if (res.status === 409) {
-        throw new SyncableConflictError();
+        throw new EntityConflictError();
       } else {
-        throw new Error("Failed to upload syncable entity");
+        throw new Error("Failed to upload entity entity");
       }
     }
   }
 
-  async getRemote(syncable: AbstractSyncable) {
+  async getRemote(entity: AbstractEntity) {
     const url = new URL(window.location.href);
-    url.pathname = syncable.route;
+    url.pathname = entity.route;
     const res = await this.app.fetch(url);
     if (!res.ok) {
       throw new Error("Failed to fetch remote entity");
     }
     // TODO(@zkat): validate this!
-    return (await res.json()) as ISyncable;
+    return (await res.json()) as IEntity;
   }
 
   async sync<Name extends StoreNames<BlackIronDBSchema>>(
     storeName: Name,
-    remote?: AbstractSyncable,
-    local?: AbstractSyncable,
+    remote?: AbstractEntity,
+    local?: AbstractEntity,
   ) {
     try {
       if (remote && local) {
-        if (remote._rev !== local._rev) {
-          if (local._rev && remote._revisions?.includes(local._rev)) {
+        if (remote.rev !== local.rev) {
+          if (local.rev && remote.revisions?.includes(local.rev)) {
             // Remote has local version. Fast-forward local and save.
-            await this.saveSyncable(storeName, remote, false);
-          } else if (local._rev && local._revisions?.includes(remote._rev!)) {
+            await this.saveEntity(storeName, remote, false);
+          } else if (local.rev && local.revisions?.includes(remote.rev!)) {
             // Local has remote version. Fast-forward remote by uploading.
-            await this.uploadSyncable(local);
+            await this.uploadEntity(local);
           } else if (remote.eq(local)) {
             // Both are effectively the same. Overwrite the local DB's copy of
-            // the syncable to save the remote sync props.
-            await this.saveSyncable(storeName, remote, false);
+            // the entity to save the remote sync props.
+            await this.saveEntity(storeName, remote, false);
           } else {
-            await this.uploadSyncable(local.merge(remote));
+            await this.uploadEntity(local.merge(remote));
           }
         } else {
-          // _revs were both the same. Already synced
+          // revs were both the same. Already synced
         }
       } else if (remote) {
-        await this.saveSyncable(storeName, remote, false);
+        await this.saveEntity(storeName, remote, false);
       } else if (local) {
-        await this.uploadSyncable(local);
+        await this.uploadEntity(local);
       } else {
-        throw new Error("Must give at least one syncable to sync.");
+        throw new Error("Must give at least one entity to sync.");
       }
     } catch (e) {
       if (
@@ -163,18 +163,18 @@ export class BlackIronDB {
         // violation). Each entity will have to deal with this in its own way.
 
         // let's let someone else deal with the conflict.
-        throw new SyncableConflictError();
-      } else if (e instanceof SyncableConflictError) {
+        throw new EntityConflictError();
+      } else if (e instanceof EntityConflictError) {
         if (!local) {
           throw new Error(
             "This should never happen? Why is there a conflict if there's no local data?",
           );
         }
-        await this.saveSyncable(
+        await this.saveEntity(
           storeName,
           {
             ...local,
-            _conflict: remote || (await this.getRemote(local)),
+            conflict: remote || (await this.getRemote(local)),
           },
           false,
         );

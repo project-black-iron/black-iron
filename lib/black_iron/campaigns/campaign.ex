@@ -4,6 +4,8 @@ defmodule BlackIron.Campaigns.Campaign do
 
   @derive {Jason.Encoder, only: [:name, :description, :memberships]}
 
+  @primary_key false
+  
   embedded_schema do
     field :__type__, :string
     field :name, :string
