@@ -307,7 +307,7 @@ defmodule BlackIron.Accounts do
     end
   end
 
-  defp confirm_user_multi(user) do
+  def confirm_user_multi(user) do
     Ecto.Multi.new()
     |> Ecto.Multi.update(:user, User.confirm_changeset(user))
     |> Ecto.Multi.delete_all(:tokens, UserToken.by_user_and_contexts_query(user, ["confirm"]))

@@ -8,14 +8,17 @@ defmodule BlackIron.Campaigns do
 
   alias BlackIron.Accounts.User
   alias BlackIron.Campaigns.Campaign
+  alias BlackIron.Entities.Entity
 
+  @entype "campaign"
+  
   def list_campaigns_for_user(%User{pid: pid}) do
-    from(c in Campaign,
-      join: m in assoc(c, :memberships),
-      where: m.user_id == ^pid,
-      # TODO(@zkat): order by an actual, manually-manageable sort.
-      order_by: [asc: c.name],
-      preload: [:memberships]
+    from(e in Entity,
+      where: fragment("? ->> '__type__'", e.data) == ^@entype,
+      where: fragment(
+        "exists(select 1 from jsonb_array_elements(?) m(obj) where m.obj ->> 'user_id' = ?)",
+        e.data["memberships"], ^pid
+      )
     )
     |> Repo.all()
   end
@@ -35,7 +38,9 @@ defmodule BlackIron.Campaigns do
       ** (Ecto.NoResultsError)
 
   """
-  def get_campaign!(id), do: Repo.get!(Campaign, id)
+  def get_campaign!(id) do
+    Repo.get!(Entity, id)
+  end
 
   # TODO(@zkat): authorization (don't really want others to be able to add
   # campaigns into someone else's account without going through the
@@ -53,8 +58,8 @@ defmodule BlackIron.Campaigns do
 
   """
   def create_campaign(%User{}, attrs \\ %{}) do
-    %Campaign{}
-    |> Campaign.changeset(attrs |> put_rev(%Campaign{}))
+    %Entity{}
+    |> Entity.changeset(attrs |> put_rev(%Campaign{}))
     |> Repo.insert()
   end
 
@@ -75,9 +80,9 @@ defmodule BlackIron.Campaigns do
     {:ok, res} =
       Repo.transaction(fn ->
         current_rev =
-          from(c in Campaign, select: c._rev, where: c.id == ^campaign.id) |> Repo.one!()
+          from(c in Campaign, select: c.rev, where: c.id == ^campaign.id) |> Repo.one!()
 
-        if current_rev != campaign._rev do
+        if current_rev != campaign.rev do
           {:error, %{conflict: current_rev}}
         else
           campaign
@@ -106,9 +111,9 @@ defmodule BlackIron.Campaigns do
     {:ok, res} =
       Repo.transaction(fn ->
         current_rev =
-          from(c in Campaign, select: c._rev, where: c.id == ^campaign.id) |> Repo.one!()
+          from(c in Campaign, select: c.rev, where: c.id == ^campaign.id) |> Repo.one!()
 
-        if current_rev != campaign._rev do
+        if current_rev != campaign.rev do
           {:error, %{conflict: current_rev}}
         else
           now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
@@ -141,10 +146,10 @@ defmodule BlackIron.Campaigns do
   end
 
   defp put_rev(attrs, obj) do
-    if !attrs["_rev"] || !attrs["_revisions"] do
+    if !attrs["rev"] || !attrs["revisions"] do
       rev = Ecto.UUID.generate()
       revs = [rev | obj._revisions]
-      attrs |> Map.put("_rev", rev) |> Map.put("_revisions", revs)
+      attrs |> Map.put("rev", rev) |> Map.put("revisions", revs)
     else
       attrs
     end

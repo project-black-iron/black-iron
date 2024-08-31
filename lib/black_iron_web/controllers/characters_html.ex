@@ -34,7 +34,7 @@ defmodule BlackIronWeb.CharactersHTML do
     <fieldset class="info">
       <bi-sync-field context="character" field="portrait" attr="src">
         <!-- TODO: File upload input -->
-        <img src={@char[:portrait]}>
+        <img src={@char[:portrait]} />
       </bi-sync-field>
       <bi-sync-field context="character" field="name">
         <.input field={@char[:name]} />

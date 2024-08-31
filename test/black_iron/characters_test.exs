@@ -8,7 +8,17 @@ defmodule BlackIron.CharactersTest do
 
     import BlackIron.CharactersFixtures
 
-    @invalid_attrs %{alias: nil, name: nil, pid: nil, description: nil, pronouns: nil, initiative: nil, portrait: nil, xp_added: nil, xp_spent: nil}
+    @invalid_attrs %{
+      alias: nil,
+      name: nil,
+      pid: nil,
+      description: nil,
+      pronouns: nil,
+      initiative: nil,
+      portrait: nil,
+      xp_added: nil,
+      xp_spent: nil
+    }
 
     test "list_characters/0 returns all characters" do
       character = character_fixture()
@@ -21,7 +31,17 @@ defmodule BlackIron.CharactersTest do
     end
 
     test "create_character/1 with valid data creates a character" do
-      valid_attrs = %{alias: "some alias", name: "some name", pid: "some pid", description: "some description", pronouns: "some pronouns", initiative: "some initiative", portrait: "some portrait", xp_added: 42, xp_spent: 42}
+      valid_attrs = %{
+        alias: "some alias",
+        name: "some name",
+        pid: "some pid",
+        description: "some description",
+        pronouns: "some pronouns",
+        initiative: "some initiative",
+        portrait: "some portrait",
+        xp_added: 42,
+        xp_spent: 42
+      }
 
       assert {:ok, %Character{} = character} = Characters.create_character(valid_attrs)
       assert character.alias == "some alias"
@@ -41,9 +61,22 @@ defmodule BlackIron.CharactersTest do
 
     test "update_character/2 with valid data updates the character" do
       character = character_fixture()
-      update_attrs = %{alias: "some updated alias", name: "some updated name", pid: "some updated pid", description: "some updated description", pronouns: "some updated pronouns", initiative: "some updated initiative", portrait: "some updated portrait", xp_added: 43, xp_spent: 43}
 
-      assert {:ok, %Character{} = character} = Characters.update_character(character, update_attrs)
+      update_attrs = %{
+        alias: "some updated alias",
+        name: "some updated name",
+        pid: "some updated pid",
+        description: "some updated description",
+        pronouns: "some updated pronouns",
+        initiative: "some updated initiative",
+        portrait: "some updated portrait",
+        xp_added: 43,
+        xp_spent: 43
+      }
+
+      assert {:ok, %Character{} = character} =
+               Characters.update_character(character, update_attrs)
+
       assert character.alias == "some updated alias"
       assert character.name == "some updated name"
       assert character.pid == "some updated pid"

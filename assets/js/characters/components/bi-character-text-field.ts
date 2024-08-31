@@ -1,8 +1,8 @@
 import { css, html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { ssrConsume } from "../../utils/ssr-context";
-import { BiCharacterContext } from "./bi-character-context";
 import { ICharacter } from "../character";
+import { BiCharacterContext } from "./bi-character-context";
 
 @customElement("bi-character-text-field")
 export class BiCharacterTextField extends LitElement {
@@ -11,17 +11,17 @@ export class BiCharacterTextField extends LitElement {
 
   @ssrConsume({ context: BiCharacterContext.context })
   character?: ICharacter;
-  
+
   @property()
   text?: string;
-  
+
   @property()
   field?: keyof ICharacter;
-  
+
   willUpdate(changed: Map<string, string | ICharacter>) {
     if (changed.has("character") && this.field) {
-      this.text = "" + this.character?.[this.field] ;
-    } 
+      this.text = "" + this.character?.[this.field];
+    }
   }
 
   render() {

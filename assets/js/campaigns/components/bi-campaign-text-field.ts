@@ -11,17 +11,17 @@ export class BiCampaignTextField extends LitElement {
 
   @ssrConsume({ context: BiCampaignContext.context })
   campaign?: ICampaign;
-  
+
   @property()
   text?: string;
-  
+
   @property()
   field?: keyof ICampaign;
-  
+
   willUpdate(changed: Map<string, string | ICampaign>) {
     if (changed.has("campaign") && this.field) {
       this.text = "" + this.campaign?.[this.field];
-    } 
+    }
   }
 
   render() {
