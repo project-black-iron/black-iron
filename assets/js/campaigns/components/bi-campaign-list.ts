@@ -106,7 +106,7 @@ export class BiCampaignList extends LitElement {
     this.addEventListener("htmx:beforeSend", (e: Event) => {
       const form = e.target as HTMLFormElement;
       const input = form.querySelector(
-        "input[name='data[pid]']",
+        "input[name='entity[pid]']",
       ) as HTMLInputElement;
       // Generate a new pid for the next campaign, in case we're in offline
       // mode (online, htmx will swap in a new pid for us).
