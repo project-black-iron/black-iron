@@ -1,7 +1,7 @@
 <.header class="text-center">
   <%= gettext("Account Settings") %>
   <:subtitle>
-    <%= gettext("Manage your account email address, username, and password settings") %>
+    <%= gettext("Manage your account email address, handle, and password settings") %>
   </:subtitle>
 </.header>
 
@@ -33,19 +33,19 @@
   <div>
     <.simple_form
       :let={f}
-      for={@username_changeset}
+      for={@handle_changeset}
       action={~p"/users/settings"}
-      id="update_username"
+      id="update_handle"
     >
-      <.error :if={@username_changeset.action}>
+      <.error :if={@handle_changeset.action}>
         <%= gettext("Oops, something went wrong! Please check the errors below.") %>
       </.error>
 
       <.input
-        field={f[:username]}
+        field={f[:handle]}
         pattern="^[a-zA-Z][-_a-zA-Z0-9]{3,15}$"
         title="4-16 characters. Can only contain letters, numbers, -, or _, and must start with a letter"
-        label="Username"
+        label="handle"
         required
       />
       <.input
@@ -58,7 +58,7 @@
       />
       <:actions>
         <.button phx-disable-with={gettext("Changing...")}>
-          <%= gettext("Change Username") %>
+          <%= gettext("Change handle") %>
         </.button>
       </:actions>
     </.simple_form>

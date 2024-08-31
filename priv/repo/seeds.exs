@@ -13,12 +13,11 @@
 alias BlackIron.Repo
 alias BlackIron.Entities
 alias BlackIron.Accounts
-alias BlackIron.Accounts.User
 
 if Application.fetch_env!(:black_iron, :env) == :dev do
   {:ok, user} =
     Accounts.register_user(%{
-      username: "sampleuser",
+      handle: "sampleuser",
       email: "example@blackiron.quest",
       password: "foobarbazquux",
       password_confirmation: "foobarbazquux"
@@ -28,8 +27,7 @@ if Application.fetch_env!(:black_iron, :env) == :dev do
 
   user = user |> Repo.reload()
   
-  # {:error, cs} = Entities.create_entity(%{
-  {:ok, campaign} = Entities.create_entity(%{
+  {:ok, _campaign} = Entities.create_entity(%{
     "data" => %{
       "__type__" => "campaign",
       "name" => "Sample Campaign",
@@ -37,5 +35,4 @@ if Application.fetch_env!(:black_iron, :env) == :dev do
       "memberships" => [%{"user_id" => user.pid, "role" => "owner"}]
     }
   })
-  # IO.inspect(cs)
 end

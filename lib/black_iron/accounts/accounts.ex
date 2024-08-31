@@ -26,8 +26,8 @@ defmodule BlackIron.Accounts do
     Repo.get_by(User, email: email)
   end
 
-  def get_user_by_username(username) when is_binary(username) do
-    Repo.get_by(User, usename: username)
+  def get_user_by_handle(handle) when is_binary(handle) do
+    Repo.get_by(User, usename: handle)
   end
 
   @doc """
@@ -178,11 +178,11 @@ defmodule BlackIron.Accounts do
     UserNotifier.deliver_update_email_instructions(user, update_email_url_fun.(encoded_token))
   end
 
-  def change_username(user, attrs \\ %{}) do
-    User.username_changeset(user, attrs)
+  def change_handle(user, attrs \\ %{}) do
+    User.handle_changeset(user, attrs)
   end
 
-  def update_username(user, password, attrs) do
+  def update_handle(user, password, attrs) do
     changeset =
       user
       |> User.password_changeset(attrs)

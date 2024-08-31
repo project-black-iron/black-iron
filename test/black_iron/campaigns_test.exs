@@ -18,8 +18,8 @@ defmodule BlackIron.CampaignsTest do
       user =
         campaign.memberships
         |> List.first()
-        |> Map.get(:username)
-        |> Accounts.get_user_by_username()
+        |> Map.get(:handle)
+        |> Accounts.get_user_by_handle()
 
       assert Campaigns.list_campaigns(user) == [campaign]
     end
@@ -51,8 +51,8 @@ defmodule BlackIron.CampaignsTest do
       user =
         campaign.memberships
         |> List.first()
-        |> Map.get(:username)
-        |> Accounts.get_user_by_username()
+        |> Map.get(:handle)
+        |> Accounts.get_user_by_handle()
 
       newpid = BlackIron.Utils.gen_pid()
 
@@ -76,8 +76,8 @@ defmodule BlackIron.CampaignsTest do
       user =
         campaign.memberships
         |> List.first()
-        |> Map.get(:username)
-        |> Accounts.get_user_by_username()
+        |> Map.get(:handle)
+        |> Accounts.get_user_by_handle()
 
       assert {:error, %Ecto.Changeset{}} =
                Campaigns.update_campaign(user, campaign, @invalid_attrs)
@@ -91,8 +91,8 @@ defmodule BlackIron.CampaignsTest do
       user =
         campaign.memberships
         |> List.first()
-        |> Map.get(:username)
-        |> Accounts.get_user_by_username()
+        |> Map.get(:handle)
+        |> Accounts.get_user_by_handle()
 
       assert {:ok, %Campaign{}} = Campaigns.delete_campaign(user, campaign)
       assert_raise Ecto.NoResultsError, fn -> Campaigns.get_campaign!(campaign.id) end

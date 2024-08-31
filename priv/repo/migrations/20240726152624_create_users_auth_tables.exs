@@ -6,7 +6,7 @@ defmodule BlackIron.Repo.Migrations.CreateUsersAuthTables do
 
     create table(:users) do
       add :email, :citext, null: false
-      add :username, :citext, null: false
+      add :handle, :citext, null: false
       add :pid, :string, null: false
       add :hashed_password, :string, null: false
       add :confirmed_at, :utc_datetime
@@ -16,7 +16,7 @@ defmodule BlackIron.Repo.Migrations.CreateUsersAuthTables do
 
     create unique_index(:users, [:pid])
     create unique_index(:users, [:email])
-    create unique_index(:users, [:username])
+    create unique_index(:users, [:handle])
 
     create table(:users_tokens) do
       add :user_id, references(:users, on_delete: :delete_all), null: false
