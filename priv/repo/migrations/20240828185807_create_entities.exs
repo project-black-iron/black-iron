@@ -11,5 +11,7 @@ defmodule BlackIron.Repo.Migrations.CreateEntities do
 
       timestamps(type: :utc_datetime)
     end
+
+    create unique_index(:entities, [:pid])
   end
 end
