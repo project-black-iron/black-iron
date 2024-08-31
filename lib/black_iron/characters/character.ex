@@ -30,7 +30,7 @@ defmodule BlackIron.Characters.Character do
   end
 
   @doc false
-  def changeset(character, attrs) do
+  def changeset(character, attrs \\ %{}) do
     character
     |> cast(attrs, [
       :name,

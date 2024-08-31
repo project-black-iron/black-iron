@@ -15,21 +15,24 @@ defmodule BlackIronWeb.CharactersHTML do
 
   def show(assigns) do
     ~H"""
-    <bi-character-context character={Jason.encode!(assigns[:character])}>
-      <article>
-        <header><%= gettext("Character Sheet") %></header>
-        <.character_info {assigns} />
-        <.character_stats {assigns} />
-        <.character_meters {assigns} />
-        <.character_special_tracks {assigns} />
-        <.character_impacts {assigns} />
-        <.character_assets {assigns} />
-      </article>
-    </bi-character-context>
     """
+    # ~H"""
+    # <bi-character-context character={Jason.encode!(assigns[:character])}>
+    #   <article>
+    #     <header><%= gettext("Character Sheet") %></header>
+    #     <.character_info {assigns} />
+    #     <.character_stats {assigns} />
+    #     <.character_meters {assigns} />
+    #     <.character_special_tracks {assigns} />
+    #     <.character_impacts {assigns} />
+    #     <.character_assets {assigns} />
+    #   </article>
+    # </bi-character-context>
+    # """
   end
 
   defp character_info(assigns) do
+    assigns = assign(assigns, :char, assigns.character)
     ~H"""
     <fieldset class="info">
       <bi-sync-field context="character" field="portrait" attr="src">

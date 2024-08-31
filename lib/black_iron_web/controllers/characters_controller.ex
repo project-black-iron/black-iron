@@ -74,7 +74,8 @@ defmodule BlackIronWeb.CharactersController do
       campaignId: params["campaignId"],
       cslug: params["cslug"],
       campaign: campaign || %{},
-      character: Characters.change_character(%Character{}, character)
+      character: character || %{},
+      character_changeset: Characters.change_character(%Character{}, character || %{})
     )
   end
 end
