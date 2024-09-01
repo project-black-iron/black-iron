@@ -13,5 +13,17 @@ defmodule BlackIron.Repo.Migrations.CreateEntities do
     end
 
     create unique_index(:entities, [:pid])
+
+    execute(
+      # Up
+      """
+      CREATE INDEX campaign_memberships_gin_idx ON entities
+      USING gin ((data->'memberships') jsonb_path_ops);
+      """,
+      # Down
+      """
+      DROP INDEX campaign_memberships_gin_idx;
+      """
+    )
   end
 end
