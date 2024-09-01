@@ -40,6 +40,14 @@
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
     <!-- Styles imported by JS source files -->
     <link phx-track-static rel="stylesheet" href={~p"/assets/js/app.css"} />
+    <%= if !String.ends_with?(assigns.conn.request_path, "/") do %>
+      <base href={unverified_url(assigns.conn, assigns.conn.request_path <> "/")} />
+      <script>
+        if (!window.location.href.endsWith("/")) {
+          document.querySelector("base").href = window.location.href + "/";
+        }
+      </script>
+    <% end %>
   </head>
   <body>
     <main class="sidebar">

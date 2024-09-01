@@ -28,7 +28,7 @@ async function precacheRoutes() {
         .split("/")
         .map((x) => (x.startsWith(":") ? `__${x.slice(1)}` : x))
         .join("/") || "/",
-  ).map((path: string) => (path.endsWith("/") || path === "/") ? path : path + "/");
+  );
   const allPaths: string[] = staticPaths.concat(appPaths);
   const pathSet = new Set(allPaths);
   const cache = await caches.open(CACHE_NAME);
@@ -108,7 +108,7 @@ async function routeAppPaths(appPaths: string[]) {
       .split("/")
       .map((x) => (x.startsWith("__") ? "[^/]+" : x))
       .join("/");
-    const regex = new RegExp(`^(:?https?://[^/]+)?${match.substr(0, match.length - 1)}/?$`);
+    const regex = new RegExp(`^(:?https?://[^/]+)?${match}/?$`);
     registerRoute(
       ({ url }) => {
         return regex.test(url.href);

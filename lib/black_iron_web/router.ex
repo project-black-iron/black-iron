@@ -23,7 +23,6 @@ defmodule BlackIronWeb.Router do
 
   pipeline :browser do
     plug :accepts, ["html", "json"]
-    plug :ensure_trailing_slash
     plug :fetch_session
     plug :fetch_live_flash
     plug :put_root_layout, html: {BlackIronWeb.Layouts, :root}
@@ -64,17 +63,6 @@ defmodule BlackIronWeb.Router do
       {:ok, rendered} = BlackIron.LitSSRWorker.prerender_html(conn.resp_body |> to_string())
       resp(conn, conn.status, rendered)
     end)
-  end
-
-  defp ensure_trailing_slash(conn, _) do
-    if String.ends_with?(conn.request_path, "/") || conn.method != "GET" do
-      conn
-    else
-      conn
-      |> put_status(:permanent_redirect)
-      |> redirect(to: conn.request_path <> "/")
-      |> halt()
-    end
   end
 
   defp put_user_token(conn, _) do

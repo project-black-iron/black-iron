@@ -8,7 +8,7 @@ defmodule BlackIronWeb.SidebarHTML do
     ~H"""
     <nav class="sidebar">
       <ul>
-        <li><a target="_top" href={~p"/play/campaigns"}>Campaigns</a></li>
+        <li><a target="_top" href={~p"/play/campaigns/"}>Campaigns</a></li>
         <li>
           <a href="journals">
             Journals
