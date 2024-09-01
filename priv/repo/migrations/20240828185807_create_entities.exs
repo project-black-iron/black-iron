@@ -25,5 +25,17 @@ defmodule BlackIron.Repo.Migrations.CreateEntities do
       DROP INDEX campaign_memberships_gin_idx;
       """
     )
+
+    execute(
+      # Up
+      """
+      CREATE INDEX campaign_pid_fkey_idx ON entities
+      USING btree (data->'campaign_pid');
+      """,
+      # Down
+      """
+      DROP INDEX campaign_pid_fkey_idx;
+      """
+    )
   end
 end
