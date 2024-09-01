@@ -166,7 +166,15 @@ defmodule BlackIron.Campaigns do
       |> Repo.exists?()
     end
   end
-  
+
+  def check_role(%User{} = user, campaign_pid, roles \\ [:owner]) do
+    if has_role?(user, campaign_pid, roles) do
+      {:ok, user}
+    else
+      {:error, :unauthorized}
+    end
+  end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking campaign changes.
 
