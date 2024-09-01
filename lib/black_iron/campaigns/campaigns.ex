@@ -75,7 +75,10 @@ defmodule BlackIron.Campaigns do
     res
   end
 
-  def get_campaign(%User{} = user, campaign_pid, role \\ nil) do
+  def get_campaign(_user, _campaign_id, _rol \\ nil)
+  def get_campaign(nil, _campaign_id, _role), do: nil
+
+  def get_campaign(%User{} = user, campaign_pid, role) do
     case in_campaign?(user, campaign_pid, role) do
       {:ok, campaign} ->
         campaign

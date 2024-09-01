@@ -21,22 +21,15 @@ setDefaultHandler(offlineFallback);
 setCatchHandler(offlineFallback);
 
 async function precacheRoutes() {
-  const staticPaths = await getStaticPaths();
-  const appPaths = (await getAppPaths()).map(
+  const staticPaths: string[] = await getStaticPaths();
+  const appPaths: string[] = (await getAppPaths()).map(
     (path: string) =>
       path
         .split("/")
         .map((x) => (x.startsWith(":") ? `__${x.slice(1)}` : x))
         .join("/") || "/",
-  );
-  const appPathsWithRedirects = appPaths.map((p: string) => {
-    const paths = [p];
-    if (!p.endsWith("/")) {
-      paths.push(p + "/");
-    }
-    return paths;
-  }).flatten();
-  const allPaths: string[] = staticPaths.concat(appPathsWithRedirects);
+  ).map((path: string) => (path.endsWith("/") || path === "/") ? path : path + "/");
+  const allPaths: string[] = staticPaths.concat(appPaths);
   const pathSet = new Set(allPaths);
   const cache = await caches.open(CACHE_NAME);
   const keys = await cache.keys();
@@ -46,10 +39,9 @@ async function precacheRoutes() {
     }
   }
   await cache.addAll(
-    allPaths.map((path) =>
+    appPaths.concat(staticPaths).map((path) =>
       new Request(path, {
         headers: { "X-Preload": "true" },
-        redirect: path.endsWith("/"),
       })
     ),
   );
@@ -116,7 +108,7 @@ async function routeAppPaths(appPaths: string[]) {
       .split("/")
       .map((x) => (x.startsWith("__") ? "[^/]+" : x))
       .join("/");
-    const regex = new RegExp(`^(:?https?://[^/]+)?${match}/?$`);
+    const regex = new RegExp(`^(:?https?://[^/]+)?${match.substr(0, match.length - 1)}/?$`);
     registerRoute(
       ({ url }) => {
         return regex.test(url.href);
@@ -132,7 +124,7 @@ async function routeAppPaths(appPaths: string[]) {
         // shell, even if the server-rendered request succeeded.
         const shellUrl = new URL(opts.url.href);
         shellUrl.pathname = path;
-        const shellReq = new Request(path);
+        const shellReq = new Request(shellUrl.pathname);
         const shellResponsePromise = staleWhileRevalidate.handle({
           ...opts,
           request: shellReq,

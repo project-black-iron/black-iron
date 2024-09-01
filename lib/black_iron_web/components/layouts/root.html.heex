@@ -35,6 +35,11 @@
     <meta name="msapplication-TileColor" content="#da532c" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <script>
+      if (!window.location.href.endsWith("/")) {
+        window.location.href = window.location.href + "/";
+      }
+    </script>
+    <script>
       const theme = localStorage.getItem("bi-theme") ||
         (matchMedia("(prefers-color-scheme: dark)").matches
           ? "dark"
