@@ -145,20 +145,24 @@ defmodule BlackIron.Campaigns do
 
     # res
   end
-  
+
   def has_role?(%User{pid: user_pid}, campaign_pid, role \\ :owner) do
-    json = [%{
-      user_id: user_pid,
-      roles: [to_string(role)]
-    }]
+    json = [
+      %{
+        user_id: user_pid,
+        roles: [to_string(role)]
+      }
+    ]
+
     from(e in Entity,
       where: e.pid == ^campaign_pid,
       # TODO(@zkat): Add a GIN index for this. We'll be calling it a lot.
-      where: fragment(
-        "? @> ?::jsonb",
-        e.data["memberships"],
-        ^json
-      )
+      where:
+        fragment(
+          "? @> ?::jsonb",
+          e.data["memberships"],
+          ^json
+        )
     )
     |> Repo.exists?()
   end
