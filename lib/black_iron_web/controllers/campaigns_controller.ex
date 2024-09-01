@@ -5,6 +5,7 @@ defmodule BlackIronWeb.CampaignsController do
   use BlackIronWeb, :controller
 
   alias BlackIron.Campaigns
+  alias BlackIron.Entities.Entity
 
   def show(conn, params) do
     render(conn, :show, campaignId: params["campaignId"])
@@ -20,49 +21,19 @@ defmodule BlackIronWeb.CampaignsController do
 
     render(conn, :index,
       campaigns: campaigns,
-      changeset:
-        Campaigns.change_campaign(
-          %Campaigns.Campaign{},
-          if conn.assigns[:current_user] do
-            %{
-              "memberships" => [
-                %{
-                  "user_id" => conn.assigns[:current_user].pid,
-                  "roles" => ["owner"]
-                }
-              ]
-            }
-          else
-            %{}
-          end
-        )
+      changeset: Campaigns.change_campaign(%Entity{}, %{})
     )
   end
 
   def create(conn, params) do
-    res = Campaigns.create_campaign(conn.assigns[:current_user], params["data"])
+    res = Campaigns.create_campaign(conn.assigns[:current_user], params["entity"])
     campaigns = Campaigns.list_campaigns_for_user(conn.assigns[:current_user])
 
     case res do
       {:ok, _campaign} ->
         render(conn, :index,
           campaigns: campaigns,
-          changeset:
-            Campaigns.change_campaign(
-              %Campaigns.Campaign{},
-              if conn.assigns[:current_user] do
-                %{
-                  "memberships" => [
-                    %{
-                      "user_id" => conn.assigns[:current_user].pid,
-                      "roles" => ["owner"]
-                    }
-                  ]
-                }
-              else
-                %{}
-              end
-            )
+          changeset: Campaigns.change_campaign(%Entity{}, %{})
         )
 
       {:error, changeset} ->

@@ -1,11 +1,11 @@
-import { AbstractSyncable, ISyncable } from "../sync";
+import { AbstractEntity, IEntity } from "../entity";
 
-export interface ICharacter extends ISyncable {
+export interface ICharacter extends IEntity {
   name: string;
   portrait: string;
 }
 
-export class Character extends AbstractSyncable implements ICharacter {
+export class Character extends AbstractEntity implements ICharacter {
   name: string;
   portrait: string;
 

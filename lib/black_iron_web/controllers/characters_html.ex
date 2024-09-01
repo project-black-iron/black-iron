@@ -15,56 +15,78 @@ defmodule BlackIronWeb.CharactersHTML do
 
   def show(assigns) do
     ~H"""
-    <bi-character-context character={Jason.encode!(assigns[:character])}>
-      <article>
-        <header><%= gettext("Character Sheet") %></header>
-        <.character_info {assigns} />
-        <.character_stats {assigns} />
-        <.character_meters {assigns} />
-        <.character_special_tracks {assigns} />
-        <.character_impacts {assigns} />
-        <.character_assets {assigns} />
-      </article>
-    </bi-character-context>
     """
+
+    # ~H"""
+    # <bi-character-context character={Jason.encode!(assigns[:character])}>
+    #   <article>
+    #     <header><%= gettext("Character Sheet") %></header>
+    #     <.character_info {assigns} />
+    #     <.character_stats {assigns} />
+    #     <.character_meters {assigns} />
+    #     <.character_special_tracks {assigns} />
+    #     <.character_impacts {assigns} />
+    #     <.character_assets {assigns} />
+    #   </article>
+    # </bi-character-context>
+    # """
   end
 
   defp character_info(assigns) do
-    char = assigns[:character] || %{}
-    campaign = assigns[:campaign] || %{}
+    assigns = assign(assigns, :char, assigns.character)
 
     ~H"""
-    <section class="info">
-      <header>
-        <bi-character-portrait src={char[:portrait]} />
-        <bi-character-text-field text={char[:name]} field="name" />
-      </header>
-      <bi-character-initiative initiative={char[:initiative]} />
+    <fieldset class="info">
+      <bi-sync-field context="character" field="portrait" attr="src">
+        <!-- TODO: File upload input -->
+        <img src={@char[:portrait]} />
+      </bi-sync-field>
+      <bi-sync-field context="character" field="name">
+        <.input field={@char[:name]} />
+      </bi-sync-field>
+      <bi-sync-field context="character" field="initiative">
+        <.input type="select" field={@char[:initiative]} options={@campaign[:initiative_options]} />
+      </bi-sync-field>
       <dl>
         <dt>
-          <bi-campaign-text-field text={campaign[:alias_label]} field="alias_label" />
+          <bi-sync-field context="campaign" field="alias_label" prop="textContent">
+            <span><%= @campaign[:alias_label] %></span>
+          </bi-sync-field>
         </dt>
-        <dd><bi-character-text-field text={char[:alias]} field="alias" /></dd>
+        <dd>
+          <bi-sync-field context="character" field="alias">
+            <.input field={@char[:alias]} />
+          </bi-sync-field>
+        </dd>
         <dt><%= gettext("Pronouns") %></dt>
         <dd>
-          <bi-character-text-field text={char[:pronouns]} field="pronouns" />
+          <bi-sync-field context="character" field="pronouns">
+            <.input field={@char[:pronouns]} />
+          </bi-sync-field>
         </dd>
         <dt><%= gettext("Description") %></dt>
         <dd>
-          <bi-character-text-field text={char[:description]} field="description" />
+          <bi-sync-field context="character" field="description">
+            <.input type="textarea" field={@char[:description]} />
+          </bi-sync-field>
         </dd>
         <dt><%= gettext("Player") %></dt>
-        <dd><bi-character-text-field text={char[:player]} field="player" /></dd>
+        <dd>
+          <bi-sync-field context="character" field="player">
+            <.input field={@char[:player]} />
+          </bi-sync-field>
+        </dd>
         <dt><%= gettext("Experience") %></dt>
         <dd>
+          <!-- TODO(@zkat): Can we make this more generic?... -->
           <bi-character-xp
-            tracks={Jason.encode!(char[:special_tracks])}
-            added={char[:xp_added]}
-            spent={char[:xp_spent]}
+            tracks={Jason.encode!(@char[:special_tracks])}
+            added={@char[:xp_added]}
+            spent={@char[:xp_spent]}
           />
         </dd>
       </dl>
-    </section>
+    </fieldset>
     """
   end
 

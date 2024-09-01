@@ -7,35 +7,25 @@ defmodule BlackIron.Campaigns do
   alias BlackIron.Repo
 
   alias BlackIron.Accounts.User
-  alias BlackIron.Campaigns.Campaign
+  alias BlackIron.Campaigns.{Campaign, Membership}
+  alias BlackIron.Entities
+  alias BlackIron.Entities.Entity
+
+  @entype "campaign"
 
   def list_campaigns_for_user(%User{pid: pid}) do
-    from(c in Campaign,
-      join: m in assoc(c, :memberships),
-      where: m.user_id == ^pid,
-      # TODO(@zkat): order by an actual, manually-manageable sort.
-      order_by: [asc: c.name],
-      preload: [:memberships]
+    from(e in Entity,
+      as: :entity,
+      where:
+        fragment(
+          "exists(select 1 from jsonb_array_elements(?) m(obj) where m.obj ->> 'user_id' = ?)",
+          e.data["memberships"],
+          ^pid
+        )
     )
+    |> Entities.is_entype(@entype)
     |> Repo.all()
   end
-
-  # TODO(@zkat): authorization
-  @doc """
-  Gets a single campaign.
-
-  Raises `Ecto.NoResultsError` if the Campaign does not exist.
-
-  ## Examples
-
-      iex> get_campaign!(123)
-      %Campaign{}
-
-      iex> get_campaign!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_campaign!(id), do: Repo.get!(Campaign, id)
 
   # TODO(@zkat): authorization (don't really want others to be able to add
   # campaigns into someone else's account without going through the
@@ -52,10 +42,39 @@ defmodule BlackIron.Campaigns do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_campaign(%User{}, attrs \\ %{}) do
-    %Campaign{}
-    |> Campaign.changeset(attrs |> put_rev(%Campaign{}))
-    |> Repo.insert()
+  def create_campaign(%User{} = actor, attrs \\ %{}) do
+    {:ok, res} =
+      Repo.transaction(fn ->
+        %Entity{}
+        |> Entities.change_entity(Campaign, attrs)
+        |> Repo.insert()
+        |> case do
+          {:ok, entity} ->
+            {1, [entity]} =
+              from(e in Entity,
+                where: e.id == ^entity.id,
+                update: [
+                  set: [
+                    data:
+                      fragment(
+                        "jsonb_set(?, '{memberships}', ?)",
+                        e.data,
+                        ^[%Membership{user_id: actor.pid, roles: ["owner"]}]
+                      )
+                  ]
+                ],
+                select: e
+              )
+              |> Repo.update_all([])
+
+            {:ok, entity}
+
+          other ->
+            other
+        end
+      end)
+
+    res
   end
 
   # TODO(@zkat): authorization
@@ -71,22 +90,22 @@ defmodule BlackIron.Campaigns do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_campaign(%Campaign{} = campaign, attrs) do
-    {:ok, res} =
-      Repo.transaction(fn ->
-        current_rev =
-          from(c in Campaign, select: c._rev, where: c.id == ^campaign.id) |> Repo.one!()
+  def update_campaign(%Entity{} = campaign, attrs) do
+    # {:ok, res} =
+    #   Repo.transaction(fn ->
+    #     current_rev =
+    #       from(c in Campaign, select: c.rev, where: c.id == ^campaign.id) |> Repo.one!()
 
-        if current_rev != campaign._rev do
-          {:error, %{conflict: current_rev}}
-        else
-          campaign
-          |> Campaign.changeset(attrs |> put_rev(campaign))
-          |> Repo.update()
-        end
-      end)
+    #     if current_rev != campaign.rev do
+    #       {:error, %{conflict: current_rev}}
+    #     else
+    #       campaign
+    #       |> Campaign.changeset(attrs |> put_rev(campaign))
+    #       |> Repo.update()
+    #     end
+    #   end)
 
-    res
+    # res
   end
 
   # TODO(@zkat): authorization
@@ -103,30 +122,47 @@ defmodule BlackIron.Campaigns do
 
   """
   def delete_campaign(%Campaign{} = campaign) do
-    {:ok, res} =
-      Repo.transaction(fn ->
-        current_rev =
-          from(c in Campaign, select: c._rev, where: c.id == ^campaign.id) |> Repo.one!()
+    # {:ok, res} =
+    #   Repo.transaction(fn ->
+    #     current_rev =
+    #       from(c in Campaign, select: c.rev, where: c.id == ^campaign.id) |> Repo.one!()
 
-        if current_rev != campaign._rev do
-          {:error, %{conflict: current_rev}}
-        else
-          now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+    #     if current_rev != campaign.rev do
+    #       {:error, %{conflict: current_rev}}
+    #     else
+    #       now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
 
-          campaign
-          |> Campaign.deactivate_changeset(
-            %{
-              deleted_at: now
-            }
-            |> put_rev(campaign)
-          )
-          |> Repo.update()
-        end
-      end)
+    #       campaign
+    #       |> Campaign.deactivate_changeset(
+    #         %{
+    #           deleted_at: now
+    #         }
+    #         |> put_rev(campaign)
+    #       )
+    #       |> Repo.update()
+    #     end
+    #   end)
 
-    res
+    # res
   end
-
+  
+  def has_roles?(%User{pid: user_pid}, campaign_pid, roles \\ [:owner]) do
+    json = [%{
+      user_id: user_pid,
+      roles: Enum.map(roles, &to_string/1)
+    }]
+    from(e in Entity,
+      where: e.pid == ^campaign_pid,
+      # TODO(@zkat): Add a GIN index for this. We'll be calling it a lot.
+      where: fragment(
+        "? @> ?::jsonb",
+        e.data["memberships"],
+        ^json
+      )
+    )
+    |> Repo.exists?()
+  end
+  
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking campaign changes.
 
@@ -136,17 +172,7 @@ defmodule BlackIron.Campaigns do
       %Ecto.Changeset{data: %Campaign{}}
 
   """
-  def change_campaign(%Campaign{} = campaign, attrs \\ %{}) do
-    Campaign.changeset(campaign, attrs)
-  end
-
-  defp put_rev(attrs, obj) do
-    if !attrs["_rev"] || !attrs["_revisions"] do
-      rev = Ecto.UUID.generate()
-      revs = [rev | obj._revisions]
-      attrs |> Map.put("_rev", rev) |> Map.put("_revisions", revs)
-    else
-      attrs
-    end
+  def change_campaign(%Entity{} = campaign, attrs \\ %{}) do
+    Entities.change_entity(campaign, Campaign, attrs)
   end
 end

@@ -34,19 +34,19 @@ defmodule BlackIronWeb.UserSettingsController do
     end
   end
 
-  def update(conn, %{"action" => "update_username"} = params) do
+  def update(conn, %{"action" => "update_handle"} = params) do
     %{"current_password" => password, "user" => user_params} = params
     user = conn.assigns.current_user
 
-    case Accounts.update_username(user, password, user_params) do
+    case Accounts.update_handle(user, password, user_params) do
       {:ok, user} ->
         conn
-        |> put_flash(:info, "Username updated successfully.")
+        |> put_flash(:info, "handle updated successfully.")
         |> put_session(:user_return_to, ~p"/users/settings")
         |> UserAuth.log_in_user(user)
 
       {:error, changeset} ->
-        render(conn, :edit, username_changeset: changeset)
+        render(conn, :edit, handle_changeset: changeset)
     end
   end
 
@@ -85,7 +85,7 @@ defmodule BlackIronWeb.UserSettingsController do
 
     conn
     |> assign(:email_changeset, Accounts.change_user_email(user))
-    |> assign(:username_changeset, Accounts.change_username(user))
+    |> assign(:handle_changeset, Accounts.change_handle(user))
     |> assign(:password_changeset, Accounts.change_user_password(user))
   end
 end

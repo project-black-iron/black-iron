@@ -1,6 +1,6 @@
 import { Channel } from "phoenix";
 import { BlackIronApp } from "../black-iron-app";
-import { Campaign, ICampaign } from "./campaign";
+import { Campaign, CampaignMembership, ICampaign } from "./campaign";
 
 export class CampaignManager {
   channel?: Channel;
@@ -72,7 +72,7 @@ export class CampaignManager {
       Array.from(allKeys).map(async (key) => {
         const remote = remotes.get(key);
         const local = locals.get(key);
-        if (!remote && local && !local.memberships.length) {
+        if (!remote && local && !local.data.memberships.length) {
           // Don't sync offline campaigns that aren't associated with any account.
           return;
         }
@@ -92,7 +92,7 @@ export class CampaignManager {
   }
 
   async saveCampaign(campaign: ICampaign) {
-    return this.app.db.saveSyncable("campaigns", campaign);
+    return this.app.db.saveEntity("campaigns", campaign);
   }
 
   async listCampaigns() {
@@ -101,12 +101,12 @@ export class CampaignManager {
         return (
           // Return both offline-only and online campaigns for the current
           // account.
-          !cdata.memberships.length
-          || cdata.memberships.find((m) => m.user_id === this.app.userId)
+          !cdata.data.memberships.length
+          || cdata.data.memberships.find((m: CampaignMembership) => m.user_id === this.app.userId)
         );
       })
       .map((cdata) => new Campaign(cdata));
-    campaigns.sort((a, b) => (a.name > b.name ? 1 : -1));
+    campaigns.sort((a, b) => (a.data.name > b.data.name ? 1 : -1));
     return campaigns;
   }
 

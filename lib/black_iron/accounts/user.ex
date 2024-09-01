@@ -5,7 +5,7 @@ defmodule BlackIron.Accounts.User do
   schema "users" do
     field :pid, :string, autogenerate: {BlackIron.Utils, :gen_pid, []}
     field :email, :string
-    field :username, :string
+    field :handle, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :current_password, :string, virtual: true, redact: true
@@ -41,9 +41,9 @@ defmodule BlackIron.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :username, :password])
+    |> cast(attrs, [:email, :handle, :password])
     |> validate_email(opts)
-    |> validate_username(opts)
+    |> validate_handle(opts)
     |> validate_password(opts)
   end
 
@@ -55,15 +55,15 @@ defmodule BlackIron.Accounts.User do
     |> maybe_validate_unique_email(opts)
   end
 
-  defp validate_username(changeset, opts) do
+  defp validate_handle(changeset, opts) do
     changeset
-    |> validate_required([:username])
-    |> validate_length(:username, min: 4, max: 16)
-    |> validate_format(:username, ~r/^[a-zA-Z][-_a-zA-Z0-9]{3,15}$/,
+    |> validate_required([:handle])
+    |> validate_length(:handle, min: 4, max: 16)
+    |> validate_format(:handle, ~r/^[a-zA-Z][-_a-zA-Z0-9]{3,15}$/,
       message:
         "must start with a letter and only contain letters, digits, hyphens, and underscores"
     )
-    |> maybe_validate_unique_username(opts)
+    |> maybe_validate_unique_handle(opts)
   end
 
   defp validate_password(changeset, opts) do
@@ -102,11 +102,11 @@ defmodule BlackIron.Accounts.User do
     end
   end
 
-  defp maybe_validate_unique_username(changeset, opts) do
-    if Keyword.get(opts, :validate_username, true) do
+  defp maybe_validate_unique_handle(changeset, opts) do
+    if Keyword.get(opts, :validate_handle, true) do
       changeset
-      |> unsafe_validate_unique(:username, BlackIron.Repo)
-      |> unique_constraint(:username)
+      |> unsafe_validate_unique(:handle, BlackIron.Repo)
+      |> unique_constraint(:handle)
     else
       changeset
     end
@@ -127,10 +127,10 @@ defmodule BlackIron.Accounts.User do
     end
   end
 
-  def username_changeset(user, attrs, opts \\ []) do
+  def handle_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:username])
-    |> validate_username(opts)
+    |> cast(attrs, [:handle])
+    |> validate_handle(opts)
   end
 
   @doc """
