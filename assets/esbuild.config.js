@@ -69,5 +69,9 @@ if (!watch) {
   await Promise.all([mainContext.rebuild(), swContext.rebuild(), litSSRContext.rebuild()]);
   process.exit(0);
 } else {
+  // https://github.com/vitejs/vite/issues/5743
+  process.stdin.on("close", () => { process.exit(0) })
+  process.stdin.resume()
+
   await Promise.all([mainContext.watch(), swContext.watch(), litSSRContext.watch()]);
 }
