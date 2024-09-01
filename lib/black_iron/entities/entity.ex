@@ -4,6 +4,9 @@ defmodule BlackIron.Entities.Entity do
 
   import PolymorphicEmbed
 
+  alias BlackIron.Campaigns.Campaign
+  alias BlackIron.Characters.Character
+
   @derive {Jason.Encoder, only: [:pid, :data, :rev, :revisions, :deleted_at]}
 
   schema "entities" do
@@ -14,8 +17,8 @@ defmodule BlackIron.Entities.Entity do
 
     polymorphic_embeds_one(:data,
       types: [
-        character: BlackIron.Characters.Character,
-        campaign: BlackIron.Campaigns.Campaign
+        {Character.entype(), Character},
+        {Campaign.entype(), Campaign}
       ],
       on_type_not_found: :raise,
       on_replace: :update

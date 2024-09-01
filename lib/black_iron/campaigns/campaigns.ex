@@ -11,19 +11,17 @@ defmodule BlackIron.Campaigns do
   alias BlackIron.Entities
   alias BlackIron.Entities.Entity
 
-  @entype "campaign"
-
   def list_campaigns_for_user(%User{pid: pid}) do
-    from(e in Entity,
-      as: :entity,
-      where:
-        fragment(
-          "exists(select 1 from jsonb_array_elements(?) m(obj) where m.obj ->> 'user_id' = ?)",
-          e.data["memberships"],
-          ^pid
-        )
+    from(e in Entity, as: :entity)
+    |> Entities.is_entype(Campaign.entype())
+    |> where(
+      [entity: e],
+      fragment(
+        "exists(select 1 from jsonb_array_elements(?) m(obj) where m.obj ->> 'user_id' = ?)",
+        e.data["memberships"],
+        ^pid
+      )
     )
-    |> Entities.is_entype(@entype)
     |> Repo.all()
   end
 
@@ -75,6 +73,16 @@ defmodule BlackIron.Campaigns do
       end)
 
     res
+  end
+
+  def get_campaign(%User{} = user, campaign_pid, role \\ nil) do
+    case in_campaign?(user, campaign_pid, role) do
+      {:ok, campaign} ->
+        campaign
+
+      {:error, _} ->
+        nil
+    end
   end
 
   # TODO(@zkat): authorization
@@ -146,32 +154,34 @@ defmodule BlackIron.Campaigns do
     # res
   end
 
-  def has_role?(%User{pid: user_pid}, campaign_pid, role \\ :owner) do
+  def in_campaign?(%User{pid: user_pid}, campaign_pid, role \\ nil) do
     json = [
       %{
         user_id: user_pid,
-        roles: [to_string(role)]
+        roles: if(role, do: [to_string(role)], else: [])
       }
     ]
 
     from(e in Entity,
       where: e.pid == ^campaign_pid,
-      # TODO(@zkat): Add a GIN index for this. We'll be calling it a lot.
       where:
         fragment(
           "? @> ?::jsonb",
           e.data["memberships"],
           ^json
-        )
+        ),
+      select: e
     )
-    |> Repo.exists?()
+    |> Repo.one()
   end
 
-  def check_role(%User{} = user, campaign_pid, role \\ :owner) do
-    if has_role?(user, campaign_pid, role) do
-      {:ok, user}
-    else
-      {:error, :unauthorized}
+  def check_membership(%User{} = user, campaign_pid, role \\ :owner) do
+    case in_campaign?(user, campaign_pid, role) do
+      %Entity{} = campaign ->
+        {:ok, campaign}
+
+      nil ->
+        {:error, :unauthorized}
     end
   end
 

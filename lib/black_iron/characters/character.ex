@@ -2,11 +2,12 @@ defmodule BlackIron.Characters.Character do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @entype :character
+
   @primary_key false
 
   @derive {Jason.Encoder,
            only: [
-             :__type__,
              :alias,
              :name,
              :description,
@@ -28,6 +29,8 @@ defmodule BlackIron.Characters.Character do
     field :xp_added, :integer
     field :xp_spent, :integer
   end
+
+  def entype, do: @entype
 
   @doc false
   def changeset(character, attrs \\ %{}) do
@@ -52,5 +55,6 @@ defmodule BlackIron.Characters.Character do
       :xp_added,
       :xp_spent
     ])
+    |> put_change(:__type__, to_string(@entype))
   end
 end

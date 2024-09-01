@@ -1,6 +1,7 @@
 defmodule BlackIronWeb.CharactersController do
   use BlackIronWeb, :controller
 
+  alias BlackIron.Campaigns
   alias BlackIron.Characters
   alias BlackIron.Characters.Character
 
@@ -13,15 +14,10 @@ defmodule BlackIronWeb.CharactersController do
 
   def show(conn, params) do
     campaign =
-      if params["campaignId"] != "__campaignId" do
-        %{
-          pid: params["campaignId"],
-          name: "Campaign #{params["campaignId"]}",
-          description: "This is a description for Campaign #{params["campaignId"]}",
-          # Really, this should live in the playset but I'm putting it here for now
-          alias_label: "Callsign"
-        }
-      end
+      Campaigns.get_campaign(
+        conn.assigns[:current_user],
+        params["campaignId"]
+      )
 
     character =
       if campaign && params["characterId"] != "__characterId" do
@@ -29,7 +25,7 @@ defmodule BlackIronWeb.CharactersController do
           pid: params["characterId"],
           name: "Kiara Doe",
           description: "This is a description for Character #{params["characterId"]}",
-          campaign_id: campaign.pid,
+          campaign_pid: campaign.pid,
           player: "Kat",
           xp_added: 0,
           xp_spent: 0,

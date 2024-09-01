@@ -4,6 +4,8 @@ defmodule BlackIron.Campaigns.Campaign do
 
   @derive {Jason.Encoder, only: [:name, :description, :memberships]}
 
+  @entype :campaign
+
   @primary_key false
 
   embedded_schema do
@@ -14,11 +16,13 @@ defmodule BlackIron.Campaigns.Campaign do
     embeds_many :memberships, BlackIron.Campaigns.Membership
   end
 
+  def entype, do: @entype
+
   @doc false
   def changeset(campaign, attrs) do
     campaign
     |> cast(attrs, [:name, :description])
     |> validate_required([:name, :description])
-    |> put_change(:__type__, "campaign")
+    |> put_change(:__type__, to_string(@entype))
   end
 end

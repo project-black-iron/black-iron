@@ -22,7 +22,7 @@ defmodule BlackIron.Entities do
 
   def is_entype(q, entype) do
     q
-    |> where([entity: e], fragment("? ->> '__type__'", e.data) == ^entype)
+    |> where([entity: e], fragment("? ->> '__type__'", e.data) == ^to_string(entype))
   end
 
   defp put_rev(attrs, obj) do
