@@ -29,7 +29,14 @@ async function precacheRoutes() {
         .map((x) => (x.startsWith(":") ? `__${x.slice(1)}` : x))
         .join("/") || "/",
   );
-  const allPaths: string[] = staticPaths.concat(appPaths);
+  const appPathsWithRedirects = appPaths.map((p: string) => {
+    const paths = [p];
+    if (!p.endsWith("/")) {
+      paths.push(p + "/");
+    }
+    return paths;
+  }).flatten()
+  const allPaths: string[] = staticPaths.concat(appPathsWithRedirects);
   const pathSet = new Set(allPaths);
   const cache = await caches.open(CACHE_NAME);
   const keys = await cache.keys();
@@ -38,7 +45,12 @@ async function precacheRoutes() {
       await cache.delete(key);
     }
   }
-  await cache.addAll(allPaths.map((path) => new Request(path, { headers: { "X-Preload": "true" } })));
+  await cache.addAll(
+    allPaths.map((path) => new Request(path, {
+      headers: { "X-Preload": "true" },
+      redirect: path.endsWith("/")
+    })),
+  );
   await routeStaticPaths(staticPaths);
   await routeAppPaths(appPaths);
   routePostRequests();

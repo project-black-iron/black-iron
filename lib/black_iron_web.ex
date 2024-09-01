@@ -89,7 +89,7 @@ defmodule BlackIronWeb do
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
-      
+
       # Support for polymorphic embeds
       import PolymorphicEmbed.HTML.Component
 

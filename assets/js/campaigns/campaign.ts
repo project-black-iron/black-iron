@@ -3,7 +3,7 @@
 import { IDBPDatabase } from "idb";
 import { convert } from "url-slug";
 import { BlackIronDBSchema } from "../db";
-import { AbstractEntity, IEntity, EntityConflictError } from "../entity";
+import { AbstractEntity, EntityConflictError, IEntity } from "../entity";
 
 export interface CampaignSchema {
   campaigns: {

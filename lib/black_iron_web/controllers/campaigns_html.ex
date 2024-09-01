@@ -27,7 +27,7 @@ defmodule BlackIronWeb.CampaignsHTML do
 
         <.input field={f[:pid]} type="hidden" value={BlackIron.Utils.gen_pid()} />
 
-        <.polymorphic_embed_inputs_for field={f[:data]} :let={c}>
+        <.polymorphic_embed_inputs_for :let={c} field={f[:data]}>
           <.input field={c[:name]} type="text" label="Name" required />
           <.input field={c[:description]} type="textarea" label="Description" required />
         </.polymorphic_embed_inputs_for>

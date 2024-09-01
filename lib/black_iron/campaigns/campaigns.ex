@@ -145,7 +145,24 @@ defmodule BlackIron.Campaigns do
 
     # res
   end
-
+  
+  def has_roles?(%User{pid: user_pid}, campaign_pid, roles \\ [:owner]) do
+    json = [%{
+      user_id: user_pid,
+      roles: Enum.map(roles, &to_string/1)
+    }]
+    from(e in Entity,
+      where: e.pid == ^campaign_pid,
+      # TODO(@zkat): Add a GIN index for this. We'll be calling it a lot.
+      where: fragment(
+        "? @> ?::jsonb",
+        e.data["memberships"],
+        ^json
+      )
+    )
+    |> Repo.exists?()
+  end
+  
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking campaign changes.
 

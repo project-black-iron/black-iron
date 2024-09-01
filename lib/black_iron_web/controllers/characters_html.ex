@@ -16,6 +16,7 @@ defmodule BlackIronWeb.CharactersHTML do
   def show(assigns) do
     ~H"""
     """
+
     # ~H"""
     # <bi-character-context character={Jason.encode!(assigns[:character])}>
     #   <article>
@@ -33,6 +34,7 @@ defmodule BlackIronWeb.CharactersHTML do
 
   defp character_info(assigns) do
     assigns = assign(assigns, :char, assigns.character)
+
     ~H"""
     <fieldset class="info">
       <bi-sync-field context="character" field="portrait" attr="src">
