@@ -2,8 +2,9 @@ import { DBSchema, IDBPDatabase, openDB, StoreNames } from "idb";
 import { BlackIronApp } from "./black-iron-app";
 import { Campaign, CampaignSchema } from "./campaigns/campaign";
 import { AbstractEntity, EntityConflictError, EntitySchema, IEntity } from "./entity";
+import { PCSchema } from "./pcs/pc";
 
-export type BlackIronDBSchema = DBSchema & EntitySchema & CampaignSchema;
+export type BlackIronDBSchema = DBSchema & EntitySchema & CampaignSchema & PCSchema;
 
 const DB_NAME = "black-iron";
 const DB_VERSION = 1;
@@ -62,11 +63,11 @@ export class BlackIronDB {
     return this.#idb.delete(storeName, key);
   }
 
-  async saveEntity<
+  async #saveEntity<
     Name extends StoreNames<BlackIronDBSchema>,
     T extends BlackIronDBSchema[Name]["value"],
   >(storeName: Name, entity: T, bumpRev: boolean = true): Promise<T> {
-    const ret = { ...entity }; // TODO(@zkat): deep clone?
+    const ret = { ...entity }; // No need to deep clone. We don't modify deeply.
     if (!ret.pid) {
       ret.pid = crypto.randomUUID();
     }
@@ -78,7 +79,7 @@ export class BlackIronDB {
     return ret;
   }
 
-  async uploadEntity(entity: AbstractEntity) {
+  async #uploadEntity(entity: AbstractEntity) {
     if (!this.app.userPid) {
       // Skip uploading if we're not logged in.
       return;
@@ -101,7 +102,7 @@ export class BlackIronDB {
     }
   }
 
-  async getRemote(entity: AbstractEntity) {
+  async #getRemote(entity: AbstractEntity) {
     const url = new URL(window.location.href);
     url.pathname = entity.route;
     const res = await this.app.fetch(url);
@@ -109,37 +110,37 @@ export class BlackIronDB {
       throw new Error("Failed to fetch remote entity");
     }
     // TODO(@zkat): validate this!
-    return (await res.json()) as IEntity;
+    return (await res.json()) as IEntity<unknown>;
   }
 
-  async sync<Name extends StoreNames<BlackIronDBSchema>>(
+  async syncEntity<Name extends StoreNames<BlackIronDBSchema>>(
     storeName: Name,
     remote?: AbstractEntity,
     local?: AbstractEntity,
-  ) {
+  ): Promise<void> {
     try {
       if (remote && local) {
         if (remote.rev !== local.rev) {
           if (local.rev && remote.revisions?.includes(local.rev)) {
             // Remote has local version. Fast-forward local and save.
-            await this.saveEntity(storeName, remote, false);
+            await this.#saveEntity(storeName, remote, false);
           } else if (local.rev && local.revisions?.includes(remote.rev!)) {
             // Local has remote version. Fast-forward remote by uploading.
-            await this.uploadEntity(local);
+            await this.#uploadEntity(local);
           } else if (remote.eq(local)) {
             // Both are effectively the same. Overwrite the local DB's copy of
             // the entity to save the remote sync props.
-            await this.saveEntity(storeName, remote, false);
+            await this.#saveEntity(storeName, remote, false);
           } else {
-            await this.uploadEntity(local.merge(remote));
+            await this.#uploadEntity(local.merge(remote));
           }
         } else {
           // revs were both the same. Already synced
         }
       } else if (remote) {
-        await this.saveEntity(storeName, remote, false);
+        await this.#saveEntity(storeName, remote, false);
       } else if (local) {
-        await this.uploadEntity(local);
+        await this.#uploadEntity(local);
       } else {
         throw new Error("Must give at least one entity to sync.");
       }
@@ -170,11 +171,11 @@ export class BlackIronDB {
             "This should never happen? Why is there a conflict if there's no local data?",
           );
         }
-        await this.saveEntity(
+        await this.#saveEntity(
           storeName,
           {
             ...local,
-            conflict: remote || (await this.getRemote(local)),
+            conflict: remote || (await this.#getRemote(local)),
           },
           false,
         );
@@ -182,5 +183,41 @@ export class BlackIronDB {
         throw e;
       }
     }
+  }
+
+  async syncEntities<Name extends StoreNames<BlackIronDBSchema>, Entype extends BlackIronDBSchema[Name]["value"]>(
+    storeName: Name,
+    factory: (data: Entype) => AbstractEntity,
+    remoteEntities?: Entype[],
+    localEntities?: Entype[],
+    filter?: (remote?: Entype, local?: Entype) => boolean,
+  ) {
+    const allKeys: Set<string> = new Set();
+    const remotes = new Map(
+      (remoteEntities ?? []).map((c) => {
+        allKeys.add(c.pid);
+        return [c.pid, c];
+      }),
+    );
+    const locals = new Map(
+      (localEntities ?? []).map((c) => {
+        allKeys.add(c.pid);
+        return [c.pid, c];
+      }),
+    );
+    await Promise.all(
+      Array.from(allKeys).map(async (key) => {
+        const remote = remotes.get(key);
+        const local = locals.get(key);
+        if (filter && !filter(remote, local)) {
+          return;
+        }
+        return await this.app.db.syncEntity(
+          storeName,
+          remote && factory(remote),
+          local && factory(local),
+        );
+      }),
+    );
   }
 }

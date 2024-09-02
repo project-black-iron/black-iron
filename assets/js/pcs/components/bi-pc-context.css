@@ -1,4 +1,4 @@
-bi-character-context {
+bi-pc-context {
   & > article > header {
     font-size: 1.5rem;
     font-weight: var(--font-semibold);

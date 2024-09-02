@@ -3,6 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 
 import { BlackIronApp } from "../../black-iron-app";
 import { BiAppContext } from "../../components/bi-app-context";
+import { hasEntityChanged } from "../../entity";
 import { genPid } from "../../utils/pid";
 import { ssrConsume } from "../../utils/ssr-context";
 import { Campaign, CampaignRole, ICampaign } from "../campaign";
@@ -57,22 +58,7 @@ export class BiCampaignList extends LitElement {
   @property({
     type: Array,
     attribute: "campaigns",
-    hasChanged(
-      newVal: ICampaign[] | undefined,
-      oldVal: ICampaign[] | undefined,
-    ) {
-      if ((newVal?.length ?? 0) !== (oldVal?.length ?? 0)) {
-        return true;
-      }
-      for (let i = 0; i < (newVal?.length ?? 0); i++) {
-        if (newVal?.[i]?.pid !== oldVal?.[i]?.pid) {
-          return true;
-        } else if (newVal?.[i]?.rev !== oldVal?.[i]?.rev) {
-          return true;
-        }
-      }
-      return false;
-    },
+    hasChanged: hasEntityChanged,
   })
   campaigns?: ICampaign[];
 
@@ -100,7 +86,7 @@ export class BiCampaignList extends LitElement {
             : [],
         },
       };
-      await this.app?.campaignManager.saveCampaign(campaign);
+      await this.app?.campaigns.sync(campaign);
       await this.#setFromLocalCampaigns();
     });
     this.addEventListener("htmx:beforeSend", (e: Event) => {
@@ -117,9 +103,6 @@ export class BiCampaignList extends LitElement {
 
   willUpdate(changed: Map<string | number | symbol, unknown>) {
     if (!isServer) {
-      if (changed.has("app") && !isServer) {
-        this.app?.campaignManager.joinSyncChannel();
-      }
       if (changed.has("campaigns") || changed.has("app")) {
         // Fire and forget: we'll be eventually consistent here.
         this.#syncCampaignData();
@@ -128,7 +111,7 @@ export class BiCampaignList extends LitElement {
   }
 
   async #setFromLocalCampaigns() {
-    const campaigns = await this.app?.campaignManager.listCampaigns();
+    const campaigns = await this.app?.campaigns.getAll();
     campaigns?.sort((a, b) => (a.data.name > b.data.name ? 1 : -1));
     if (campaigns) {
       this.campaigns = campaigns;
@@ -137,7 +120,7 @@ export class BiCampaignList extends LitElement {
 
   async #syncCampaignData() {
     try {
-      await this.app?.campaignManager.syncCampaigns(this.campaigns);
+      await this.app?.campaigns.syncAll(this.campaigns);
     } catch (e) {
       console.error("Failed to sync campaigns", e);
     }
@@ -162,7 +145,7 @@ export class BiCampaignList extends LitElement {
         ],
       },
     };
-    await this.app?.campaignManager.saveCampaign(newC);
+    await this.app?.campaigns.sync(newC);
     await this.#syncCampaignData();
   }
 
@@ -174,8 +157,8 @@ export class BiCampaignList extends LitElement {
         ?.filter((c) => !c.deleted_at)
         .map(
           (campaign) =>
-            html`<li>
-                <a href=${new Campaign(campaign).route}>
+            this.app && html`<li>
+                <a href=${new Campaign(campaign, this.app).route}>
                   <article>
                     <header>
                       <h3>${campaign.data.name}</h3>

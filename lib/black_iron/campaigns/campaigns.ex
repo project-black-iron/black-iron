@@ -8,20 +8,14 @@ defmodule BlackIron.Campaigns do
 
   alias BlackIron.Accounts.User
   alias BlackIron.Campaigns.{Campaign, Membership}
+  require BlackIron.Entities
   alias BlackIron.Entities
   alias BlackIron.Entities.Entity
 
-  def list_campaigns_for_user(%User{pid: pid}) do
-    from(e in Entity, as: :entity)
-    |> Entities.is_entype(Campaign.entype())
-    |> where(
-      [entity: e],
-      fragment(
-        "exists(select 1 from jsonb_array_elements(?) m(obj) where m.obj ->> 'user_pid' = ?)",
-        e.data["memberships"],
-        ^pid
-      )
-    )
+  def list_campaigns_for_user(%User{} = user) do
+    from(e in Entity, as: :campaign)
+    |> Entities.is_entype(:campaign, Campaign.entype())
+    |> where_campaign_role(user)
     |> Repo.all()
   end
 
@@ -75,10 +69,22 @@ defmodule BlackIron.Campaigns do
     res
   end
 
-  def get_campaign(_user, _campaign_id, _rol \\ nil)
-  def get_campaign(nil, _campaign_id, _role), do: nil
+  def get_campaign(user, campaign_pid, role \\ nil)
+  def get_campaign(nil, _campaign_pid, _role), do: nil
+  def get_campaign(_, "__campaign_pid", _role), do: nil
 
-  def get_campaign(%User{pid: user_pid}, campaign_pid, role) do
+  def get_campaign(%User{} = user, campaign_pid, role) do
+    from(e in Entity,
+      as: :campaign,
+      where: e.pid == ^campaign_pid,
+      select: e
+    )
+    |> Entities.is_entype(:campaign, Campaign.entype())
+    |> where_campaign_role(user, role)
+    |> Repo.one()
+  end
+
+  def where_campaign_role(q, %User{pid: user_pid}, role \\ :owner) do
     json = [
       %{
         user_pid: user_pid,
@@ -86,17 +92,15 @@ defmodule BlackIron.Campaigns do
       }
     ]
 
-    from(e in Entity,
-      where: e.pid == ^campaign_pid,
-      where:
-        fragment(
-          "? @> ?::jsonb",
-          e.data["memberships"],
-          ^json
-        ),
-      select: e
+    q
+    |> where(
+      [campaign: c],
+      fragment(
+        "? @> ?::jsonb",
+        c.data["memberships"],
+        ^json
+      )
     )
-    |> Repo.one()
   end
 
   # TODO(@zkat): authorization
@@ -184,7 +188,7 @@ defmodule BlackIron.Campaigns do
   ## Examples
 
       iex> change_campaign(campaign)
-      %Ecto.Changeset{data: %Campaign{}}
+      %Ecto.Changeset{data: %Entity{}}
 
   """
   def change_campaign(%Entity{} = campaign, attrs \\ %{}) do

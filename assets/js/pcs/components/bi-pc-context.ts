@@ -2,28 +2,28 @@ import { createContext } from "@lit/context";
 import { html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
-import "./bi-character-context.css";
+import "./bi-pc-context.css";
 import { Campaign } from "../../campaigns/campaign";
 import { BiCampaignContext } from "../../campaigns/components/bi-campaign-context";
 import { Route } from "../../utils/route";
 import { ssrConsume, ssrProvide } from "../../utils/ssr-context";
-import { Character, ICharacter } from "../character";
+import { IPC, PC } from "../pc";
 
-@customElement("bi-character-context")
-export class BiCharacterContext extends LitElement {
-  static context = createContext<Character | undefined>("character");
+@customElement("bi-pc-context")
+export class BiPCContext extends LitElement {
+  static context = createContext<PC | undefined>("pc");
 
-  @ssrProvide({ context: BiCharacterContext.context })
+  @ssrProvide({ context: BiPCContext.context })
   @property({
     type: Object,
     hasChanged(
-      value: ICharacter | undefined,
-      oldValue: ICharacter | undefined,
+      value: IPC | undefined,
+      oldValue: IPC | undefined,
     ) {
       return value?.rev !== oldValue?.rev;
     },
   })
-  character?: Character;
+  pc?: PC;
 
   @ssrConsume({ context: BiCampaignContext.context })
   @property({ attribute: false })
@@ -35,12 +35,12 @@ export class BiCharacterContext extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    this.#updateCharacterFromUrl();
+    this.#updatePCFromUrl();
   }
 
-  async #updateCharacterFromUrl() {
+  async #updatePCFromUrl() {
     console.log("matched route:", Route.matchLocation());
-    // TODO: fill in this.character based on route,
+    // TODO: fill in thisIEntity<T>.pc based on route,
   }
 
   render() {

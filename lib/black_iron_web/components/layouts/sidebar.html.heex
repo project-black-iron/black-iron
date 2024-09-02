@@ -46,7 +46,7 @@
     <main class="sidebar">
       <%= if !assigns[:sidebar_marker] do %>
         <a href={
-          ~p"/play/campaigns/#{assigns.conn.params["campaignId"]}/#{assigns.conn.params["cslug"]}/sidebar"
+          ~p"/play/campaigns/#{assigns.conn.params["campaign_pid"]}/#{assigns.conn.params["cslug"]}/sidebar"
         }>
           ←
         </a>

@@ -15,8 +15,8 @@ defmodule BlackIronWeb.SidebarHTML do
           </a>
         </li>
         <li>
-          <a href="characters">
-            Characters
+          <a href="pcs">
+            PCs
           </a>
         </li>
         <li>

@@ -47,10 +47,10 @@ msgstr "Cambia contraseña"
 msgid "Changing..."
 msgstr "Cambiando..."
 
-#: lib/black_iron_web/controllers/character_sheet_html.ex:11
-#: lib/black_iron_web/controllers/character_sheet_html.ex:17
+#: lib/black_iron_web/controllers/pc_sheet_html.ex:11
+#: lib/black_iron_web/controllers/pc_sheet_html.ex:17
 #, elixir-autogen, elixir-format
-msgid "Character Sheet"
+msgid "PC Sheet"
 msgstr "Hoja de personaje"
 
 #: lib/black_iron_web/controllers/user_confirmation_html/edit.html.heex:2
@@ -88,7 +88,7 @@ msgstr "Contraseña actual"
 msgid "Current password"
 msgstr "Contraseña actual"
 
-#: lib/black_iron_web/controllers/character_sheet_html.ex:42
+#: lib/black_iron_web/controllers/pc_sheet_html.ex:42
 #, elixir-autogen, elixir-format
 msgid "Description"
 msgstr "Descripción"
@@ -108,7 +108,7 @@ msgstr "Correo electrónico"
 msgid "Error!"
 msgstr "¡Error!"
 
-#: lib/black_iron_web/controllers/character_sheet_html.ex:46
+#: lib/black_iron_web/controllers/pc_sheet_html.ex:46
 #, elixir-autogen, elixir-format
 msgid "Experience"
 msgstr "Experiencia"
@@ -166,12 +166,12 @@ msgstr "¿No recibiste instrucciones de confirmación?"
 msgid "Oops, something went wrong! Please check the errors below."
 msgstr "¡Ups! Algo salió mal. Por favor, revisa los errores abajo."
 
-#: lib/black_iron_web/controllers/character_sheet_html.ex:44
+#: lib/black_iron_web/controllers/pc_sheet_html.ex:44
 #, elixir-autogen, elixir-format
 msgid "Player"
 msgstr "Jugador"
 
-#: lib/black_iron_web/controllers/character_sheet_html.ex:40
+#: lib/black_iron_web/controllers/pc_sheet_html.ex:40
 #, elixir-autogen, elixir-format
 msgid "Pronouns"
 msgstr "Pronombres/género"
@@ -204,9 +204,9 @@ msgstr "Restablecer contraseña"
 msgid "Reset password"
 msgstr "Restablecer contraseña"
 
-#: lib/black_iron_web/controllers/character_sheet_html.ex:12
+#: lib/black_iron_web/controllers/pc_sheet_html.ex:12
 #, elixir-autogen, elixir-format
-msgid "Select a character to view their sheet."
+msgid "Select a player character to view their sheet."
 msgstr "Selecciona un persona para ver su hoja."
 
 #: lib/black_iron_web/controllers/user_reset_password_html/new.html.heex:11

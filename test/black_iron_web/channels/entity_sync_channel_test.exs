@@ -1,11 +1,11 @@
-defmodule BlackIronWeb.CampaignSyncChannelTest do
+defmodule BlackIronWeb.EntitySyncChannelTest do
   use BlackIronWeb.ChannelCase
 
   setup do
     {:ok, _, socket} =
       BlackIronWeb.UserSocket
       |> socket("user_id", %{some: :assign})
-      |> subscribe_and_join(BlackIronWeb.CampaignSyncChannel, "campaign_sync:lobby")
+      |> subscribe_and_join(BlackIronWeb.EntitySyncChannel, "entity_sync:lobby")
 
     %{socket: socket}
   end
@@ -15,7 +15,7 @@ defmodule BlackIronWeb.CampaignSyncChannelTest do
     assert_reply ref, :ok, %{"hello" => "there"}
   end
 
-  test "shout broadcasts to campaign_sync:lobby", %{socket: socket} do
+  test "shout broadcasts to entity_sync:lobby", %{socket: socket} do
     push(socket, "shout", %{"hello" => "all"})
     assert_broadcast "shout", %{"hello" => "all"}
   end

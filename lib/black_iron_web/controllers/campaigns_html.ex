@@ -44,8 +44,8 @@ defmodule BlackIronWeb.CampaignsHTML do
 
   def show(assigns) do
     ~H"""
-    <h3>Campaign <%= assigns[:campaignId] %></h3>
-    <p>Details about Campaign <%= assigns[:campaignId] %></p>
+    <h3>Campaign <%= assigns[:campaign_pid] %></h3>
+    <p>Details about Campaign <%= assigns[:campaign_pid] %></p>
     <p><a href="/play/campaigns">Back to campaigns list</a></p>
     """
   end

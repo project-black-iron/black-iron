@@ -1,4 +1,4 @@
-import { Socket } from "phoenix";
+import { Channel, Socket } from "phoenix";
 
 import { CampaignManager } from "./campaigns/campaign-manager";
 import { BlackIronDB } from "./db";
@@ -7,9 +7,10 @@ export class BlackIronApp {
   // >> socket.enableDebug()
   // >> socket.enableLatencySim(1000)  // enabled for duration of browser session
   // >> socket.disableLatencySim()
-  campaignManager = new CampaignManager(this);
+  campaigns = new CampaignManager(this);
   socket?: Socket;
   #userToken?: string;
+  channel?: Channel;
 
   static async createApp(
     userToken?: string,
@@ -66,5 +67,23 @@ export class BlackIronApp {
       // logged in.
       this.connect();
     }
+  }
+
+  joinSyncChannel() {
+    if (!this.socket) {
+      return;
+    }
+    this.channel = this.socket.channel(
+      "entity_sync:" + this.userPid,
+      {},
+    );
+    this.channel
+      .join()
+      .receive("ok", (resp) => {
+        console.log("Joined successfully", resp);
+      })
+      .receive("error", (resp) => {
+        console.log("Unable to join", resp);
+      });
   }
 }

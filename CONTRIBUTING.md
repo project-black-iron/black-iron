@@ -122,7 +122,7 @@ working, without having to load (and manage) additional JavaScript.
 Even the "app" side is an "MPA": it's broken up into multiple pages, each of
 which loads the game-specific content dynamically. Changing things like which
 campaign is currently active is done through the URL (e.g.
-`/campaigns/my-cool-campaign/characters/bob`). When you're online, these pages
+`/campaigns/my-cool-campaign/pcs/bob`). When you're online, these pages
 are largely generated server-side. When offline, a "default" shell is loaded,
 and JS itself looks up data in indexeddb to try and fill in the contents.
 

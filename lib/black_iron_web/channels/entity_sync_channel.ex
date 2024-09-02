@@ -1,11 +1,11 @@
-defmodule BlackIronWeb.CampaignSyncChannel do
+defmodule BlackIronWeb.EntitySyncChannel do
   @moduledoc """
-  Syncs campaign data.
+  Syncs entity data.
   """
   use BlackIronWeb, :channel
 
   @impl true
-  def join("campaign_sync:" <> user_pid, _payload, socket) do
+  def join("entity_sync:" <> user_pid, _payload, socket) do
     if socket.assigns[:user].pid == user_pid do
       {:ok, socket}
     else
@@ -21,7 +21,7 @@ defmodule BlackIronWeb.CampaignSyncChannel do
   end
 
   # It is also common to receive messages from the client and
-  # broadcast to everyone in the current topic (campaign_sync:lobby).
+  # broadcast to everyone in the current topic (entity_sync:lobby).
   @impl true
   def handle_in("shout", payload, socket) do
     broadcast(socket, "shout", payload)

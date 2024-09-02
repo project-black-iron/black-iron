@@ -14,7 +14,7 @@ defmodule BlackIronWeb.JournalsHTML do
         <a
           target="_top"
           href={
-            ~p"/play/campaigns/#{assigns.conn.params["campaignId"]}/#{assigns.conn.params["cslug"]}/journals/1/chapter-1"
+            ~p"/play/campaigns/#{assigns.conn.params["campaign_pid"]}/#{assigns.conn.params["cslug"]}/journals/1/chapter-1"
           }
         >
           Chapter 1

@@ -47,10 +47,10 @@ msgstr ""
 msgid "Changing..."
 msgstr ""
 
-#: lib/black_iron_web/controllers/character_sheet_html.ex:11
-#: lib/black_iron_web/controllers/character_sheet_html.ex:17
+#: lib/black_iron_web/controllers/pc_sheet_html.ex:11
+#: lib/black_iron_web/controllers/pc_sheet_html.ex:17
 #, elixir-autogen, elixir-format
-msgid "Character Sheet"
+msgid "PC Sheet"
 msgstr ""
 
 #: lib/black_iron_web/controllers/user_confirmation_html/edit.html.heex:2
@@ -88,7 +88,7 @@ msgstr ""
 msgid "Current password"
 msgstr ""
 
-#: lib/black_iron_web/controllers/character_sheet_html.ex:42
+#: lib/black_iron_web/controllers/pc_sheet_html.ex:42
 #, elixir-autogen, elixir-format
 msgid "Description"
 msgstr ""
@@ -108,7 +108,7 @@ msgstr ""
 msgid "Error!"
 msgstr ""
 
-#: lib/black_iron_web/controllers/character_sheet_html.ex:46
+#: lib/black_iron_web/controllers/pc_sheet_html.ex:46
 #, elixir-autogen, elixir-format
 msgid "Experience"
 msgstr ""
@@ -166,12 +166,12 @@ msgstr ""
 msgid "Oops, something went wrong! Please check the errors below."
 msgstr ""
 
-#: lib/black_iron_web/controllers/character_sheet_html.ex:44
+#: lib/black_iron_web/controllers/pc_sheet_html.ex:44
 #, elixir-autogen, elixir-format
 msgid "Player"
 msgstr ""
 
-#: lib/black_iron_web/controllers/character_sheet_html.ex:40
+#: lib/black_iron_web/controllers/pc_sheet_html.ex:40
 #, elixir-autogen, elixir-format
 msgid "Pronouns"
 msgstr ""
@@ -204,9 +204,9 @@ msgstr ""
 msgid "Reset password"
 msgstr ""
 
-#: lib/black_iron_web/controllers/character_sheet_html.ex:12
+#: lib/black_iron_web/controllers/pc_sheet_html.ex:12
 #, elixir-autogen, elixir-format
-msgid "Select a character to view their sheet."
+msgid "Select a player character to view their sheet."
 msgstr ""
 
 #: lib/black_iron_web/controllers/user_reset_password_html/new.html.heex:11

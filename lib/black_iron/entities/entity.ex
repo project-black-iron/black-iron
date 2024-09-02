@@ -5,7 +5,7 @@ defmodule BlackIron.Entities.Entity do
   import PolymorphicEmbed
 
   alias BlackIron.Campaigns.Campaign
-  alias BlackIron.Characters.Character
+  alias BlackIron.PCs.PC
 
   @derive {Jason.Encoder, only: [:pid, :data, :rev, :revisions, :deleted_at]}
 
@@ -17,7 +17,7 @@ defmodule BlackIron.Entities.Entity do
 
     polymorphic_embeds_one(:data,
       types: [
-        {Character.entype(), Character},
+        {PC.entype(), PC},
         {Campaign.entype(), Campaign}
       ],
       on_type_not_found: :raise,
@@ -49,7 +49,7 @@ defmodule BlackIron.Entities.Entity do
     |> cast_polymorphic_embed(:data,
       required: true,
       with: [
-        character: &BlackIron.Characters.Character.changeset/2,
+        pc: &BlackIron.PCs.PC.changeset/2,
         campaign: &BlackIron.Campaigns.Campaign.changeset/2
       ]
     )

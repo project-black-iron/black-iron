@@ -22,7 +22,7 @@ defmodule BlackIronWeb.CoreComponents do
       <base href={unverified_url(@conn, @conn.request_path <> "/")} />
       <script>
         // This is only useful for offline pages, which
-        // have `__fooId` url params in their static content.
+        // have `__foo_pid` url params in their static content.
         // We do it for all pages just to keep the script simple.
         if (!window.location.href.endsWith("/")) {
           document.querySelector("base").href = window.location.href + "/";
@@ -409,7 +409,7 @@ defmodule BlackIronWeb.CoreComponents do
 
   def label(assigns) do
     ~H"""
-    <label for={@for} class="block text-sm font-semibold leading-6 text-zinc-800">
+    <label for={@for}>
       <%= render_slot(@inner_block) %>
     </label>
     """

@@ -2,8 +2,10 @@
 
 import { IDBPDatabase } from "idb";
 import { convert } from "url-slug";
+import { BlackIronApp } from "../black-iron-app";
 import { BlackIronDBSchema } from "../db";
 import { AbstractEntity, EntityConflictError, IEntity } from "../entity";
+import { PCManager } from "../pcs/pc-manager";
 
 export interface CampaignSchema {
   campaigns: {
@@ -18,26 +20,30 @@ export enum CampaignRole {
   Owner = "owner",
 }
 
-export interface ICampaign extends IEntity {
-  data: {
-    name: string;
-    description: string;
-    memberships: CampaignMembership[];
-  };
+export interface ICampaignData {
+  name: string;
+  description: string;
+  memberships: ICampaignMembership[];
 }
 
-export interface CampaignMembership {
+export interface ICampaign extends IEntity<ICampaignData> {
+  data: ICampaignData;
+}
+
+export interface ICampaignMembership {
   user_pid: string;
   roles: CampaignRole[];
 }
 
 export class Campaign extends AbstractEntity implements ICampaign {
-  // NB(@zkat): initialized by AbstractEntity.
-  data!: {
-    name: string;
-    description: string;
-    memberships: CampaignMembership[];
-  };
+  // NB(@zkat): Assigned by AbstractEntity's constructor
+  data!: ICampaignData;
+  pcs: PCManager;
+
+  constructor(data: ICampaign, public app: BlackIronApp) {
+    super(data);
+    this.pcs = new PCManager(this);
+  }
 
   static dbUpgrade(db: IDBPDatabase<BlackIronDBSchema>) {
     db.createObjectStore("campaigns", {
@@ -61,7 +67,7 @@ export class Campaign extends AbstractEntity implements ICampaign {
       && cmpMemberships(this.data.memberships, other.data.memberships)
     );
 
-    function cmpMemberships(a: CampaignMembership[], b: CampaignMembership[]) {
+    function cmpMemberships(a: ICampaignMembership[], b: ICampaignMembership[]) {
       if (a.length !== b.length) {
         return false;
       }
@@ -76,7 +82,7 @@ export class Campaign extends AbstractEntity implements ICampaign {
   }
 
   merge(other: ICampaign) {
-    const campaign = new Campaign(this);
+    const campaign = new Campaign(this, this.app);
     if (!this.eq(other)) {
       throw new EntityConflictError();
     }

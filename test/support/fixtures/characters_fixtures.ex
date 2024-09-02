@@ -1,14 +1,14 @@
-defmodule BlackIron.CharactersFixtures do
+defmodule BlackIron.PCsFixtures do
   @moduledoc """
   This module defines test helpers for creating
-  entities via the `BlackIron.Characters` context.
+  entities via the `BlackIron.PCs` context.
   """
 
   @doc """
-  Generate a character.
+  Generate a pc.
   """
-  def character_fixture(attrs \\ %{}) do
-    {:ok, character} =
+  def pc_fixture(attrs \\ %{}) do
+    {:ok, pc} =
       attrs
       |> Enum.into(%{
         alias: "some alias",
@@ -21,8 +21,8 @@ defmodule BlackIron.CharactersFixtures do
         xp_added: 42,
         xp_spent: 42
       })
-      |> BlackIron.Characters.create_character()
+      |> BlackIron.PCs.create_pc()
 
-    character
+    pc
   end
 end

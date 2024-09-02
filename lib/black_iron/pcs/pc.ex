@@ -1,13 +1,14 @@
-defmodule BlackIron.Characters.Character do
+defmodule BlackIron.PCs.PC do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @entype :character
+  @entype :pc
 
   @primary_key false
 
   @derive {Jason.Encoder,
            only: [
+             :campaign_pid,
              :alias,
              :name,
              :description,
@@ -20,6 +21,7 @@ defmodule BlackIron.Characters.Character do
 
   embedded_schema do
     field :__type__, :string
+    field :campaign_pid, :string
     field :alias, :string
     field :name, :string
     field :description, :string
@@ -33,8 +35,8 @@ defmodule BlackIron.Characters.Character do
   def entype, do: @entype
 
   @doc false
-  def changeset(character, attrs \\ %{}) do
-    character
+  def changeset(pc, attrs \\ %{}) do
+    pc
     |> cast(attrs, [
       :name,
       :description,

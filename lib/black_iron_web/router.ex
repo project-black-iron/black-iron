@@ -195,21 +195,21 @@ defmodule BlackIronWeb.Router do
 
     get "/", PlayController, :show
     get "/campaigns", CampaignsController, :index
-    get "/campaigns/:campaignId/:slug", CampaignsController, :show
+    get "/campaigns/:campaign_pid/:slug", CampaignsController, :show
 
-    scope "/campaigns/:campaignId/:cslug" do
-      get "/journals/:journalId/:slug", JournalsController, :show
+    scope "/campaigns/:campaign_pid/:cslug" do
+      get "/journals/:journal_pid/:slug", JournalsController, :show
       get "/journals", JournalsController, :index
       get "/worlds", WorldsController, :index
-      get "/worlds/:worldId/:slug", WorldsController, :show
+      get "/worlds/:world_pid/:slug", WorldsController, :show
       get "/npcs", NPCsController, :index
-      get "/npcs/:npcId/:slug", NPCsController, :show
+      get "/npcs/:npc_pid/:slug", NPCsController, :show
       get "/lore", LoreController, :index
-      get "/lore/:loreId/:slug", LoreController, :show
+      get "/lore/:lore_pid/:slug", LoreController, :show
       get "/tracks", TracksController, :index
-      get "/tracks/:trackId/:slug", TracksController, :show
-      get "/characters", CharactersController, :index
-      get "/characters/:characterId/:slug", CharactersController, :show
+      get "/tracks/:track_pid/:slug", TracksController, :show
+      get "/pcs", PCsController, :index
+      get "/pcs/:pc_pid/:slug", PCsController, :show
 
       scope "/sidebar" do
         pipe_through [:sidebar]
@@ -217,15 +217,15 @@ defmodule BlackIronWeb.Router do
         get "/", SidebarController, :show
         get "/journals", JournalsController, :index
         get "/worlds", WorldsController, :index
-        get "/worlds/:worldId/:slug", WorldsController, :show
+        get "/worlds/:world_pid/:slug", WorldsController, :show
         get "/npcs", NPCsController, :index
-        get "/npcs/:npcId/:slug", NPCsController, :show
+        get "/npcs/:npc_pid/:slug", NPCsController, :show
         get "/lore", LoreController, :index
-        get "/lore/:loreId/:slug", LoreController, :show
+        get "/lore/:lore_pid/:slug", LoreController, :show
         get "/tracks", TracksController, :index
-        get "/tracks/:trackId/:slug", TracksController, :show
-        get "/characters", CharactersController, :index
-        get "/characters/:characterId/:slug", CharactersController, :show
+        get "/tracks/:track_pid/:slug", TracksController, :show
+        get "/pcs", PCsController, :index
+        get "/pcs/:pc_pid/:slug", PCsController, :show
       end
     end
   end

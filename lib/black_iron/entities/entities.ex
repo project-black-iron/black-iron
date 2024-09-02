@@ -20,9 +20,14 @@ defmodule BlackIron.Entities do
     Entity.changeset(entity, enstruct, attrs |> put_rev(entity))
   end
 
-  def is_entype(q, entype) do
-    q
-    |> where([entity: e], fragment("? ->> '__type__'", e.data) == ^to_string(entype))
+  defmacro is_entype(q, key, entype) do
+    quote do
+      where(
+        unquote(q),
+        [{unquote(key), e}],
+        fragment("? ->> '__type__'", e.data) == ^to_string(unquote(entype))
+      )
+    end
   end
 
   defp put_rev(attrs, obj) do

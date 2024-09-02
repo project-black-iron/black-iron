@@ -15,25 +15,25 @@ export class BiCampaignContext extends LitElement {
   app?: BlackIronApp;
 
   @property({ attribute: "campaign" })
-  _campaignId?: string;
+  _campaign_pid?: string;
 
   @ssrProvide({ context: BiCampaignContext.context })
   @property({ attribute: false })
   campaign?: Campaign;
 
   async willUpdate(changed: PropertyValues<this>) {
-    if (changed.has("_campaignId") || changed.has("app")) {
-      if (this._campaignId) {
-        this.campaign = this._campaignId == null
+    if (changed.has("_campaign_pid") || changed.has("app")) {
+      if (this._campaign_pid) {
+        this.campaign = this._campaign_pid == null
           ? undefined
-          : await this.app?.campaignManager.getCampaign(this._campaignId);
+          : await this.app?.campaigns.get(this._campaign_pid);
       }
     }
     if (
       changed.has("campaign")
       && changed.get("campaign")?.pid !== this.campaign?.pid
     ) {
-      this._campaignId = this.campaign?.pid;
+      this._campaign_pid = this.campaign?.pid;
     }
   }
 

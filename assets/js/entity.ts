@@ -1,20 +1,21 @@
 export interface EntitySchema {
   _abstract: {
     key: string;
-    value: IEntity;
+    value: IEntity<unknown>;
   };
 }
 
-export interface IEntity {
+export interface IEntity<T> {
   pid: string;
   rev?: string;
   revisions?: string[];
-  conflict?: IEntity;
+  conflict?: IEntity<T>;
   deleted_at?: string;
-  data: unknown;
+  data: T;
 }
 
-export class AbstractEntity implements IEntity {
+// eslint-disable-next-line
+export class AbstractEntity implements IEntity<any> {
   get baseRoute() {
     return "/";
   }
@@ -25,11 +26,14 @@ export class AbstractEntity implements IEntity {
   pid: string;
   rev?: string;
   revisions?: string[];
-  conflict?: IEntity;
+  // eslint-disable-next-line
+  conflict?: IEntity<any>;
   deleted_at?: string;
-  data: unknown;
+  // eslint-disable-next-line
+  data: any;
 
-  constructor(data: IEntity) {
+  // eslint-disable-next-line
+  constructor(data: IEntity<any>) {
     this.pid = data.pid;
     this.rev = data.rev;
     this.revisions = data.revisions;
@@ -38,17 +42,20 @@ export class AbstractEntity implements IEntity {
     this.data = data.data;
   }
 
-  eq(other: IEntity): boolean {
+  // eslint-disable-next-line
+  eq(other: IEntity<any>): boolean {
     return this.pid === other.pid && this.deleted_at == other.deleted_at;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  merge(other: IEntity): AbstractEntity {
+  // eslint-disable-next-line
+  merge(other: IEntity<any>): AbstractEntity {
     throw new Error("Not implemented");
   }
 
-  toEntity(): IEntity {
-    const entity: IEntity = { pid: this.pid, data: structuredClone(this.data) };
+  // eslint-disable-next-line
+  toEntity(): IEntity<any> {
+    // eslint-disable-next-line
+    const entity: IEntity<any> = { pid: this.pid, data: structuredClone(this.data) };
     if (this.rev) {
       entity.rev = this.rev;
     }
@@ -57,6 +64,23 @@ export class AbstractEntity implements IEntity {
     }
     return entity;
   }
+}
+
+export function hasEntityChanged<T>(
+  newVal: IEntity<T>[] | undefined,
+  oldVal: IEntity<T>[] | undefined,
+) {
+  if ((newVal?.length ?? 0) !== (oldVal?.length ?? 0)) {
+    return true;
+  }
+  for (let i = 0; i < (newVal?.length ?? 0); i++) {
+    if (newVal?.[i]?.pid !== oldVal?.[i]?.pid) {
+      return true;
+    } else if (newVal?.[i]?.rev !== oldVal?.[i]?.rev) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /**
