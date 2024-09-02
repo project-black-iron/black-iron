@@ -27,7 +27,7 @@ export interface ICampaign extends IEntity {
 }
 
 export interface CampaignMembership {
-  user_id: string;
+  user_pid: string;
   roles: CampaignRole[];
 }
 
@@ -67,7 +67,7 @@ export class Campaign extends AbstractEntity implements ICampaign {
       }
       return a.every((membership) =>
         b.some((otherMembership) =>
-          membership.user_id === otherMembership.user_id
+          membership.user_pid === otherMembership.user_pid
           && membership.roles.length === otherMembership.roles.length
           && membership.roles.every((role) => otherMembership.roles.includes(role))
         )

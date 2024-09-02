@@ -15,77 +15,55 @@ defmodule BlackIronWeb.CharactersHTML do
 
   def show(assigns) do
     ~H"""
+    <bi-character-context character={Jason.encode!(assigns[:character])}>
+      <article>
+        <header><%= gettext("Character Sheet") %></header>
+        <.form for={@form}>
+          <.character_info {assigns} />
+          <.character_stats {assigns} />
+          <.character_meters {assigns} />
+          <.character_special_tracks {assigns} />
+          <.character_impacts {assigns} />
+          <.character_assets {assigns} />
+        </.form>
+      </article>
+    </bi-character-context>
     """
-
-    # ~H"""
-    # <bi-character-context character={Jason.encode!(assigns[:character])}>
-    #   <article>
-    #     <header><%= gettext("Character Sheet") %></header>
-    #     <.character_info {assigns} />
-    #     <.character_stats {assigns} />
-    #     <.character_meters {assigns} />
-    #     <.character_special_tracks {assigns} />
-    #     <.character_impacts {assigns} />
-    #     <.character_assets {assigns} />
-    #   </article>
-    # </bi-character-context>
-    # """
   end
 
   defp character_info(assigns) do
-    assigns = assign(assigns, :char, assigns.character)
-
     ~H"""
     <fieldset class="info">
       <bi-sync-field context="character" field="portrait" attr="src">
-        <!-- TODO: File upload input -->
-        <img src={@char[:portrait]} />
+        <img src={@character[:portrait]} width="100" />
       </bi-sync-field>
       <bi-sync-field context="character" field="name">
-        <.input field={@char[:name]} />
+        <.input field={@form[:name]} />
       </bi-sync-field>
       <bi-sync-field context="character" field="initiative">
-        <.input type="select" field={@char[:initiative]} options={@campaign[:initiative_options]} />
+        <.input type="select" field={@form[:initiative]} options={[]} />
       </bi-sync-field>
-      <dl>
-        <dt>
-          <bi-sync-field context="campaign" field="alias_label" prop="textContent">
-            <span><%= @campaign[:alias_label] %></span>
-          </bi-sync-field>
-        </dt>
-        <dd>
-          <bi-sync-field context="character" field="alias">
-            <.input field={@char[:alias]} />
-          </bi-sync-field>
-        </dd>
-        <dt><%= gettext("Pronouns") %></dt>
-        <dd>
-          <bi-sync-field context="character" field="pronouns">
-            <.input field={@char[:pronouns]} />
-          </bi-sync-field>
-        </dd>
-        <dt><%= gettext("Description") %></dt>
-        <dd>
-          <bi-sync-field context="character" field="description">
-            <.input type="textarea" field={@char[:description]} />
-          </bi-sync-field>
-        </dd>
-        <dt><%= gettext("Player") %></dt>
-        <dd>
-          <bi-sync-field context="character" field="player">
-            <.input field={@char[:player]} />
-          </bi-sync-field>
-        </dd>
-        <dt><%= gettext("Experience") %></dt>
-        <dd>
-          <!-- TODO(@zkat): Can we make this more generic?... -->
-          <bi-character-xp
-            tracks={Jason.encode!(@char[:special_tracks])}
-            added={@char[:xp_added]}
-            spent={@char[:xp_spent]}
-          />
-        </dd>
-      </dl>
+      <bi-sync-field context="campaign" field="alias_label" prop="textContent">
+        <span><%= gettext("Alias") %></span>
+      </bi-sync-field>
+      <bi-sync-field context="character" field="alias">
+        <.input field={@form[:alias]} />
+      </bi-sync-field>
+      <bi-sync-field context="character" field="pronouns">
+        <.input label={gettext("Pronouns")} field={@form[:pronouns]} />
+      </bi-sync-field>
+      <bi-sync-field context="character" field="description">
+        <.input label={gettext("Description")} type="textarea" field={@form[:description]} />
+      </bi-sync-field>
+      <bi-sync-field context="character" field="player">
+        <.input label={gettext("Player")} field={@form[:player]} />
+      </bi-sync-field>
+      <span><%= gettext("Experience") %></span>
+      <bi-character-xp
+        tracks={Jason.encode!(@character[:special_tracks])}
+        added={@character[:xp_added]}
+        spent={@character[:xp_spent]}
+      />
     </fieldset>
     """
   end

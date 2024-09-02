@@ -79,7 +79,7 @@ export class BlackIronDB {
   }
 
   async uploadEntity(entity: AbstractEntity) {
-    if (!this.app.userId) {
+    if (!this.app.userPid) {
       // Skip uploading if we're not logged in.
       return;
     }

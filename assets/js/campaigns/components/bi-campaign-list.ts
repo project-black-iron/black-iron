@@ -90,10 +90,10 @@ export class BiCampaignList extends LitElement {
         data: {
           name: formData.get("entity[data][name]") as string,
           description: formData.get("entity[data][description]") as string,
-          memberships: this.app?.userId
+          memberships: this.app?.userPid
             ? [
               {
-                user_id: this.app.userId,
+                user_pid: this.app.userPid,
                 roles: [CampaignRole.Owner],
               },
             ]
@@ -147,7 +147,7 @@ export class BiCampaignList extends LitElement {
   async #addToAccount(e: MouseEvent, campaign: ICampaign) {
     e.preventDefault();
     e.stopPropagation();
-    if (!this.app?.userId) {
+    if (!this.app?.userPid) {
       return;
     }
     const newC: ICampaign = {
@@ -156,7 +156,7 @@ export class BiCampaignList extends LitElement {
         ...campaign.data,
         memberships: [
           {
-            user_id: this.app.userId,
+            user_pid: this.app.userPid,
             roles: [CampaignRole.Owner],
           },
         ],
@@ -188,7 +188,7 @@ export class BiCampaignList extends LitElement {
                           associated with any account. It is not saved on the
                           server.
                           ${
-                  this.app?.userId
+                  this.app?.userPid
                     ? html`<button
                                 type="button"
                                 @click=${(e: MouseEvent) => this.#addToAccount(e, campaign)}

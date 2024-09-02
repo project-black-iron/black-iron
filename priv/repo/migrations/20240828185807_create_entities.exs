@@ -30,7 +30,7 @@ defmodule BlackIron.Repo.Migrations.CreateEntities do
       # Up
       """
       CREATE INDEX campaign_pid_fkey_idx ON entities
-      USING btree (data->'campaign_pid');
+      USING gin ((data->'campaign_pid') jsonb_path_ops);
       """,
       # Down
       """

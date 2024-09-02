@@ -17,7 +17,7 @@ defmodule BlackIron.Campaigns do
     |> where(
       [entity: e],
       fragment(
-        "exists(select 1 from jsonb_array_elements(?) m(obj) where m.obj ->> 'user_id' = ?)",
+        "exists(select 1 from jsonb_array_elements(?) m(obj) where m.obj ->> 'user_pid' = ?)",
         e.data["memberships"],
         ^pid
       )
@@ -57,7 +57,7 @@ defmodule BlackIron.Campaigns do
                       fragment(
                         "jsonb_set(?, '{memberships}', ?)",
                         e.data,
-                        ^[%Membership{user_id: actor.pid, roles: ["owner"]}]
+                        ^[%Membership{user_pid: actor.pid, roles: ["owner"]}]
                       )
                   ]
                 ],
@@ -78,14 +78,25 @@ defmodule BlackIron.Campaigns do
   def get_campaign(_user, _campaign_id, _rol \\ nil)
   def get_campaign(nil, _campaign_id, _role), do: nil
 
-  def get_campaign(%User{} = user, campaign_pid, role) do
-    case in_campaign?(user, campaign_pid, role) do
-      {:ok, campaign} ->
-        campaign
+  def get_campaign(%User{pid: user_pid}, campaign_pid, role) do
+    json = [
+      %{
+        user_pid: user_pid,
+        roles: if(role, do: [to_string(role)], else: [])
+      }
+    ]
 
-      {:error, _} ->
-        nil
-    end
+    from(e in Entity,
+      where: e.pid == ^campaign_pid,
+      where:
+        fragment(
+          "? @> ?::jsonb",
+          e.data["memberships"],
+          ^json
+        ),
+      select: e
+    )
+    |> Repo.one()
   end
 
   # TODO(@zkat): authorization
@@ -157,29 +168,8 @@ defmodule BlackIron.Campaigns do
     # res
   end
 
-  def in_campaign?(%User{pid: user_pid}, campaign_pid, role \\ nil) do
-    json = [
-      %{
-        user_id: user_pid,
-        roles: if(role, do: [to_string(role)], else: [])
-      }
-    ]
-
-    from(e in Entity,
-      where: e.pid == ^campaign_pid,
-      where:
-        fragment(
-          "? @> ?::jsonb",
-          e.data["memberships"],
-          ^json
-        ),
-      select: e
-    )
-    |> Repo.one()
-  end
-
   def check_membership(%User{} = user, campaign_pid, role \\ :owner) do
-    case in_campaign?(user, campaign_pid, role) do
+    case get_campaign(user, campaign_pid, role) do
       %Entity{} = campaign ->
         {:ok, campaign}
 

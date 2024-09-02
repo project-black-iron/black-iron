@@ -66,12 +66,15 @@ defmodule BlackIronWeb.CharactersController do
         }
       end
 
+    changeset = Characters.change_character(%Character{}, character || %{})
+
     render(conn, :show,
       campaignId: params["campaignId"],
       cslug: params["cslug"],
-      campaign: campaign || %{},
+      campaign: campaign,
       character: character || %{},
-      character_changeset: Characters.change_character(%Character{}, character || %{})
+      changeset: changeset,
+      form: Phoenix.Component.to_form(changeset)
     )
   end
 end

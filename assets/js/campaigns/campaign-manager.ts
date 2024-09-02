@@ -13,11 +13,11 @@ export class CampaignManager {
   }
 
   joinSyncChannel() {
-    if (!this.app.userId) {
+    if (!this.app.userPid) {
       return;
     }
     this.channel = this.app.socket?.channel(
-      "campaign_sync:" + this.app.userId,
+      "campaign_sync:" + this.app.userPid,
       {},
     );
     this.channel
@@ -102,7 +102,7 @@ export class CampaignManager {
           // Return both offline-only and online campaigns for the current
           // account.
           !cdata.data.memberships.length
-          || cdata.data.memberships.find((m: CampaignMembership) => m.user_id === this.app.userId)
+          || cdata.data.memberships.find((m: CampaignMembership) => m.user_pid === this.app.userPid)
         );
       })
       .map((cdata) => new Campaign(cdata));

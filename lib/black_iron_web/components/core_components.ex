@@ -13,6 +13,26 @@ defmodule BlackIronWeb.CoreComponents do
   import BlackIronWeb.Gettext
 
   @doc """
+  Makes sure our relative URLs work as expected.
+  """
+  def ensure_base(assigns) do
+    ~H"""
+    <%= if !String.ends_with?(@conn.request_path, "/") do %>
+      <!-- Set the base link path to have `/` so relative URLs work as "expected" -->
+      <base href={unverified_url(@conn, @conn.request_path <> "/")} />
+      <script>
+        // This is only useful for offline pages, which
+        // have `__fooId` url params in their static content.
+        // We do it for all pages just to keep the script simple.
+        if (!window.location.href.endsWith("/")) {
+          document.querySelector("base").href = window.location.href + "/";
+        }
+      </script>
+    <% end %>
+    """
+  end
+
+  @doc """
   Renders a modal.
 
   ## Examples
