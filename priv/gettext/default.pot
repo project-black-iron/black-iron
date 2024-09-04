@@ -16,7 +16,7 @@ msgstr ""
 msgid "Account Settings"
 msgstr ""
 
-#: lib/black_iron_web/components/core_components.ex:474
+#: lib/black_iron_web/components/core_components.ex:495
 #, elixir-autogen, elixir-format
 msgid "Actions"
 msgstr ""
@@ -26,31 +26,26 @@ msgstr ""
 msgid "Already registered?"
 msgstr ""
 
-#: lib/black_iron_web/components/core_components.ex:152
+#: lib/black_iron_web/components/core_components.ex:173
 #, elixir-autogen, elixir-format
 msgid "Attempting to reconnect"
 msgstr ""
 
-#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:25
+#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:28
 #, elixir-autogen, elixir-format
 msgid "Change Email"
 msgstr ""
 
-#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:59
+#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:99
 #, elixir-autogen, elixir-format
 msgid "Change Password"
 msgstr ""
 
-#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:25
-#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:59
+#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:27
+#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:55
+#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:98
 #, elixir-autogen, elixir-format
 msgid "Changing..."
-msgstr ""
-
-#: lib/black_iron_web/controllers/pc_sheet_html.ex:11
-#: lib/black_iron_web/controllers/pc_sheet_html.ex:17
-#, elixir-autogen, elixir-format
-msgid "PC Sheet"
 msgstr ""
 
 #: lib/black_iron_web/controllers/user_confirmation_html/edit.html.heex:2
@@ -63,32 +58,34 @@ msgstr ""
 msgid "Confirm my account"
 msgstr ""
 
-#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:46
+#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:85
 #, elixir-autogen, elixir-format
 msgid "Confirm new password"
 msgstr ""
 
-#: lib/black_iron_web/controllers/user_registration_html/new.html.heex:21
+#: lib/black_iron_web/controllers/user_registration_html/new.html.heex:36
 #, elixir-autogen, elixir-format
 msgid "Create an account"
 msgstr ""
 
-#: lib/black_iron_web/controllers/user_registration_html/new.html.heex:21
+#: lib/black_iron_web/controllers/user_registration_html/new.html.heex:35
 #, elixir-autogen, elixir-format
 msgid "Creating account..."
 msgstr ""
 
-#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:20
+#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:22
+#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:50
 #, elixir-autogen, elixir-format
 msgid "Current Password"
 msgstr ""
 
-#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:54
+#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:93
 #, elixir-autogen, elixir-format
 msgid "Current password"
 msgstr ""
 
-#: lib/black_iron_web/controllers/pc_sheet_html.ex:42
+#: lib/black_iron_web/controllers/campaigns_html.ex:32
+#: lib/black_iron_web/controllers/pcs_html.ex:43
 #, elixir-autogen, elixir-format
 msgid "Description"
 msgstr ""
@@ -98,17 +95,17 @@ msgstr ""
 msgid "Don't have an account?"
 msgstr ""
 
-#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:15
+#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:17
 #, elixir-autogen, elixir-format
 msgid "Email"
 msgstr ""
 
-#: lib/black_iron_web/components/core_components.ex:143
+#: lib/black_iron_web/components/core_components.ex:164
 #, elixir-autogen, elixir-format
 msgid "Error!"
 msgstr ""
 
-#: lib/black_iron_web/controllers/pc_sheet_html.ex:46
+#: lib/black_iron_web/controllers/pcs_html.ex:45
 #, elixir-autogen, elixir-format
 msgid "Experience"
 msgstr ""
@@ -119,11 +116,12 @@ msgstr ""
 msgid "Forgot your password?"
 msgstr ""
 
-#: lib/black_iron_web/components/core_components.ex:164
+#: lib/black_iron_web/components/core_components.ex:185
 #, elixir-autogen, elixir-format
 msgid "Hang in there while we get back on track"
 msgstr ""
 
+#: lib/black_iron_web/components/nav.ex:48
 #: lib/black_iron_web/controllers/user_confirmation_html/edit.html.heex:12
 #: lib/black_iron_web/controllers/user_confirmation_html/new.html.heex:18
 #: lib/black_iron_web/controllers/user_reset_password_html/edit.html.heex:27
@@ -143,12 +141,7 @@ msgstr ""
 msgid "Log in to your account now."
 msgstr ""
 
-#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:3
-#, elixir-autogen, elixir-format
-msgid "Manage your account email address and password settings"
-msgstr ""
-
-#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:42
+#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:79
 #, elixir-autogen, elixir-format
 msgid "New password"
 msgstr ""
@@ -158,24 +151,27 @@ msgstr ""
 msgid "No confirmation instructions received?"
 msgstr ""
 
+#: lib/black_iron_web/controllers/campaigns_html.ex:25
 #: lib/black_iron_web/controllers/user_registration_html/new.html.heex:14
 #: lib/black_iron_web/controllers/user_reset_password_html/edit.html.heex:8
-#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:10
-#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:37
+#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:12
+#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:36
+#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:69
 #, elixir-autogen, elixir-format
 msgid "Oops, something went wrong! Please check the errors below."
 msgstr ""
 
-#: lib/black_iron_web/controllers/pc_sheet_html.ex:44
+#: lib/black_iron_web/controllers/pcs_html.ex:44
 #, elixir-autogen, elixir-format
 msgid "Player"
 msgstr ""
 
-#: lib/black_iron_web/controllers/pc_sheet_html.ex:40
+#: lib/black_iron_web/controllers/pcs_html.ex:42
 #, elixir-autogen, elixir-format
 msgid "Pronouns"
 msgstr ""
 
+#: lib/black_iron_web/components/nav.ex:43
 #: lib/black_iron_web/controllers/user_confirmation_html/edit.html.heex:11
 #: lib/black_iron_web/controllers/user_confirmation_html/new.html.heex:17
 #: lib/black_iron_web/controllers/user_reset_password_html/edit.html.heex:26
@@ -204,11 +200,6 @@ msgstr ""
 msgid "Reset password"
 msgstr ""
 
-#: lib/black_iron_web/controllers/pc_sheet_html.ex:12
-#, elixir-autogen, elixir-format
-msgid "Select a player character to view their sheet."
-msgstr ""
-
 #: lib/black_iron_web/controllers/user_reset_password_html/new.html.heex:11
 #, elixir-autogen, elixir-format
 msgid "Send password reset instructions"
@@ -219,17 +210,17 @@ msgstr ""
 msgid "Sign up for an account now."
 msgstr ""
 
-#: lib/black_iron_web/components/core_components.ex:159
+#: lib/black_iron_web/components/core_components.ex:180
 #, elixir-autogen, elixir-format
 msgid "Something went wrong!"
 msgstr ""
 
-#: lib/black_iron_web/components/core_components.ex:142
+#: lib/black_iron_web/components/core_components.ex:163
 #, elixir-autogen, elixir-format
 msgid "Success!"
 msgstr ""
 
-#: lib/black_iron_web/components/core_components.ex:147
+#: lib/black_iron_web/components/core_components.ex:168
 #, elixir-autogen, elixir-format
 msgid "We can't find the internet"
 msgstr ""
@@ -244,8 +235,98 @@ msgstr ""
 msgid "We'll send a password reset link to your inbox"
 msgstr ""
 
-#: lib/black_iron_web/components/core_components.ex:68
-#: lib/black_iron_web/components/core_components.ex:122
+#: lib/black_iron_web/components/core_components.ex:89
+#: lib/black_iron_web/components/core_components.ex:143
 #, elixir-autogen, elixir-format
 msgid "close"
+msgstr ""
+
+#: lib/black_iron_web/controllers/pcs_html.ex:40
+#, elixir-autogen, elixir-format
+msgid "Alias"
+msgstr ""
+
+#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:56
+#, elixir-autogen, elixir-format
+msgid "Change handle"
+msgstr ""
+
+#: lib/black_iron_web/controllers/campaigns_html.ex:37
+#, elixir-autogen, elixir-format
+msgid "Create campaign"
+msgstr ""
+
+#: lib/black_iron_web/components/nav.ex:37
+#, elixir-autogen, elixir-format
+msgid "Log out"
+msgstr ""
+
+#: lib/black_iron_web/controllers/user_settings_html/edit.html.heex:4
+#, elixir-autogen, elixir-format
+msgid "Manage your account email address, handle, and password settings"
+msgstr ""
+
+#: lib/black_iron_web/components/nav.ex:24
+#, elixir-autogen, elixir-format
+msgid "Play Now!"
+msgstr ""
+
+#: lib/black_iron_web/components/nav.ex:32
+#, elixir-autogen, elixir-format
+msgid "Settings"
+msgstr ""
+
+#: lib/black_iron_web/controllers/campaigns_html.ex:49
+#, elixir-autogen, elixir-format
+msgid "Back to campaigns list"
+msgstr ""
+
+#: lib/black_iron_web/controllers/pcs_html.ex:17
+#, elixir-autogen, elixir-format
+msgid "Character Sheet"
+msgstr ""
+
+#: lib/black_iron_web/controllers/campaigns_html.ex:36
+#, elixir-autogen, elixir-format
+msgid "Creating new campaign..."
+msgstr ""
+
+#: lib/black_iron_web/controllers/sidebar_html.ex:14
+#, elixir-autogen, elixir-format
+msgid "Journals"
+msgstr ""
+
+#: lib/black_iron_web/controllers/sidebar_html.ex:29
+#, elixir-autogen, elixir-format
+msgid "Lore"
+msgstr ""
+
+#: lib/black_iron_web/controllers/sidebar_html.ex:24
+#, elixir-autogen, elixir-format
+msgid "NPCs"
+msgstr ""
+
+#: lib/black_iron_web/controllers/campaigns_html.ex:31
+#, elixir-autogen, elixir-format
+msgid "Name"
+msgstr ""
+
+#: lib/black_iron_web/controllers/sidebar_html.ex:19
+#, elixir-autogen, elixir-format
+msgid "PCs"
+msgstr ""
+
+#: lib/black_iron_web/controllers/pcs_html.ex:8
+#, elixir-autogen, elixir-format
+msgid "Player character list"
+msgstr ""
+
+#: lib/black_iron_web/controllers/sidebar_html.ex:34
+#, elixir-autogen, elixir-format
+msgid "Tracks"
+msgstr ""
+
+#: lib/black_iron_web/controllers/sidebar_html.ex:38
+#, elixir-autogen, elixir-format
+msgid "Worlds"
 msgstr ""

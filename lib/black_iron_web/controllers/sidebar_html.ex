@@ -11,31 +11,31 @@ defmodule BlackIronWeb.SidebarHTML do
         <li><a target="_top" href={~p"/play/campaigns/"}>Campaigns</a></li>
         <li>
           <a href="journals">
-            Journals
+            <%= gettext("Journals") %>
           </a>
         </li>
         <li>
           <a href="pcs">
-            PCs
+            <%= gettext("PCs") %>
           </a>
         </li>
         <li>
           <a href="npcs">
-            NPCs
+            <%= gettext("NPCs") %>
           </a>
         </li>
         <li>
           <a href="lore">
-            Lore
+            <%= gettext("Lore") %>
           </a>
         </li>
         <li>
           <a href="tracks">
-            Tracks and Clocks
+            <%= gettext("Tracks") %>
           </a>
         </li>
         <li>
-          <a href="worlds">Worlds</a>
+          <a href="worlds"><%= gettext("Worlds") %></a>
         </li>
       </ul>
     </nav>

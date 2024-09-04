@@ -5,7 +5,7 @@ defmodule BlackIronWeb.PCsHTML do
 
   def index(assigns) do
     ~H"""
-    <h3>Player character list</h3>
+    <h3><%= gettext("Player character list") %></h3>
     <bi-pc-list pcs={Jason.encode!(assigns[:pcs])} />
     """
   end
@@ -14,7 +14,7 @@ defmodule BlackIronWeb.PCsHTML do
     ~H"""
     <bi-pc-context pc={Jason.encode!(assigns[:pc])}>
       <article>
-        <header><%= gettext("PC Sheet") %></header>
+        <header><%= gettext("Character Sheet") %></header>
         <bi-synced-form>
           <.form for={@form}>
             <.pc_info {assigns} />

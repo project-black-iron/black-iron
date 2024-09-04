@@ -28,12 +28,12 @@ defmodule BlackIronWeb.CampaignsHTML do
         <.input field={f[:pid]} type="hidden" value={BlackIron.Utils.gen_pid()} />
 
         <.polymorphic_embed_inputs_for :let={c} field={f[:data]}>
-          <.input field={c[:name]} type="text" label="Name" required />
-          <.input field={c[:description]} type="textarea" label="Description" required />
+          <.input field={c[:name]} type="text" label={gettext("Name")} required />
+          <.input field={c[:description]} type="textarea" label={gettext("Description")} required />
         </.polymorphic_embed_inputs_for>
 
         <:actions>
-          <.button phx-disable-with="Creating new campaign...">
+          <.button phx-disable-with={gettext("Creating new campaign...")}>
             <%= gettext("Create campaign") %>
           </.button>
         </:actions>
@@ -46,7 +46,7 @@ defmodule BlackIronWeb.CampaignsHTML do
     ~H"""
     <h3>Campaign <%= assigns[:campaign_pid] %></h3>
     <p>Details about Campaign <%= assigns[:campaign_pid] %></p>
-    <p><a href="/play/campaigns">Back to campaigns list</a></p>
+    <p><a href="/play/campaigns"><%= gettext("Back to campaigns list") %></a></p>
     """
   end
 end
