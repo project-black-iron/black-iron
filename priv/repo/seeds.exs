@@ -79,8 +79,8 @@ if Application.fetch_env!(:black_iron, :env) == :dev do
             "shaken" => false,
             "unprepared" => false
           },
-          "assets" => []
-        }
+        },
+        "assets" => []
       }
     })
 end
