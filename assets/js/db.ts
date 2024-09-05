@@ -2,7 +2,7 @@ import { DBSchema, IDBPDatabase, openDB, StoreNames } from "idb";
 import { BlackIronApp } from "./black-iron-app";
 import { Campaign, CampaignSchema } from "./campaigns/campaign";
 import { AbstractEntity, EntityConflictError, EntitySchema, IEntity } from "./entity";
-import { PCSchema } from "./pcs/pc";
+import { PC, PCSchema } from "./pcs/pc";
 import { genPid } from "./utils/pid";
 
 export type BlackIronDBSchema = DBSchema & EntitySchema & CampaignSchema & PCSchema;
@@ -27,6 +27,7 @@ export class BlackIronDB {
     return openDB<BlackIronDBSchema>(DB_NAME, DB_VERSION, {
       upgrade(db) {
         Campaign.dbUpgrade(db);
+        PC.dbUpgrade(db);
       },
     });
   }

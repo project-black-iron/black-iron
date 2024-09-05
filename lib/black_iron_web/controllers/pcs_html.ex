@@ -6,27 +6,31 @@ defmodule BlackIronWeb.PCsHTML do
   def index(assigns) do
     ~H"""
     <h3><%= gettext("Player character list") %></h3>
-    <bi-pc-list pcs={Jason.encode!(assigns[:pcs])} />
+    <bi-campaign-context campaign={Jason.encode!(assigns[:campaign])}>
+      <bi-pc-list pcs={Jason.encode!(assigns[:pcs])} />
+    </bi-campaign-context>
     """
   end
 
   def show(assigns) do
     ~H"""
-    <bi-pc-context pc={Jason.encode!(assigns[:pc])}>
-      <article>
-        <header><%= gettext("Character Sheet") %></header>
-        <bi-synced-form>
-          <.form for={@form}>
-            <.pc_info {assigns} />
-            <.pc_stats {assigns} />
-            <.pc_meters {assigns} />
-            <.pc_special_tracks {assigns} />
-            <.pc_impacts {assigns} />
-            <.pc_assets {assigns} />
-          </.form>
-        </bi-synced-form>
-      </article>
-    </bi-pc-context>
+    <bi-campaign-context campaign={Jason.encode!(assigns[:campaign])}>
+      <bi-pc-context pc={Jason.encode!(assigns[:pc])}>
+        <article>
+          <header><%= gettext("Character Sheet") %></header>
+          <bi-synced-form>
+            <.form for={@form}>
+              <.pc_info {assigns} />
+              <.pc_stats {assigns} />
+              <.pc_meters {assigns} />
+              <.pc_special_tracks {assigns} />
+              <.pc_impacts {assigns} />
+              <.pc_assets {assigns} />
+            </.form>
+          </bi-synced-form>
+        </article>
+      </bi-pc-context>
+    </bi-campaign-context>
     """
   end
 

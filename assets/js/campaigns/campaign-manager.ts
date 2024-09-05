@@ -25,7 +25,7 @@ export class CampaignManager {
 
     return campaigns;
   }
-  
+
   async sync(remote?: ICampaign, local?: ICampaign) {
     return this.app.db.syncEntity(
       "campaigns",
@@ -33,7 +33,7 @@ export class CampaignManager {
       local && new Campaign(local, this.app),
     );
   }
-  
+
   async syncAll(remotes?: ICampaign[], locals?: ICampaign[]) {
     return this.app.db.syncEntities(
       "campaigns",

@@ -67,6 +67,18 @@ export class AbstractEntity implements IEntity<any> {
 }
 
 export function hasEntityChanged<T>(
+  newVal: IEntity<T> | undefined,
+  oldVal: IEntity<T> | undefined,
+) {
+  if (newVal?.pid !== oldVal?.pid) {
+    return true;
+  } else if (newVal?.rev !== oldVal?.rev) {
+    return true;
+  }
+  return false;
+}
+
+export function hasEntityArrayChanged<T>(
   newVal: IEntity<T>[] | undefined,
   oldVal: IEntity<T>[] | undefined,
 ) {

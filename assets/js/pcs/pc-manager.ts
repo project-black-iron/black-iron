@@ -14,11 +14,11 @@ export class PCManager {
   }
 
   async getAll() {
-    return (await this.app.db.getAll("pcs")).map(
+    return (await this.app.db.getAll("pcs")).filter((pc) => pc.data.campaign_pid === this.campaign.pid).map(
       (data) => new PC(data, this.campaign),
     );
   }
-  
+
   async sync(remote?: IPC, local?: IPC) {
     return this.app.db.syncEntity(
       "pcs",

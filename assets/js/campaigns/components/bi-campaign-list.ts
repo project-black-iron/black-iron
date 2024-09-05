@@ -3,7 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 
 import { BlackIronApp } from "../../black-iron-app";
 import { BiAppContext } from "../../components/bi-app-context";
-import { hasEntityChanged } from "../../entity";
+import { hasEntityArrayChanged } from "../../entity";
 import { genPid } from "../../utils/pid";
 import { ssrConsume } from "../../utils/ssr-context";
 import { Campaign, CampaignRole, ICampaign } from "../campaign";
@@ -58,7 +58,7 @@ export class BiCampaignList extends LitElement {
   @property({
     type: Array,
     attribute: "campaigns",
-    hasChanged: hasEntityChanged,
+    hasChanged: hasEntityArrayChanged,
   })
   campaigns?: ICampaign[];
 
@@ -157,7 +157,8 @@ export class BiCampaignList extends LitElement {
         ?.filter((c) => !c.deleted_at)
         .map(
           (campaign) =>
-            this.app && html`<li>
+            this.app
+            && html`<li>
                 <a href=${new Campaign(campaign, this.app).route}>
                   <article>
                     <header>

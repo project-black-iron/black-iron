@@ -4,36 +4,51 @@ import { customElement, property } from "lit/decorators.js";
 
 import { BlackIronApp } from "../../black-iron-app";
 import { BiAppContext } from "../../components/bi-app-context";
+import { hasEntityChanged } from "../../entity";
+import { Route } from "../../utils/route";
 import { ssrConsume, ssrProvide } from "../../utils/ssr-context";
-import { Campaign } from "../campaign";
+import { Campaign, ICampaign } from "../campaign";
 
 @customElement("bi-campaign-context")
 export class BiCampaignContext extends LitElement {
   static context = createContext<Campaign | undefined>("campaign");
-  @ssrConsume({ context: BiAppContext.context })
+
+  @ssrConsume({ context: BiAppContext.context, subscribe: true })
   @property({ attribute: false })
   app?: BlackIronApp;
 
-  @property({ attribute: "campaign" })
-  _campaign_pid?: string;
+  @property({
+    type: Object,
+    attribute: "campaign",
+    hasChanged: hasEntityChanged,
+  })
+  _icampaign?: ICampaign;
 
   @ssrProvide({ context: BiCampaignContext.context })
   @property({ attribute: false })
   campaign?: Campaign;
 
-  async willUpdate(changed: PropertyValues<this>) {
-    if (changed.has("_campaign_pid") || changed.has("app")) {
-      if (this._campaign_pid) {
-        this.campaign = this._campaign_pid == null
-          ? undefined
-          : await this.app?.campaigns.get(this._campaign_pid);
-      }
+  async #setCampaignFromRoute() {
+    const pid = Route.matchLocation()?.campaign_pid;
+    if (pid) {
+      this.campaign = await this.app?.campaigns.get(pid);
     }
-    if (
-      changed.has("campaign")
-      && changed.get("campaign")?.pid !== this.campaign?.pid
-    ) {
-      this._campaign_pid = this.campaign?.pid;
+  }
+
+  async #syncCampaign() {
+    if (this._icampaign) {
+      await this.app?.campaigns.sync(this._icampaign);
+      this.campaign = await this.app?.campaigns.get(this._icampaign.pid);
+    }
+  }
+
+  async willUpdate(changed: PropertyValues<this>) {
+    if (changed.has("_icampaign") || changed.has("app")) {
+      if (this._icampaign && this.app) {
+        this.#syncCampaign();
+      } else if (this.app) {
+        this.#setCampaignFromRoute();
+      }
     }
   }
 
