@@ -37,8 +37,7 @@ defmodule BlackIronWeb.PCsHTML do
         <img src={@pc["data"]["portrait"]} width="100" />
         <.input field={data[:name]} />
         <.input type="select" field={data[:initiative]} options={[]} />
-        <span><%= gettext("Alias") %></span>
-        <.input field={data[:alias]} />
+        <.input label={gettext("Alias")} field={data[:alias]} />
         <.input label={gettext("Pronouns")} field={data[:pronouns]} />
         <.input label={gettext("Description")} type="textarea" field={data[:description]} />
         <.input label={gettext("Player")} field={data[:player]} />

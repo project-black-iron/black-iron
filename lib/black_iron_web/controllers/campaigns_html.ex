@@ -25,7 +25,7 @@ defmodule BlackIronWeb.CampaignsHTML do
           <%= gettext("Oops, something went wrong! Please check the errors below.") %>
         </.error>
 
-        <.input field={f[:pid]} type="hidden" value={BlackIron.Utils.gen_pid()} />
+        <input name={f[:pid].name} type="hidden" value={BlackIron.Utils.gen_pid()} />
 
         <.polymorphic_embed_inputs_for :let={c} field={f[:data]}>
           <.input field={c[:name]} type="text" label={gettext("Name")} required />
