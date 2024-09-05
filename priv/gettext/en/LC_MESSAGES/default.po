@@ -279,27 +279,27 @@ msgstr ""
 #: lib/black_iron_web/controllers/campaigns_html.ex:49
 #, elixir-autogen, elixir-format
 msgid "Back to campaigns list"
-msgstr "Volver a la lista de campañas"
+msgstr ""
 
 #: lib/black_iron_web/controllers/pcs_html.ex:17
 #, elixir-autogen, elixir-format
 msgid "Character Sheet"
-msgstr "Hoja de personaje"
+msgstr ""
 
 #: lib/black_iron_web/controllers/campaigns_html.ex:36
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Creating new campaign..."
-msgstr "Creando nueva campaña..."
+msgstr ""
 
 #: lib/black_iron_web/controllers/sidebar_html.ex:14
 #, elixir-autogen, elixir-format
 msgid "Journals"
-msgstr "Diarios"
+msgstr ""
 
 #: lib/black_iron_web/controllers/sidebar_html.ex:29
 #, elixir-autogen, elixir-format
 msgid "Lore"
-msgstr "Historias"
+msgstr ""
 
 #: lib/black_iron_web/controllers/sidebar_html.ex:24
 #, elixir-autogen, elixir-format
@@ -309,7 +309,7 @@ msgstr ""
 #: lib/black_iron_web/controllers/campaigns_html.ex:31
 #, elixir-autogen, elixir-format
 msgid "Name"
-msgstr "Nombre"
+msgstr ""
 
 #: lib/black_iron_web/controllers/sidebar_html.ex:19
 #, elixir-autogen, elixir-format
@@ -319,14 +319,14 @@ msgstr ""
 #: lib/black_iron_web/controllers/pcs_html.ex:8
 #, elixir-autogen, elixir-format
 msgid "Player character list"
-msgstr "Lista de personajes de jugadores"
+msgstr ""
 
 #: lib/black_iron_web/controllers/sidebar_html.ex:34
 #, elixir-autogen, elixir-format
 msgid "Tracks"
-msgstr "Pistas"
+msgstr ""
 
 #: lib/black_iron_web/controllers/sidebar_html.ex:38
 #, elixir-autogen, elixir-format
 msgid "Worlds"
-msgstr "Mundos"
+msgstr ""
