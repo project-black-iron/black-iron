@@ -42,7 +42,7 @@ export class CampaignManager {
       locals,
       (remote?: ICampaign, local?: ICampaign) =>
         // Don't sync offline campaigns that aren't associated with any account.
-        !!(!remote && local && !local.data.memberships.length),
+        !!(remote || (local && !local.data.memberships.length)),
     );
   }
 }

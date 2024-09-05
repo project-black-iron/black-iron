@@ -3,6 +3,7 @@ import { BlackIronApp } from "./black-iron-app";
 import { Campaign, CampaignSchema } from "./campaigns/campaign";
 import { AbstractEntity, EntityConflictError, EntitySchema, IEntity } from "./entity";
 import { PCSchema } from "./pcs/pc";
+import { genPid } from "./utils/pid";
 
 export type BlackIronDBSchema = DBSchema & EntitySchema & CampaignSchema & PCSchema;
 
@@ -67,10 +68,15 @@ export class BlackIronDB {
     Name extends StoreNames<BlackIronDBSchema>,
     T extends BlackIronDBSchema[Name]["value"],
   >(storeName: Name, entity: T, bumpRev: boolean = true): Promise<T> {
-    const ret = { ...entity }; // No need to deep clone. We don't modify deeply.
-    if (!ret.pid) {
-      ret.pid = crypto.randomUUID();
-    }
+    // No need to deep clone. We don't modify deeply.
+    const ret: T = {
+      pid: entity.pid || genPid(),
+      rev: entity.rev,
+      revisions: entity.revisions,
+      conflict: entity.conflict,
+      deleted_at: entity.deleted_at,
+      data: entity.data,
+    } as unknown as T; // Sorry.
     if (!ret.rev || bumpRev) {
       ret.rev = crypto.randomUUID();
       ret.revisions = [ret.rev, ...(ret.revisions || [])];
