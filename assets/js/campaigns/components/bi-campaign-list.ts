@@ -71,7 +71,7 @@ export class BiCampaignList extends LitElement {
       console.log("Before request?");
       const form = e.target as HTMLFormElement;
       const formData = new FormData(form);
-      // TODO(@zkat): validate this! htmx:beforeRequest can cancel requests (if validation fails).
+      // TODO(@zkat): validate this! ajax-it:beforeRequest can cancel requests (if validation fails).
       const campaign: ICampaign = {
         pid: formData.get("entity[pid]") as string,
         data: {
@@ -97,7 +97,7 @@ export class BiCampaignList extends LitElement {
         "input[name='entity[pid]']",
       ) as HTMLInputElement;
       // Generate a new pid for the next campaign, in case we're in offline
-      // mode (online, htmx will swap in a new pid for us).
+      // mode (online, ajax-it will swap in a new pid for us).
       input.value = genPid();
       form.reset();
     });

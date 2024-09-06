@@ -2,7 +2,6 @@
 
 // Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
 import "phoenix_html";
-import "htmx.org";
 // import "./i18n";
 // import topbar from "../vendor/topbar"
 
