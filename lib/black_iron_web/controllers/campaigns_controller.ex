@@ -8,7 +8,8 @@ defmodule BlackIronWeb.CampaignsController do
   alias BlackIron.Entities.Entity
 
   def show(conn, params) do
-    render(conn, :show, campaign_pid: params["campaign_pid"])
+    campaign = Campaigns.get_campaign(conn.assigns[:current_user], params["campaign_pid"])
+    render(conn, :show, campaign: campaign)
   end
 
   def index(conn, _params) do
