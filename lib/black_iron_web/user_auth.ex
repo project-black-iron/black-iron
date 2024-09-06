@@ -205,7 +205,7 @@ defmodule BlackIronWeb.UserAuth do
     if conn.assigns[:current_user] do
       conn
     else
-      if conn.assigns[:htmx] do
+      if conn.assigns[:ajax] do
         conn
         |> send_resp(401, "Unauthorized")
         |> halt()

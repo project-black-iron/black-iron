@@ -26,7 +26,6 @@ defmodule BlackIronWeb.Router do
     plug :fetch_session
     plug :fetch_live_flash
     plug :put_root_layout, html: {BlackIronWeb.Layouts, :root}
-    plug :check_htmx_request
     plug :protect_from_forgery
 
     plug :put_secure_browser_headers, %{
@@ -36,6 +35,7 @@ defmodule BlackIronWeb.Router do
     plug :fetch_current_user
     plug :put_current_route
     plug BlackIronWeb.Plugs.Locale, "en"
+    plug :check_ajax_request
     plug :put_user_token
     plug :lit_ssr_content
   end
@@ -47,10 +47,10 @@ defmodule BlackIronWeb.Router do
     end
   end
 
-  defp check_htmx_request(conn, _) do
-    if get_req_header(conn, "hx-request") == ["true"] do
+  defp check_ajax_request(conn, _) do
+    if get_req_header(conn, "ajax-it") == ["true"] do
       conn
-      |> assign(:htmx, true)
+      |> assign(:ajax, true)
       |> put_root_layout(html: false)
       |> put_layout(html: false)
     else
@@ -191,7 +191,7 @@ defmodule BlackIronWeb.Router do
   end
 
   scope "/play", BlackIronWeb do
-    pipe_through [:browser, :app, :service_worker]
+    pipe_through [:app, :browser, :service_worker]
 
     get "/", PlayController, :show
     get "/campaigns", CampaignsController, :index
@@ -231,7 +231,7 @@ defmodule BlackIronWeb.Router do
   end
 
   scope "/play", BlackIronWeb do
-    pipe_through [:browser, :app, :require_authenticated_user]
+    pipe_through [:app, :browser, :require_authenticated_user]
 
     post "/campaigns", CampaignsController, :create
   end

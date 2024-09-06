@@ -67,7 +67,8 @@ export class BiCampaignList extends LitElement {
 
   constructor() {
     super();
-    this.addEventListener("htmx:beforeRequest", async (e: Event) => {
+    this.addEventListener("ajax-it:beforeRequest", async (e: Event) => {
+      console.log("Before request?");
       const form = e.target as HTMLFormElement;
       const formData = new FormData(form);
       // TODO(@zkat): validate this! htmx:beforeRequest can cancel requests (if validation fails).
@@ -89,7 +90,8 @@ export class BiCampaignList extends LitElement {
       await this.app?.campaigns.sync(campaign);
       await this.#setFromLocalCampaigns();
     });
-    this.addEventListener("htmx:beforeSend", (e: Event) => {
+    this.addEventListener("ajax-it:beforeSend", (e: Event) => {
+      console.log("before send?");
       const form = e.target as HTMLFormElement;
       const input = form.querySelector(
         "input[name='entity[pid]']",
@@ -157,8 +159,7 @@ export class BiCampaignList extends LitElement {
         ?.filter((c) => !c.deleted_at)
         .map(
           (campaign) =>
-            this.app
-            && html`<li>
+            html`<li>
                 <a href=${new Campaign(campaign, this.app).route}>
                   <article>
                     <header>

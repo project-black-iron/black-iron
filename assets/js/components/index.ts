@@ -1,3 +1,4 @@
+import "./ajax-it";
 import "./bi-app-context";
 import "./bi-theme-picker";
 

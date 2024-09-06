@@ -1,6 +1,7 @@
 import { stdin as input, stdout as output } from "node:process";
 import * as readline from "node:readline/promises";
 
+import "@lit-labs/ssr/lib/install-global-dom-shim";
 import { render } from "@lit-labs/ssr";
 import { collectResult } from "@lit-labs/ssr/lib/render-result.js";
 import { html } from "lit-html";

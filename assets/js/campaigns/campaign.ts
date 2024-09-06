@@ -40,7 +40,7 @@ export class Campaign extends AbstractEntity implements ICampaign {
   data!: ICampaignData;
   pcs: PCManager;
 
-  constructor(data: ICampaign, public app: BlackIronApp) {
+  constructor(data: ICampaign, public app?: BlackIronApp) {
     super(data);
     this.pcs = new PCManager(this);
   }
