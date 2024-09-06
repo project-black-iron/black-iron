@@ -68,7 +68,6 @@ export class BiCampaignList extends LitElement {
   constructor() {
     super();
     this.addEventListener("ajax-it:beforeRequest", async (e: Event) => {
-      console.log("Before request?");
       const form = e.target as HTMLFormElement;
       const formData = new FormData(form);
       // TODO(@zkat): validate this! ajax-it:beforeRequest can cancel requests (if validation fails).
@@ -91,7 +90,6 @@ export class BiCampaignList extends LitElement {
       await this.#setFromLocalCampaigns();
     });
     this.addEventListener("ajax-it:beforeSend", (e: Event) => {
-      console.log("before send?");
       const form = e.target as HTMLFormElement;
       const input = form.querySelector(
         "input[name='entity[pid]']",
