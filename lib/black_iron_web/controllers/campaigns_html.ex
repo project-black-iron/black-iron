@@ -36,9 +36,11 @@ defmodule BlackIronWeb.CampaignsHTML do
 
   def show(assigns) do
     ~H"""
+    <%= if assigns[:campaign] do %>
     <h3>Campaign <%= assigns[:campaign].data.name %></h3>
     <p><%= assigns[:campaign].data.description %></p>
     <p><a href="pcs"><%= gettext("PCs") %></a></p>
+    <% end %>
     <p><a href="/play/campaigns"><%= gettext("Back to campaigns list") %></a></p>
     """
   end

@@ -22,6 +22,7 @@ defmodule BlackIron.Campaigns.Campaign do
   def changeset(campaign, attrs) do
     campaign
     |> cast(attrs, [:name, :description])
+    |> cast_embed(:memberships, with: &BlackIron.Campaigns.Membership.changeset/2)
     |> validate_required([:name, :description])
     |> put_change(:__type__, to_string(@entype))
   end

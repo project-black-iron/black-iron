@@ -22,7 +22,13 @@ defmodule BlackIronWeb.CampaignsController do
 
     render(conn, :index,
       campaigns: campaigns,
-      changeset: Campaigns.change_campaign(%Entity{}, %{})
+      changeset: Campaigns.change_campaign(%Entity{}, %{
+        "data" => %{
+          "name" => "New campaign",
+          "description" => "A new campaign",
+          "memberships" => [%{"roles" => ["player"], "user" => "234ojoas"}]
+        }
+      })
     )
   end
 

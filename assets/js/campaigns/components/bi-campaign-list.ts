@@ -7,6 +7,7 @@ import { hasEntityArrayChanged } from "../../entity";
 import { genPid } from "../../utils/pid";
 import { ssrConsume } from "../../utils/ssr-context";
 import { Campaign, CampaignRole, ICampaign } from "../campaign";
+import { formDataToObject } from "../../utils/form-data";
 
 @customElement("bi-campaign-list")
 export class BiCampaignList extends LitElement {
@@ -68,24 +69,16 @@ export class BiCampaignList extends LitElement {
   constructor() {
     super();
     this.addEventListener("ajax-it:beforeRequest", async (e: Event) => {
-      const form = e.target as HTMLFormElement;
-      const formData = new FormData(form);
       // TODO(@zkat): validate this! ajax-it:beforeRequest can cancel requests (if validation fails).
-      const campaign: ICampaign = {
-        pid: formData.get("entity[pid]") as string,
-        data: {
-          name: formData.get("entity[data][name]") as string,
-          description: formData.get("entity[data][description]") as string,
-          memberships: this.app?.userPid
-            ? [
-              {
-                user_pid: this.app.userPid,
-                roles: [CampaignRole.Owner],
-              },
-            ]
-            : [],
-        },
-      };
+      const campaign: ICampaign = formDataToObject(e.target as HTMLFormElement);
+      campaign.data.memberships = this.app?.userPid
+        ? [
+          {
+            user_pid: this.app.userPid,
+            roles: [CampaignRole.Owner],
+          },
+        ]
+        : [];
       await this.app?.campaigns.sync(campaign);
       await this.#setFromLocalCampaigns();
     });
