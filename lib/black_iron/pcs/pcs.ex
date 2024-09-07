@@ -10,6 +10,7 @@ defmodule BlackIron.PCs do
 
   alias BlackIron.Accounts.User
   alias BlackIron.Campaigns
+  alias BlackIron.Campaigns.Campaign
   alias BlackIron.PCs.PC
   alias BlackIron.Entities
   alias BlackIron.Entities.Entity
@@ -64,11 +65,13 @@ defmodule BlackIron.PCs do
       where: pc.pid == ^pc_pid,
       join: camp in Entity,
       as: :campaign,
-      on: camp.pid == type(pc.data["campaign_pid"], :string),
+      on: camp.pid == fragment("?->>'campaign_pid'", pc.data),
       where: camp.pid == ^campaign_pid,
       select: pc
     )
     |> Campaigns.where_campaign_role(user, role)
+    |> Entities.is_entype(:pc, PC.entype())
+    |> Entities.is_entype(:campaign, Campaign.entype())
     |> Repo.one()
   end
 

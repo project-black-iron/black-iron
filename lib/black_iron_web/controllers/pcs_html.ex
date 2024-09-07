@@ -19,14 +19,23 @@ defmodule BlackIronWeb.PCsHTML do
         <article>
           <header><%= gettext("Character Sheet") %></header>
           <bi-synced-form>
-            <.form for={@form}>
-              <.pc_info {assigns} />
+            <.simple_form
+              :let={cs}
+              for={@changeset}
+              action={
+                ~p"/play/campaigns/#{assigns[:campaign_pid]}/#{assigns[:cslug]}/pcs/#{assigns[:pc_pid]}/#{assigns[:pc_slug]}"
+              }
+            >
+              <.error :if={@changeset.action == :insert}>
+                <%= gettext("Oops, something went wrong! Please check the errors below.") %>
+              </.error>
+              <.pc_info cs={cs} {assigns} />
               <.pc_stats {assigns} />
               <.pc_meters {assigns} />
               <.pc_special_tracks {assigns} />
               <.pc_impacts {assigns} />
               <.pc_assets {assigns} />
-            </.form>
+            </.simple_form>
           </bi-synced-form>
         </article>
       </bi-pc-context>
@@ -37,20 +46,30 @@ defmodule BlackIronWeb.PCsHTML do
   defp pc_info(assigns) do
     ~H"""
     <fieldset class="info">
-      <.polymorphic_embed_inputs_for :let={data} field={@form[:data]}>
-        <img src={@pc["data"]["portrait"]} width="100" />
+      <.polymorphic_embed_inputs_for :let={data} field={@cs[:data]}>
+        <img src={@pc && @pc.data.portrait} width="100" />
         <.input field={data[:name]} />
-        <.input type="select" field={data[:initiative]} options={[]} />
+        <!--
+        TODO(@zkat): configure these based on the current campaign's playset rules,
+        and bi-initiative-select can handle the dynamic/offline switching between
+        different rules.
+        -->
+        <bi-initiative-select>
+          <.input
+            type="select"
+            label={gettext("Initiative")}
+            field={data[:initiative]}
+            options={[
+              "Out of combat": "out-of-combat",
+              "Has initiative": "has-initiative",
+              "No initiative": "no-initiative"
+            ]}
+          />
+        </bi-initiative-select>
         <.input label={gettext("Alias")} field={data[:alias]} />
         <.input label={gettext("Pronouns")} field={data[:pronouns]} />
         <.input label={gettext("Description")} type="textarea" field={data[:description]} />
         <.input label={gettext("Player")} field={data[:player]} />
-        <span><%= gettext("Experience") %></span>
-        <bi-pc-xp
-          tracks={Jason.encode!(@pc["data"]["special_tracks"])}
-          added={@pc["data"]["xp_added"]}
-          spent={@pc["data"]["xp_spent"]}
-        />
       </.polymorphic_embed_inputs_for>
     </fieldset>
     """

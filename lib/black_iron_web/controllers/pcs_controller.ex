@@ -21,15 +21,14 @@ defmodule BlackIronWeb.PCsController do
     pc =
       PCs.get_pc(conn.assigns[:current_user], campaign, params["pc_pid"])
 
-    changeset = PCs.change_pc(%Entity{}, pc || %{})
-
     render(conn, :show,
       campaign_pid: params["campaign_pid"],
       cslug: params["cslug"],
+      pc_pid: params["pc_pid"],
+      pc_slug: params["slug"],
       campaign: campaign,
-      pc: pc || %{},
-      changeset: changeset,
-      form: Phoenix.Component.to_form(changeset, as: "pc")
+      pc: pc,
+      changeset: PCs.change_pc(pc || %Entity{}, %{})
     )
   end
 end

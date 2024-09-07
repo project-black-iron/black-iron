@@ -19,12 +19,12 @@ export function formDataToObject<T>(data: FormData | HTMLFormElement): T {
       if (lastKey != null) {
         if (isNaN(numKey)) {
           if (currentObj[lastKey] == null) {
-            currentObj[lastKey] = {}; 
+            currentObj[lastKey] = {};
           }
           currentObj = currentObj[lastKey];
         } else {
           if (currentObj[lastKey] == null) {
-            currentObj[lastKey] = []; 
+            currentObj[lastKey] = [];
           }
           currentObj = currentObj[lastKey];
         }

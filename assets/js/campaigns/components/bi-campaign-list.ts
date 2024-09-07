@@ -4,10 +4,10 @@ import { customElement, property, state } from "lit/decorators.js";
 import { BlackIronApp } from "../../black-iron-app";
 import { BiAppContext } from "../../components/bi-app-context";
 import { hasEntityArrayChanged } from "../../entity";
+import { formDataToObject } from "../../utils/form-data";
 import { genPid } from "../../utils/pid";
 import { ssrConsume } from "../../utils/ssr-context";
 import { Campaign, CampaignRole, ICampaign } from "../campaign";
-import { formDataToObject } from "../../utils/form-data";
 
 @customElement("bi-campaign-list")
 export class BiCampaignList extends LitElement {
