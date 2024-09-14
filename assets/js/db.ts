@@ -5,7 +5,11 @@ import { AbstractEntity, EntityConflictError, EntitySchema, IEntity } from "./en
 import { PC, PCSchema } from "./pcs/pc";
 import { genPid } from "./utils/pid";
 
-export type BlackIronDBSchema = DBSchema & EntitySchema & CampaignSchema & PCSchema;
+export type BlackIronDBSchema =
+  & DBSchema
+  & EntitySchema
+  & CampaignSchema
+  & PCSchema;
 
 const DB_NAME = "black-iron";
 const DB_VERSION = 1;
@@ -70,6 +74,7 @@ export class BlackIronDB {
     T extends BlackIronDBSchema[Name]["value"],
   >(storeName: Name, entity: T, bumpRev: boolean = true): Promise<T> {
     // No need to deep clone. We don't modify deeply.
+    console.log("Saving entity locally!", entity);
     const ret: T = {
       pid: entity.pid || genPid(),
       rev: entity.rev,
@@ -91,6 +96,7 @@ export class BlackIronDB {
       // Skip uploading if we're not logged in.
       return;
     }
+    console.log("Uploading entity!", entity);
     const url = new URL(window.location.href);
     url.pathname = entity.baseRoute;
     const res = await this.app.fetch(url, {
@@ -128,18 +134,17 @@ export class BlackIronDB {
     try {
       if (remote && local) {
         if (remote.rev !== local.rev) {
-          if (local.rev && remote.revisions?.includes(local.rev)) {
-            // Remote has local version. Fast-forward local and save.
+          if (
+            remote.eq(local)
+            || (local.rev && remote.revisions?.includes(local.rev))
+          ) {
             await this.#saveEntity(storeName, remote, false);
           } else if (local.rev && local.revisions?.includes(remote.rev!)) {
-            // Local has remote version. Fast-forward remote by uploading.
             await this.#uploadEntity(local);
-          } else if (remote.eq(local)) {
-            // Both are effectively the same. Overwrite the local DB's copy of
-            // the entity to save the remote sync props.
-            await this.#saveEntity(storeName, remote, false);
           } else {
-            await this.#uploadEntity(local.merge(remote));
+            const merged = local.merge(remote);
+            await this.#saveEntity(storeName, merged);
+            await this.#uploadEntity(merged);
           }
         } else {
           // revs were both the same. Already synced
@@ -192,7 +197,10 @@ export class BlackIronDB {
     }
   }
 
-  async syncEntities<Name extends StoreNames<BlackIronDBSchema>, Entype extends BlackIronDBSchema[Name]["value"]>(
+  async syncEntities<
+    Name extends StoreNames<BlackIronDBSchema>,
+    Entype extends BlackIronDBSchema[Name]["value"],
+  >(
     storeName: Name,
     factory: (data: Entype) => AbstractEntity,
     remoteEntities?: Entype[],

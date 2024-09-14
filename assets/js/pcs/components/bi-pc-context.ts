@@ -1,10 +1,13 @@
 import { createContext } from "@lit/context";
-import { html, LitElement } from "lit";
+import { html, LitElement, PropertyValues } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
 import "./bi-pc-context.css";
+import { BlackIronApp } from "../../black-iron-app";
 import { Campaign } from "../../campaigns/campaign";
 import { BiCampaignContext } from "../../campaigns/components/bi-campaign-context";
+import { BiAppContext } from "../../components/bi-app-context";
+import { hasEntityChanged } from "../../entity";
 import { Route } from "../../utils/route";
 import { ssrConsume, ssrProvide } from "../../utils/ssr-context";
 import { IPC, PC } from "../pc";
@@ -13,34 +16,48 @@ import { IPC, PC } from "../pc";
 export class BiPCContext extends LitElement {
   static context = createContext<PC | undefined>("pc");
 
-  @ssrProvide({ context: BiPCContext.context })
+  @ssrConsume({ context: BiAppContext.context, subscribe: true })
+  @property({ attribute: false })
+  app?: BlackIronApp;
+
   @property({
     type: Object,
-    hasChanged(
-      value: IPC | undefined,
-      oldValue: IPC | undefined,
-    ) {
-      return value?.rev !== oldValue?.rev;
-    },
+    attribute: "pc",
+    hasChanged: hasEntityChanged,
   })
+  _ipc?: IPC;
+
+  @ssrProvide({ context: BiPCContext.context })
+  @property({ attribute: false })
   pc?: PC;
 
-  @ssrConsume({ context: BiCampaignContext.context })
+  @ssrConsume({ context: BiCampaignContext.context, subscribe: true })
   @property({ attribute: false })
   campaign?: Campaign;
 
-  constructor() {
-    super();
+  async #setFromRoute() {
+    const match = Route.matchLocation();
+    const pcPid = match?.pc_pid;
+    if (pcPid) {
+      this.pc = await this.campaign?.pcs.get(pcPid);
+    }
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    this.#updatePCFromUrl();
+  async #sync() {
+    if (this._ipc) {
+      await this.campaign?.pcs.sync(this._ipc);
+      this.pc = await this.campaign?.pcs.get(this._ipc.pid);
+    }
   }
 
-  async #updatePCFromUrl() {
-    console.log("matched route:", Route.matchLocation());
-    // TODO: fill in thisIEntity<T>.pc based on route,
+  async willUpdate(changed: PropertyValues<this>) {
+    if (changed.has("_ipc") || changed.has("campaign") || changed.has("app")) {
+      if (this._ipc && this.app) {
+        this.#sync();
+      } else if (this.app) {
+        this.#setFromRoute();
+      }
+    }
   }
 
   render() {

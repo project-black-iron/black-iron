@@ -1,8 +1,8 @@
-import { IDBPDatabase } from "idb";
+import { IDBPDatabase, StoreNames } from "idb";
 import convert from "url-slug";
 import { Campaign } from "../campaigns/campaign";
 import { BlackIronDBSchema } from "../db";
-import { AbstractEntity, EntityConflictError, IEntity } from "../entity";
+import { AbstractEntity, IEntity } from "../entity";
 
 export interface PCSchema {
   pcs: {
@@ -39,9 +39,15 @@ export class PC extends AbstractEntity implements IPC {
     });
   }
 
+  get storeName(): StoreNames<BlackIronDBSchema> {
+    return "pcs";
+  }
+
   get baseRoute() {
     return `/play/campaigns/${this.campaign ? this.campaign.pid : this.data.campaign_pid}/${
-      this.campaign ? convert(this.campaign.data.name) : "campaign"
+      convert(
+        this.campaign.data.name,
+      )
     }/pcs`;
   }
 
@@ -55,10 +61,8 @@ export class PC extends AbstractEntity implements IPC {
   }
 
   merge(other: IPC) {
-    const pc = new PC(this, this.campaign);
-    if (!this.eq(other)) {
-      throw new EntityConflictError();
-    }
+    const pc = new PC({ ...this, ...other }, this.campaign);
+    pc.bumpRev();
     return pc;
   }
 }

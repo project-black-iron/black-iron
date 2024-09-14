@@ -234,5 +234,8 @@ defmodule BlackIronWeb.Router do
     pipe_through [:app, :browser, :require_authenticated_user]
 
     post "/campaigns", CampaignsController, :create
+
+    scope "/campaigns/:campaign_pid/:cslug" do
+    end
   end
 end

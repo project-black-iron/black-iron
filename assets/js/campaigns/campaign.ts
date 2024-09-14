@@ -1,10 +1,10 @@
 // Campaign schema, class, and database definitions.
 
-import { IDBPDatabase } from "idb";
+import { IDBPDatabase, StoreNames } from "idb";
 import { convert } from "url-slug";
 import { BlackIronApp } from "../black-iron-app";
 import { BlackIronDBSchema } from "../db";
-import { AbstractEntity, EntityConflictError, IEntity } from "../entity";
+import { AbstractEntity, IEntity } from "../entity";
 import { PCManager } from "../pcs/pc-manager";
 
 export interface CampaignSchema {
@@ -51,6 +51,10 @@ export class Campaign extends AbstractEntity implements ICampaign {
     });
   }
 
+  get storeName(): StoreNames<BlackIronDBSchema> {
+    return "campaigns";
+  }
+
   get baseRoute() {
     return "/play/campaigns";
   }
@@ -82,10 +86,8 @@ export class Campaign extends AbstractEntity implements ICampaign {
   }
 
   merge(other: ICampaign) {
-    const campaign = new Campaign(this, this.app);
-    if (!this.eq(other)) {
-      throw new EntityConflictError();
-    }
+    const campaign = new Campaign({ ...this, ...other }, this.app);
+    campaign.bumpRev();
     return campaign;
   }
 }

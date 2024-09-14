@@ -18,10 +18,11 @@ defmodule BlackIronWeb.PCsHTML do
       <bi-pc-context pc={Jason.encode!(assigns[:pc])}>
         <article>
           <header><%= gettext("Character Sheet") %></header>
-          <bi-synced-form>
+          <bi-synced-form context="pc">
             <.simple_form
               :let={cs}
               for={@changeset}
+              autocomplete="off"
               action={
                 ~p"/play/campaigns/#{assigns[:campaign_pid]}/#{assigns[:cslug]}/pcs/#{assigns[:pc_pid]}/#{assigns[:pc_slug]}"
               }
@@ -60,9 +61,9 @@ defmodule BlackIronWeb.PCsHTML do
             label={gettext("Initiative")}
             field={data[:initiative]}
             options={[
-              "Out of combat": "out-of-combat",
-              "Has initiative": "has-initiative",
-              "No initiative": "no-initiative"
+              {gettext("Out of combat"), "out-of-combat"},
+              {gettext("Has initiative"), "has-initiative"},
+              {gettext("No initiative"), "no-initiative"}
             ]}
           />
         </bi-initiative-select>

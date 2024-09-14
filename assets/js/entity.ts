@@ -1,3 +1,6 @@
+import { StoreNames } from "idb";
+import { BlackIronDBSchema } from "./db";
+
 export interface EntitySchema {
   _abstract: {
     key: string;
@@ -16,6 +19,10 @@ export interface IEntity<T> {
 
 // eslint-disable-next-line
 export class AbstractEntity implements IEntity<any> {
+  get storeName(): StoreNames<BlackIronDBSchema> {
+    throw new Error("No store name defined for entity.");
+  }
+
   get baseRoute() {
     return "/";
   }
@@ -40,6 +47,12 @@ export class AbstractEntity implements IEntity<any> {
     this.conflict = data.conflict;
     this.deleted_at = data.deleted_at;
     this.data = data.data;
+  }
+
+  bumpRev() {
+    this.rev = crypto.randomUUID();
+    this.revisions = this.revisions ?? [];
+    this.revisions.unshift(this.rev);
   }
 
   // eslint-disable-next-line
@@ -105,5 +118,12 @@ export function hasEntityArrayChanged<T>(
 export class EntityConflictError extends Error {
   constructor() {
     super("Entity conflict detected");
+  }
+}
+
+export class DataValidationError extends Error {
+  // This record should be `fieldName => errorMessages[]`
+  constructor(values: Record<string, string[]>) {
+    super("Data update failed: " + JSON.stringify(values));
   }
 }

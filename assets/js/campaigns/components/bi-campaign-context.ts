@@ -28,26 +28,26 @@ export class BiCampaignContext extends LitElement {
   @property({ attribute: false })
   campaign?: Campaign;
 
-  async #setCampaignFromRoute() {
-    const pid = Route.matchLocation()?.campaign_pid;
-    if (pid) {
-      this.campaign = await this.app?.campaigns.get(pid);
-    }
-  }
-
-  async #syncCampaign() {
+  async #sync() {
     if (this._icampaign) {
       await this.app?.campaigns.sync(this._icampaign);
       this.campaign = await this.app?.campaigns.get(this._icampaign.pid);
     }
   }
 
+  async #setFromRoute() {
+    const pid = Route.matchLocation()?.campaign_pid;
+    if (pid) {
+      this.campaign = await this.app?.campaigns.get(pid);
+    }
+  }
+
   async willUpdate(changed: PropertyValues<this>) {
     if (changed.has("_icampaign") || changed.has("app")) {
       if (this._icampaign && this.app) {
-        this.#syncCampaign();
+        this.#sync();
       } else if (this.app) {
-        this.#setCampaignFromRoute();
+        this.#setFromRoute();
       }
     }
   }
