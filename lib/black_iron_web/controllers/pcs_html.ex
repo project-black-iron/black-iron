@@ -30,6 +30,7 @@ defmodule BlackIronWeb.PCsHTML do
               <.error :if={@changeset.action == :insert}>
                 <%= gettext("Oops, something went wrong! Please check the errors below.") %>
               </.error>
+              <.input type="hidden" field={cs[:pid]} />
               <.pc_info cs={cs} {assigns} />
               <.pc_stats {assigns} />
               <.pc_meters {assigns} />

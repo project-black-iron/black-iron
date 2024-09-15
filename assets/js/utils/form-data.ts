@@ -2,7 +2,7 @@ const outerRe = /^([^[\]]+)(.*)$/;
 const regex = /\[([^[\]]*)\]/g;
 
 export function formDataToObject<T>(data: FormData | HTMLFormElement): T {
-  if (data instanceof HTMLFormElement) {
+  if (globalThis.HTMLFormElement && data instanceof globalThis.HTMLFormElement) {
     data = new FormData(data);
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -38,6 +38,37 @@ export function formDataToObject<T>(data: FormData | HTMLFormElement): T {
   // TODO(@zkat): some sort of verifier so we can actually guaranatee
   // we're returning what we're supposed to.
   return obj as T;
+}
+
+export function objectToFormData<T>(
+  obj: T,
+  prefix: string = "entity",
+): FormData {
+  const formData = new FormData();
+  setValues(formData, obj, prefix);
+  return formData;
+}
+
+function setValues(formData: FormData, val: unknown, key: string = "") {
+  if (val == null) {
+    return;
+  } else if (Array.isArray(val)) {
+    for (const [idx, subVal] of val.entries()) {
+      if (subVal == null) {
+        continue;
+      }
+      setValues(formData, subVal, key + `[${idx}]`);
+    }
+  } else if (typeof val === "object") {
+    for (const [subKey, subVal] of Object.entries(val)) {
+      if (subVal == null) {
+        continue;
+      }
+      setValues(formData, subVal, key + `[${subKey}]`);
+    }
+  } else {
+    formData.append(key, "" + val);
+  }
 }
 
 function parseKey(key: string) {
