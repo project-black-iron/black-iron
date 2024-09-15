@@ -1,5 +1,7 @@
 import { StoreNames } from "idb";
+import { z, ZodError } from "zod";
 import { BlackIronDBSchema } from "./db";
+import { objectToFormData } from "./utils/form-data";
 
 export interface EntitySchema {
   _abstract: {
@@ -13,9 +15,23 @@ export interface IEntity<T> {
   rev?: string;
   revisions?: string[];
   conflict?: IEntity<T>;
-  deleted_at?: string;
+  deleted_at?: string | null;
   data: T;
 }
+
+const baseEntitySchema = z.object({
+  pid: z.string(),
+  rev: z.string().optional(),
+  revisions: z.array(z.string()).optional(),
+  deleted_at: z.string().nullable().optional(),
+  data: z.any(),
+});
+
+// @ts-expect-error -- TS doesn't like this, but it's fine.
+export const entitySchema = baseEntitySchema.extend({
+  // @ts-expect-error -- TS doesn't like this, but it's fine.
+  conflict: z.lazy(() => entitySchema.nullable().optional()),
+});
 
 // eslint-disable-next-line
 export class AbstractEntity implements IEntity<any> {
@@ -26,8 +42,13 @@ export class AbstractEntity implements IEntity<any> {
   get baseRoute() {
     return "/";
   }
+
   get route() {
     return "/_abstract";
+  }
+
+  get schema() {
+    return entitySchema;
   }
 
   pid: string;
@@ -41,12 +62,20 @@ export class AbstractEntity implements IEntity<any> {
 
   // eslint-disable-next-line
   constructor(data: IEntity<any>) {
-    this.pid = data.pid;
-    this.rev = data.rev;
-    this.revisions = data.revisions;
-    this.conflict = data.conflict;
-    this.deleted_at = data.deleted_at;
-    this.data = data.data;
+    try {
+      const parsed = this.schema.parse(data);
+      this.pid = parsed.pid;
+      this.rev = parsed.rev;
+      this.revisions = parsed.revisions;
+      this.conflict = parsed.conflict;
+      this.deleted_at = parsed.deleted_at;
+      this.data = parsed.data;
+    } catch (e) {
+      if (e instanceof ZodError) {
+        throw new DataValidationError(e.errors);
+      }
+      throw e;
+    }
   }
 
   bumpRev() {
@@ -76,6 +105,10 @@ export class AbstractEntity implements IEntity<any> {
       entity.revisions = this.revisions;
     }
     return entity;
+  }
+
+  toFormData(): FormData {
+    return objectToFormData(this, ["pid", "rev", "revisions", "deleted_at", "data"]);
   }
 }
 
@@ -122,8 +155,19 @@ export class EntityConflictError extends Error {
 }
 
 export class DataValidationError extends Error {
-  // This record should be `fieldName => errorMessages[]`
-  constructor(values: Record<string, string[]>) {
-    super("Data update failed: " + JSON.stringify(values));
+  errors: { path: string; message: string }[];
+  constructor(values: { path: string | (string | number)[]; message: string }[]) {
+    const errors = values.map((e) => {
+      if (Array.isArray(e.path)) {
+        const path = e.path.reduce((acc, next) => {
+          return acc + `[${next}]`;
+        }, "entity") as string;
+        return { path, message: e.message };
+      } else {
+        return { path: e.path, message: e.message };
+      }
+    });
+    super(`Data validation failed with ${values.length} errors: ${JSON.stringify(errors)}`);
+    this.errors = errors;
   }
 }

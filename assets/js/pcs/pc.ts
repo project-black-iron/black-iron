@@ -1,8 +1,9 @@
 import { IDBPDatabase, StoreNames } from "idb";
 import convert from "url-slug";
+import { z } from "zod";
 import { Campaign } from "../campaigns/campaign";
 import { BlackIronDBSchema } from "../db";
-import { AbstractEntity, IEntity } from "../entity";
+import { AbstractEntity, entitySchema } from "../entity";
 
 export interface PCSchema {
   pcs: {
@@ -11,16 +12,20 @@ export interface PCSchema {
   };
 }
 
-export interface IPCData {
-  campaign_pid: string;
-  name: string;
-  alias?: string;
-  portrait?: string;
-}
+const pcDataSchema = z.object({
+  campaign_pid: z.string(),
+  name: z.string(),
+  alias: z.string().nullish(),
+  portrait: z.string().nullish(),
+});
 
-export interface IPC extends IEntity<IPCData> {
-  data: IPCData;
-}
+const pcSchema = entitySchema.extend({
+  data: pcDataSchema,
+});
+
+export type IPCData = z.infer<typeof pcDataSchema>;
+
+export type IPC = z.infer<typeof pcSchema>;
 
 export class PC extends AbstractEntity implements IPC {
   // NB(@zkat): Assigned by AbstractEntity's constructor
@@ -37,6 +42,10 @@ export class PC extends AbstractEntity implements IPC {
     db.createObjectStore("pcs", {
       keyPath: "pid",
     });
+  }
+
+  get schema() {
+    return pcSchema;
   }
 
   get storeName(): StoreNames<BlackIronDBSchema> {

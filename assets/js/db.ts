@@ -74,7 +74,6 @@ export class BlackIronDB {
     T extends BlackIronDBSchema[Name]["value"],
   >(storeName: Name, entity: T, bumpRev: boolean = true): Promise<T> {
     // No need to deep clone. We don't modify deeply.
-    console.log("Saving entity locally!", entity);
     const ret: T = {
       pid: entity.pid || genPid(),
       rev: entity.rev,
@@ -96,7 +95,6 @@ export class BlackIronDB {
       // Skip uploading if we're not logged in.
       return;
     }
-    console.log("Uploading entity!", entity);
     const url = new URL(window.location.href);
     url.pathname = entity.baseRoute;
     const res = await this.app.fetch(url, {

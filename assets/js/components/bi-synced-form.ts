@@ -2,9 +2,8 @@ import { Context, ContextConsumer, createContext } from "@lit/context";
 import { html, isServer, LitElement, PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { BlackIronApp } from "../black-iron-app";
-import { AbstractEntity, DataValidationError } from "../entity";
-import { IPC } from "../pcs/pc";
-import { formDataToObject, objectToFormData } from "../utils/form-data";
+import { AbstractEntity, DataValidationError, IEntity } from "../entity";
+import { formDataToObject } from "../utils/form-data";
 import { ssrConsume } from "../utils/ssr-context";
 import { BiAppContext } from "./bi-app-context";
 
@@ -30,7 +29,8 @@ export class BiSyncedForm extends LitElement {
         | HTMLInputElement
         | HTMLSelectElement
         | HTMLTextAreaElement;
-      const newEnt = target.form && formDataToObject<IPC>(target.form);
+      // eslint-disable-next-line
+      const newEnt = target.form && formDataToObject<IEntity<any>>(target.form);
       if (newEnt && this.consumer?.value && this.app) {
         try {
           const newEntity = this.consumer.value.merge(newEnt);
@@ -84,7 +84,9 @@ export class BiSyncedForm extends LitElement {
         context: createContext(this.context),
         subscribe: true,
         callback: (value) => {
-          this.#updateForm(objectToFormData(value));
+          if (value) {
+            this.#updateForm(value.toFormData());
+          }
         },
       });
     }

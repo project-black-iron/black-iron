@@ -42,14 +42,15 @@ export function formDataToObject<T>(data: FormData | HTMLFormElement): T {
 
 export function objectToFormData<T>(
   obj: T,
+  fields?: string[],
   prefix: string = "entity",
 ): FormData {
   const formData = new FormData();
-  setValues(formData, obj, prefix);
+  setValues(formData, obj, prefix, fields);
   return formData;
 }
 
-function setValues(formData: FormData, val: unknown, key: string = "") {
+function setValues(formData: FormData, val: unknown, key: string = "", fields?: string[]) {
   if (val == null) {
     return;
   } else if (Array.isArray(val)) {
@@ -61,7 +62,7 @@ function setValues(formData: FormData, val: unknown, key: string = "") {
     }
   } else if (typeof val === "object") {
     for (const [subKey, subVal] of Object.entries(val)) {
-      if (subVal == null) {
+      if (subVal == null || (fields && !fields.includes(subKey))) {
         continue;
       }
       setValues(formData, subVal, key + `[${subKey}]`);

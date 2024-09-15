@@ -2,9 +2,10 @@
 
 import { IDBPDatabase, StoreNames } from "idb";
 import { convert } from "url-slug";
+import { z } from "zod";
 import { BlackIronApp } from "../black-iron-app";
 import { BlackIronDBSchema } from "../db";
-import { AbstractEntity, IEntity } from "../entity";
+import { AbstractEntity, entitySchema } from "../entity";
 import { PCManager } from "../pcs/pc-manager";
 
 export interface CampaignSchema {
@@ -20,20 +21,24 @@ export enum CampaignRole {
   Owner = "owner",
 }
 
-export interface ICampaignData {
-  name: string;
-  description: string;
-  memberships: ICampaignMembership[];
-}
+const campaignMembershipSchema = z.object({
+  user_pid: z.string(),
+  roles: z.array(z.nativeEnum(CampaignRole)),
+});
 
-export interface ICampaign extends IEntity<ICampaignData> {
-  data: ICampaignData;
-}
+const campaignDataSchema = z.object({
+  name: z.string(),
+  description: z.string(),
+  memberships: z.array(campaignMembershipSchema),
+});
 
-export interface ICampaignMembership {
-  user_pid: string;
-  roles: CampaignRole[];
-}
+const campaignSchema = entitySchema.extend({
+  data: campaignDataSchema,
+});
+
+export type ICampaignData = z.infer<typeof campaignDataSchema>;
+export type ICampaignMembership = z.infer<typeof campaignMembershipSchema>;
+export type ICampaign = z.infer<typeof campaignSchema>;
 
 export class Campaign extends AbstractEntity implements ICampaign {
   // NB(@zkat): Assigned by AbstractEntity's constructor
@@ -49,6 +54,10 @@ export class Campaign extends AbstractEntity implements ICampaign {
     db.createObjectStore("campaigns", {
       keyPath: "pid",
     });
+  }
+
+  get schema() {
+    return campaignSchema;
   }
 
   get storeName(): StoreNames<BlackIronDBSchema> {
