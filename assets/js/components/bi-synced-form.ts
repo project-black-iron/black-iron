@@ -1,6 +1,6 @@
 import { Context, ContextConsumer, createContext } from "@lit/context";
 import { html, isServer, LitElement, PropertyValues } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { customElement, property, queryAssignedElements, state } from "lit/decorators.js";
 import { BlackIronApp } from "../black-iron-app";
 import { AbstractEntity, DataValidationError, IEntity } from "../entity";
 import { formDataToObject } from "../utils/form-data";
@@ -22,8 +22,13 @@ export class BiSyncedForm extends LitElement {
     BiSyncedForm
   >;
 
+  @queryAssignedElements({ slot: "form-error" })
+  errorTemplate!: Array<HTMLTemplateElement>;
+
   constructor() {
     super();
+    // We disable the submit event here because we're gonna go entirely off change events.
+    this.addEventListener("submit", (e: Event) => e.preventDefault());
     this.addEventListener("change", async (e: Event) => {
       const target = e.target as
         | HTMLInputElement
@@ -40,17 +45,49 @@ export class BiSyncedForm extends LitElement {
             undefined,
             newEntity,
           );
+          this.#resetErrors();
         } catch (e) {
           if (e instanceof DataValidationError) {
-            console.log("TODO: add error messages to fields below");
+            this.#setError(e);
           } else {
             throw e;
           }
         }
       }
     });
-    // We disable the submit event here because we're gonna go entirely off change events.
-    this.addEventListener("submit", (e: Event) => e.preventDefault());
+  }
+
+  #setError(e: DataValidationError) {
+    const errorContainer = this.querySelector(".synced-form-error") as HTMLElement | undefined;
+    const errTpl = this.errorTemplate?.[0];
+    if (errorContainer && errTpl) {
+      errorContainer.innerHTML = "";
+      errorContainer.append(errTpl.content.cloneNode(true));
+      for (const input of this.querySelectorAll("input, select, textarea")) {
+        const name = input.getAttribute("name");
+        const errorsEl = input.parentElement?.querySelector(".errors");
+        if (!name || !errorsEl) {
+          continue;
+        }
+        for (const { path, message } of e.errors) {
+          if (path === name) {
+            const errorEl = document.createElement("p");
+            errorEl.textContent = message;
+            errorsEl.append(errorEl);
+          }
+        }
+      }
+    }
+  }
+
+  #resetErrors() {
+    const errorContainer = this.querySelector(".synced-form-error") as HTMLElement | undefined;
+    if (errorContainer) {
+      errorContainer.innerHTML = "";
+    }
+    for (const errorsEl of this.querySelectorAll("label > .errors")) {
+      errorsEl.innerHTML = "";
+    }
   }
 
   #updateForm(formData: FormData) {
@@ -93,6 +130,6 @@ export class BiSyncedForm extends LitElement {
   }
 
   render() {
-    return html`<slot></slot>`;
+    return html`<slot name="form-error"></slot><slot></slot>`;
   }
 }

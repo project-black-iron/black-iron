@@ -18,27 +18,28 @@ defmodule BlackIronWeb.PCsHTML do
       <bi-pc-context pc={Jason.encode!(assigns[:pc])}>
         <article>
           <header><%= gettext("Character Sheet") %></header>
-          <bi-synced-form context="pc">
-            <.simple_form
-              :let={cs}
-              for={@changeset}
-              autocomplete="off"
-              action={
-                ~p"/play/campaigns/#{assigns[:campaign_pid]}/#{assigns[:cslug]}/pcs/#{assigns[:pc_pid]}/#{assigns[:pc_slug]}"
-              }
-            >
-              <.error :if={@changeset.action == :insert}>
+          <.synced_form
+            :let={cs}
+            context="pc"
+            for={@changeset}
+            autocomplete="off"
+            action={
+              ~p"/play/campaigns/#{assigns[:campaign_pid]}/#{assigns[:cslug]}/pcs/#{assigns[:pc_pid]}/#{assigns[:pc_slug]}"
+            }
+          >
+            <:form_error>
+              <.error>
                 <%= gettext("Oops, something went wrong! Please check the errors below.") %>
               </.error>
-              <.input type="hidden" field={cs[:pid]} />
-              <.pc_info cs={cs} {assigns} />
-              <.pc_stats {assigns} />
-              <.pc_meters {assigns} />
-              <.pc_special_tracks {assigns} />
-              <.pc_impacts {assigns} />
-              <.pc_assets {assigns} />
-            </.simple_form>
-          </bi-synced-form>
+            </:form_error>
+            <.input type="hidden" field={cs[:pid]} />
+            <.pc_info cs={cs} {assigns} />
+            <.pc_stats {assigns} />
+            <.pc_meters {assigns} />
+            <.pc_special_tracks {assigns} />
+            <.pc_impacts {assigns} />
+            <.pc_assets {assigns} />
+          </.synced_form>
         </article>
       </bi-pc-context>
     </bi-campaign-context>
@@ -49,6 +50,7 @@ defmodule BlackIronWeb.PCsHTML do
     ~H"""
     <fieldset class="info">
       <.polymorphic_embed_inputs_for :let={data} field={@cs[:data]}>
+        <.input type="hidden" field={data[:campaign_pid]} />
         <img src={@pc && @pc.data.portrait} width="100" />
         <.input field={data[:name]} />
         <!--

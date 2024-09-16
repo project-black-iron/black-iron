@@ -190,6 +190,42 @@ defmodule BlackIronWeb.CoreComponents do
   end
 
   @doc """
+  Renders a form that can synchronize with a context entity.
+  """
+  attr :context, :string, required: true, doc: "the name of the entity context to sync"
+  attr :for, :any, required: true, doc: "the data structure for the form"
+  attr :as, :any, default: nil, doc: "the server side parameter to collect all input under"
+
+  attr :rest, :global,
+    include: ~w(autocomplete name rel action hx-post enctype method novalidate target multipart),
+    doc: "the arbitrary HTML attributes to apply to the form tag"
+
+  slot :inner_block, required: true
+  slot :actions, doc: "the slot for form actions, such as a submit button"
+  slot :form_error, doc: "the error template for the whole form"
+
+  def synced_form(assigns) do
+    ~H"""
+    <bi-synced-form context={@context}>
+      <template slot="form-error">
+        <%= render_slot(@form_error) %>
+      </template>
+      <.simple_form :let={f} for={@for} as={@as} {@rest}>
+        <div class="synced-form-error">
+          <%= if @for.action == :insert do %>
+            <%= render_slot(@form_error) %>
+          <% end %>
+        </div>
+        <%= render_slot(@inner_block, f) %>
+        <:actions>
+          <%= render_slot(@actions) %>
+        </:actions>
+      </.simple_form>
+    </bi-synced-form>
+    """
+  end
+
+  @doc """
   Renders a simple form.
 
   ## Examples
@@ -326,7 +362,9 @@ defmodule BlackIronWeb.CoreComponents do
       <input type="hidden" name={@name} value="false" disabled={@rest[:disabled]} />
       <input type="checkbox" name={@name} value="true" checked={@checked} {@rest} />
       <%= @label %>
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <div class="errors">
+        <.error :for={msg <- @errors}><%= msg %></.error>
+      </div>
     </label>
     """
   end
@@ -339,7 +377,9 @@ defmodule BlackIronWeb.CoreComponents do
         <option :if={@prompt} value=""><%= @prompt %></option>
         <%= Phoenix.HTML.Form.options_for_select(@options, @value) %>
       </select>
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <div class="errors">
+        <.error :for={msg <- @errors}><%= msg %></.error>
+      </div>
     </.label>
     """
   end
@@ -355,7 +395,9 @@ defmodule BlackIronWeb.CoreComponents do
         ]}
         {@rest}
       ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <div class="errors">
+        <.error :for={msg <- @errors}><%= msg %></.error>
+      </div>
     </.label>
     """
   end
@@ -374,7 +416,9 @@ defmodule BlackIronWeb.CoreComponents do
         ]}
         {@rest}
       />
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <div class="errors">
+        <.error :for={msg <- @errors}><%= msg %></.error>
+      </div>
     </.label>
     """
   end
@@ -400,8 +444,7 @@ defmodule BlackIronWeb.CoreComponents do
 
   def error(assigns) do
     ~H"""
-    <p class="mt-3 flex gap-3 text-sm leading-6 text-rose-600">
-      <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
+    <p class="error-message">
       <%= render_slot(@inner_block) %>
     </p>
     """

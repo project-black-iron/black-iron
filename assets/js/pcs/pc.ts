@@ -4,6 +4,7 @@ import { z } from "zod";
 import { Campaign } from "../campaigns/campaign";
 import { BlackIronDBSchema } from "../db";
 import { AbstractEntity, entitySchema } from "../entity";
+import { mergeDeep } from "../utils/merge-deep";
 
 export interface PCSchema {
   pcs: {
@@ -14,7 +15,7 @@ export interface PCSchema {
 
 const pcDataSchema = z.object({
   campaign_pid: z.string(),
-  name: z.string(),
+  name: z.string().max(15, "Name must be 15 characters or less."),
   alias: z.string().nullish(),
   portrait: z.string().nullish(),
 });
@@ -34,8 +35,12 @@ export class PC extends AbstractEntity implements IPC {
   constructor(
     data: IPC,
     public campaign: Campaign,
+    bumpRev?: boolean,
   ) {
     super(data);
+    if (bumpRev) {
+      this.bumpRev();
+    }
   }
 
   static dbUpgrade(db: IDBPDatabase<BlackIronDBSchema>) {
@@ -70,8 +75,6 @@ export class PC extends AbstractEntity implements IPC {
   }
 
   merge(other: IPC) {
-    const pc = new PC({ ...this, ...other }, this.campaign);
-    pc.bumpRev();
-    return pc;
+    return new PC(mergeDeep(this, other), this.campaign, true);
   }
 }
