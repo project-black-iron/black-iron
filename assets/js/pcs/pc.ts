@@ -15,7 +15,7 @@ export interface PCSchema {
 
 const pcDataSchema = z.object({
   campaign_pid: z.string(),
-  name: z.string().max(15, "Name must be 15 characters or less."),
+  name: z.string(),
   alias: z.string().nullish(),
   portrait: z.string().nullish(),
 });
