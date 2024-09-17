@@ -36,9 +36,9 @@ defmodule BlackIron.PCs do
       on: camp.pid == fragment("?->>'campaign_pid'", pc.data),
       where: camp.pid == ^campaign_pid
     )
-    # |> Entities.is_entype(:pc, PC.entype())
-    # |> Entities.is_entype(:campaign, Campaign.entype())
-    # |> Campaigns.where_campaign_role(actor)
+    |> Entities.is_entype(:pc, PC.entype())
+    |> Entities.is_entype(:campaign, Campaign.entype())
+    |> Campaigns.where_campaign_role(actor)
     |> Repo.all()
   end
 
