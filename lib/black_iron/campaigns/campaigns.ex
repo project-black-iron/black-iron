@@ -15,7 +15,7 @@ defmodule BlackIron.Campaigns do
   def list_campaigns_for_user(%User{} = user) do
     from(e in Entity, as: :campaign)
     |> Entities.is_entype(:campaign, Campaign.entype())
-    |> where_campaign_role(user)
+    |> where_campaign_roles(user)
     |> Repo.all()
   end
 
@@ -69,26 +69,29 @@ defmodule BlackIron.Campaigns do
     res
   end
 
-  def get_campaign(user, campaign_pid, role \\ nil)
-  def get_campaign(nil, _campaign_pid, _role), do: nil
-  def get_campaign(_, "__campaign_pid", _role), do: nil
+  def get_campaign(user, campaign_pid, roles \\ nil)
+  def get_campaign(nil, _campaign_pid, _roles), do: nil
+  def get_campaign(_, "__campaign_pid", _roles), do: nil
 
-  def get_campaign(%User{} = user, campaign_pid, role) do
+  def get_campaign(%User{} = user, campaign_pid, roles) do
     from(e in Entity,
       as: :campaign,
       where: e.pid == ^campaign_pid,
       select: e
     )
     |> Entities.is_entype(:campaign, Campaign.entype())
-    |> where_campaign_role(user, role)
+    |> where_campaign_roles(user, roles)
     |> Repo.one()
   end
 
-  def where_campaign_role(q, %User{pid: user_pid}, role \\ :owner) do
+  def where_campaign_roles(q, %User{pid: user_pid}, roles \\ [:owner]) do
+    roles = if !roles, do: [], else: roles
+    roles = if is_atom(roles), do: [roles], else: roles
+
     json = [
       %{
         user_pid: user_pid,
-        roles: if(role, do: [to_string(role)], else: [])
+        roles: roles |> Enum.map(&to_string/1)
       }
     ]
 
@@ -172,8 +175,8 @@ defmodule BlackIron.Campaigns do
     # res
   end
 
-  def check_membership(%User{} = user, campaign_pid, role \\ :owner) do
-    case get_campaign(user, campaign_pid, role) do
+  def check_membership(%User{} = user, campaign_pid, roles \\ [:owner]) do
+    case get_campaign(user, campaign_pid, roles) do
       %Entity{} = campaign ->
         {:ok, campaign}
 

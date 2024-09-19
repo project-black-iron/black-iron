@@ -3,6 +3,9 @@ defmodule BlackIronWeb.PCsHTML do
   """
   use BlackIronWeb, :html
 
+  def new(assigns) do
+  end
+
   def index(assigns) do
     ~H"""
     <h3><%= gettext("Player character list") %></h3>
@@ -18,11 +21,12 @@ defmodule BlackIronWeb.PCsHTML do
       <bi-pc-context pc={Jason.encode!(assigns[:pc])}>
         <article>
           <header><%= gettext("Character Sheet") %></header>
-          <.synced_form
+          <.entity_form
             :let={cs}
             context="pc"
             for={@changeset}
             autocomplete="off"
+            live
             action={
               ~p"/play/campaigns/#{assigns[:campaign_pid]}/#{assigns[:cslug]}/pcs/#{assigns[:pc_pid]}/#{assigns[:pc_slug]}"
             }
@@ -32,17 +36,23 @@ defmodule BlackIronWeb.PCsHTML do
                 <%= gettext("Oops, something went wrong! Please check the errors below.") %>
               </.error>
             </:form_error>
-            <.input type="hidden" field={cs[:pid]} />
-            <.pc_info cs={cs} {assigns} />
-            <.pc_stats {assigns} />
-            <.pc_meters {assigns} />
-            <.pc_special_tracks {assigns} />
-            <.pc_impacts {assigns} />
-            <.pc_assets {assigns} />
-          </.synced_form>
+            <.pc_form_fields cs={cs} {assigns} />
+          </.entity_form>
         </article>
       </bi-pc-context>
     </bi-campaign-context>
+    """
+  end
+
+  defp pc_form_fields(assigns) do
+    ~H"""
+    <.input type="hidden" field={@cs[:pid]} />
+    <.pc_info cs={@cs} {assigns} />
+    <.pc_stats {assigns} />
+    <.pc_meters {assigns} />
+    <.pc_special_tracks {assigns} />
+    <.pc_impacts {assigns} />
+    <.pc_assets {assigns} />
     """
   end
 
@@ -74,6 +84,8 @@ defmodule BlackIronWeb.PCsHTML do
         <.input label={gettext("Pronouns")} field={data[:pronouns]} />
         <.input label={gettext("Description")} type="textarea" field={data[:description]} />
         <.input label={gettext("Player")} field={data[:player]} />
+        <.input label={gettext("XP Added")} field={data[:xp_added]} />
+        <.input label={gettext("XP Spent")} field={data[:xp_spent]} />
       </.polymorphic_embed_inputs_for>
     </fieldset>
     """

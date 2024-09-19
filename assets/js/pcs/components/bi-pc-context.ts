@@ -7,14 +7,14 @@ import { BlackIronApp } from "../../black-iron-app";
 import { Campaign } from "../../campaigns/campaign";
 import { BiCampaignContext } from "../../campaigns/components/bi-campaign-context";
 import { BiAppContext } from "../../components/bi-app-context";
-import { hasEntityChanged } from "../../entity";
+import { DataValidationError, hasEntityChanged } from "../../entity";
 import { Route } from "../../utils/route";
 import { ssrConsume, ssrProvide } from "../../utils/ssr-context";
 import { IPC, PC } from "../pc";
 
 @customElement("bi-pc-context")
 export class BiPCContext extends LitElement {
-  static context = createContext<PC | undefined>("pc");
+  static context = createContext<PC | DataValidationError | undefined>("pc");
 
   @ssrConsume({ context: BiAppContext.context, subscribe: true })
   @property({ attribute: false })
@@ -29,7 +29,7 @@ export class BiPCContext extends LitElement {
 
   @ssrProvide({ context: BiPCContext.context })
   @property({ attribute: false })
-  pc?: PC;
+  pc?: PC | Error;
 
   @ssrConsume({ context: BiCampaignContext.context, subscribe: true })
   @property({ attribute: false })
@@ -48,6 +48,28 @@ export class BiPCContext extends LitElement {
       await this.campaign?.pcs.sync(this._ipc);
       this.pc = await this.campaign?.pcs.get(this._ipc.pid);
     }
+  }
+
+  constructor() {
+    super();
+    this.addEventListener("saveentity", async (e: CustomEvent) => {
+      if (this.campaign && this.app) {
+        try {
+          const pc = new PC(e.detail.entity, this.campaign);
+          await this.app.db.syncEntity(pc.storeName, pc);
+          await this.app.db.syncEntity(pc.storeName, undefined, pc);
+          this.pc = pc;
+        } catch (e) {
+          if (e instanceof Error) {
+            this.pc = e;
+          } else {
+            throw e;
+          }
+        }
+      } else {
+        e.preventDefault();
+      }
+    });
   }
 
   async willUpdate(changed: PropertyValues<this>) {

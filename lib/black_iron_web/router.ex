@@ -225,6 +225,7 @@ defmodule BlackIronWeb.Router do
         get "/tracks", TracksController, :index
         get "/tracks/:track_pid/:slug", TracksController, :show
         get "/pcs", PCsController, :index
+        get "/pcs/new", PCsController, :new
         get "/pcs/:pc_pid/:slug", PCsController, :show
       end
     end
@@ -236,6 +237,7 @@ defmodule BlackIronWeb.Router do
     post "/campaigns", CampaignsController, :create
 
     scope "/campaigns/:campaign_pid/:cslug" do
+      post "/pcs", PCsController, :insert_or_update
     end
   end
 end

@@ -40,7 +40,7 @@ if Application.fetch_env!(:black_iron, :env) == :dev do
     })
 
   {:ok, _pc} =
-    PCs.create_pc(user, campaign, %{
+    PCs.insert_or_update_pc(user, campaign, %{
       "data" => %{
         "name" => "Kiara Doe",
         "description" => "This is a description for Kiara",
@@ -50,7 +50,7 @@ if Application.fetch_env!(:black_iron, :env) == :dev do
         "pronouns" => "they/them",
         "alias" => "Lace",
         "portrait" => portrait_data_uri,
-        "initiative" => "Out of combat",
+        "initiative" => "out-of-combat",
         "stats" => %{
           "edge" => 3,
           "heart" => 2,

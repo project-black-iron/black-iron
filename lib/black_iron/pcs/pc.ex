@@ -9,6 +9,7 @@ defmodule BlackIron.PCs.PC do
   @derive {Jason.Encoder,
            only: [
              :campaign_pid,
+             :player_pid,
              :alias,
              :name,
              :description,
@@ -22,11 +23,12 @@ defmodule BlackIron.PCs.PC do
   embedded_schema do
     field :__type__, :string
     field :campaign_pid, :string
+    field :player_pid, :string
     field :alias, :string
     field :name, :string
     field :description, :string
     field :pronouns, :string
-    field :initiative, :string
+    field :initiative, Ecto.Enum, values: [:"out-of-combat", :"has-initiative", :"no-initiative"]
     field :portrait, :string
     field :xp_added, :integer
     field :xp_spent, :integer

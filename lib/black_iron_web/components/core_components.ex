@@ -196,6 +196,10 @@ defmodule BlackIronWeb.CoreComponents do
   attr :for, :any, required: true, doc: "the data structure for the form"
   attr :as, :any, default: nil, doc: "the server side parameter to collect all input under"
 
+  attr :live, :boolean,
+    default: false,
+    doc: "whether to invoke entity updates on change events vs only on submit"
+
   attr :rest, :global,
     include: ~w(autocomplete name rel action hx-post enctype method novalidate target multipart),
     doc: "the arbitrary HTML attributes to apply to the form tag"
@@ -204,14 +208,14 @@ defmodule BlackIronWeb.CoreComponents do
   slot :actions, doc: "the slot for form actions, such as a submit button"
   slot :form_error, doc: "the error template for the whole form"
 
-  def synced_form(assigns) do
+  def entity_form(assigns) do
     ~H"""
-    <bi-synced-form context={@context}>
+    <bi-entity-form live={@live} context={@context}>
       <template slot="form-error">
         <%= render_slot(@form_error) %>
       </template>
       <.simple_form :let={f} for={@for} as={@as} {@rest}>
-        <div class="synced-form-error">
+        <div class="entity-form-error">
           <%= if @for.action == :insert do %>
             <%= render_slot(@form_error) %>
           <% end %>
@@ -221,7 +225,7 @@ defmodule BlackIronWeb.CoreComponents do
           <%= render_slot(@actions) %>
         </:actions>
       </.simple_form>
-    </bi-synced-form>
+    </bi-entity-form>
     """
   end
 

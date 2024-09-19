@@ -13,11 +13,22 @@ export interface PCSchema {
   };
 }
 
+export enum Initiative {
+  OutOfCombat = "out-of-combat",
+  HasInitiative = "has-initiative",
+  NoInitiative = "no-initiative",
+}
+
 const pcDataSchema = z.object({
   campaign_pid: z.string(),
-  name: z.string(),
   alias: z.string().nullish(),
+  name: z.string(),
+  description: z.string(),
+  pronouns: z.string(),
+  initiative: z.nativeEnum(Initiative),
   portrait: z.string().nullish(),
+  xp_added: z.coerce.number().nonnegative(),
+  xp_spent: z.coerce.number().nonnegative(),
 });
 
 const pcSchema = entitySchema.extend({

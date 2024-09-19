@@ -38,7 +38,7 @@ defmodule BlackIron.PCs do
     )
     |> Entities.is_entype(:pc, PC.entype())
     |> Entities.is_entype(:campaign, Campaign.entype())
-    |> Campaigns.where_campaign_role(actor)
+    |> Campaigns.where_campaign_roles(actor)
     |> Repo.all()
   end
 
@@ -59,7 +59,7 @@ defmodule BlackIron.PCs do
   def get_pc(_, nil, _, _), do: nil
   def get_pc(_, _, nil, _), do: nil
 
-  def get_pc(%User{} = user, %Entity{pid: campaign_pid}, pc_pid, role) do
+  def get_pc(%User{} = user, %Entity{pid: campaign_pid} = _campaign, pc_pid, role) do
     from(pc in Entity,
       as: :pc,
       where: pc.pid == ^pc_pid,
@@ -69,7 +69,7 @@ defmodule BlackIron.PCs do
       where: camp.pid == ^campaign_pid,
       select: pc
     )
-    |> Campaigns.where_campaign_role(user, role)
+    |> Campaigns.where_campaign_roles(user, role)
     |> Entities.is_entype(:pc, PC.entype())
     |> Entities.is_entype(:campaign, Campaign.entype())
     |> Repo.one()
@@ -87,24 +87,32 @@ defmodule BlackIron.PCs do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_pc(%User{} = actor, %Entity{pid: campaign_pid}, attrs \\ %{}) do
+  def insert_or_update_pc(%User{} = actor, %Entity{pid: campaign_pid} = _campaign, attrs \\ %{}) do
     {:ok, res} =
       Repo.transaction(fn ->
         case Campaigns.get_campaign(actor, campaign_pid) do
           nil ->
             {:error, :unauthorized}
 
-          %Entity{} ->
+          %Entity{} = campaign ->
             changeset =
-              %Entity{}
+              get_pc(actor, campaign, attrs["pid"])
+              |> case do
+                nil -> %Entity{}
+                pc -> pc
+              end
               |> Entities.change_entity(PC, attrs)
 
             changeset
             |> Ecto.Changeset.put_change(
               :data,
-              %{Ecto.Changeset.get_field(changeset, :data) | campaign_pid: campaign_pid}
+              %{
+                Ecto.Changeset.get_field(changeset, :data)
+                | campaign_pid: campaign_pid,
+                  player_pid: actor.pid
+              }
             )
-            |> Repo.insert()
+            |> Repo.insert_or_update()
         end
       end)
 
@@ -123,10 +131,21 @@ defmodule BlackIron.PCs do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_pc(%PC{} = pc, attrs) do
-    pc
-    |> PC.changeset(attrs)
-    |> Repo.update()
+  def update_pc(%User{} = actor, %Entity{data: %PC{}} = pc, attrs) do
+    {:ok, ret} =
+      Repo.transaction(fn ->
+        case Campaigns.get_campaign(actor, pc.data.campaign_pid) do
+          nil ->
+            {:error, :unauthorized}
+
+          %Entity{} ->
+            pc
+            |> change_pc(attrs)
+            |> Repo.update()
+        end
+      end)
+
+    ret
   end
 
   @doc """
@@ -135,13 +154,13 @@ defmodule BlackIron.PCs do
   ## Examples
 
       iex> delete_pc(pc)
-      {:ok, %PC{}}
+      {:ok, %Entity{}}
 
       iex> delete_pc(pc)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_pc(%PC{} = pc) do
+  def delete_pc(%Entity{} = pc) do
     Repo.delete(pc)
   end
 

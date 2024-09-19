@@ -102,7 +102,7 @@ export class BlackIronDB {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ data: entity.toEntity() }),
+      body: JSON.stringify({ entity: entity.toEntity() }),
     });
     if (!res.ok) {
       if (res.status === 409) {
