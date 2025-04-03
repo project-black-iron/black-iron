@@ -29,3 +29,9 @@ rl.on("line", async (line) => {
     console.error(e);
   }
 });
+
+// shut down when phoenix stops
+process.stdin.on("close", () => {
+  process.exit(0);
+});
+process.stdin.resume();
