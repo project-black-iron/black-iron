@@ -9,6 +9,9 @@ import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
 
 import "./components/index";
 
+// @ts-expect-error this is just an opt-in into Context support for SSR
+globalThis.litSsrCallConnectedCallback = true;
+
 const rl = readline.createInterface({ input, output });
 
 rl.on("line", async (line) => {

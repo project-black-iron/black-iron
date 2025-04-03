@@ -1,4 +1,4 @@
-import { createContext } from "@lit/context";
+import { consume, createContext, provide } from "@lit/context";
 import { html, LitElement, PropertyValues } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
@@ -9,14 +9,15 @@ import { BiCampaignContext } from "../../campaigns/components/bi-campaign-contex
 import { BiAppContext } from "../../components/bi-app-context";
 import { DataValidationError, hasEntityChanged } from "../../entity";
 import { Route } from "../../utils/route";
-import { ssrConsume, ssrProvide } from "../../utils/ssr-context";
 import { IPC, PC } from "../pc";
+
+const ctx = createContext<PC | Error | undefined>("pc");
 
 @customElement("bi-pc-context")
 export class BiPCContext extends LitElement {
-  static context = createContext<PC | DataValidationError<PC> | undefined>("pc");
+  static context = ctx;
 
-  @ssrConsume({ context: BiAppContext.context, subscribe: true })
+  @consume({ context: BiAppContext.context, subscribe: true })
   @property({ attribute: false })
   app?: BlackIronApp;
 
@@ -27,11 +28,11 @@ export class BiPCContext extends LitElement {
   })
   _ipc?: IPC;
 
-  @ssrProvide({ context: BiPCContext.context })
+  @provide({ context: BiPCContext.context })
   @property({ attribute: false })
   pc?: PC | Error;
 
-  @ssrConsume({ context: BiCampaignContext.context, subscribe: true })
+  @consume({ context: BiCampaignContext.context, subscribe: true })
   @property({ attribute: false })
   campaign?: Campaign;
 
@@ -60,7 +61,7 @@ export class BiPCContext extends LitElement {
           await this.app.db.syncEntity(pc.storeName, undefined, pc);
           this.pc = pc;
         } catch (e) {
-          if (e instanceof Error) {
+          if (e instanceof DataValidationError && e.isFor<IPC>()) {
             this.pc = e;
           } else {
             throw e;

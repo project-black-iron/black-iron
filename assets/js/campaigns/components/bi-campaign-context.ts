@@ -1,4 +1,4 @@
-import { createContext } from "@lit/context";
+import { consume, createContext, provide } from "@lit/context";
 import { html, LitElement, PropertyValues } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
@@ -6,14 +6,13 @@ import { BlackIronApp } from "../../black-iron-app";
 import { BiAppContext } from "../../components/bi-app-context";
 import { hasEntityChanged } from "../../entity";
 import { Route } from "../../utils/route";
-import { ssrConsume, ssrProvide } from "../../utils/ssr-context";
 import { Campaign, ICampaign } from "../campaign";
 
 @customElement("bi-campaign-context")
 export class BiCampaignContext extends LitElement {
   static context = createContext<Campaign | undefined>("campaign");
 
-  @ssrConsume({ context: BiAppContext.context, subscribe: true })
+  @consume({ context: BiAppContext.context, subscribe: true })
   @property({ attribute: false })
   app?: BlackIronApp;
 
@@ -24,7 +23,7 @@ export class BiCampaignContext extends LitElement {
   })
   _icampaign?: ICampaign;
 
-  @ssrProvide({ context: BiCampaignContext.context })
+  @provide({ context: BiCampaignContext.context })
   @property({ attribute: false })
   campaign?: Campaign;
 

@@ -1,3 +1,4 @@
+import { consume } from "@lit/context";
 import { css, html, isServer, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 
@@ -6,7 +7,6 @@ import { Campaign } from "../../campaigns/campaign";
 import { BiCampaignContext } from "../../campaigns/components/bi-campaign-context";
 import { BiAppContext } from "../../components/bi-app-context";
 import { hasEntityArrayChanged } from "../../entity";
-import { ssrConsume } from "../../utils/ssr-context";
 import { IPC, PC } from "../pc";
 
 @customElement("bi-pc-list")
@@ -14,11 +14,11 @@ export class BiPCList extends LitElement {
   static styles = css``;
 
   @property({ attribute: false })
-  @ssrConsume({ context: BiAppContext.context, subscribe: true })
+  @consume({ context: BiAppContext.context, subscribe: true })
   app?: BlackIronApp;
 
   @property({ attribute: false })
-  @ssrConsume({ context: BiCampaignContext.context, subscribe: true })
+  @consume({ context: BiCampaignContext.context, subscribe: true })
   campaign?: Campaign;
 
   @property({

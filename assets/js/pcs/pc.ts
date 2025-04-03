@@ -3,7 +3,7 @@ import convert from "url-slug";
 import * as v from "valibot";
 import { Campaign } from "../campaigns/campaign";
 import { BlackIronDBSchema } from "../db";
-import { AbstractEntity, entitySchema } from "../entity";
+import { Entity, IEntity } from "../entity";
 import { mergeDeep } from "../utils/merge-deep";
 
 export interface PCSchema {
@@ -27,19 +27,27 @@ const pcDataSchema = v.object({
   pronouns: v.string(),
   initiative: v.enum(Initiative),
   portrait: v.nullish(v.string()),
-  xp_added: v.pipe(v.unknown(), v.transform(Number), v.integer(), v.minValue(0)),
-  xp_spent: v.pipe(v.unknown(), v.transform(Number), v.integer(), v.minValue(0)),
-});
-
-const pcSchema = entitySchema.extend({
-  data: pcDataSchema,
+  xp_added: v.pipe(
+    v.unknown(),
+    v.transform(Number),
+    v.integer(),
+    v.minValue(0),
+  ),
+  xp_spent: v.pipe(
+    v.unknown(),
+    v.transform(Number),
+    v.integer(),
+    v.minValue(0),
+  ),
 });
 
 export type IPCData = v.InferOutput<typeof pcDataSchema>;
 
-export type IPC = v.InferOutput<typeof pcSchema>;
+export type IPC = IEntity<IPCData>;
 
-export class PC extends AbstractEntity implements IPC {
+export class PC extends Entity<IPCData> implements IPC {
+  static schema = Entity.makeSchema(pcDataSchema);
+
   // NB(@zkat): Assigned by AbstractEntity's constructor
   data!: IPCData;
 
@@ -61,7 +69,7 @@ export class PC extends AbstractEntity implements IPC {
   }
 
   get schema() {
-    return pcSchema;
+    return PC.schema;
   }
 
   get storeName(): StoreNames<BlackIronDBSchema> {
@@ -86,6 +94,10 @@ export class PC extends AbstractEntity implements IPC {
   }
 
   merge(other: IPC) {
-    return new PC(mergeDeep(this, other), this.campaign, true);
+    return new PC(
+      mergeDeep(this, other),
+      this.campaign,
+      true,
+    ) as unknown as this;
   }
 }

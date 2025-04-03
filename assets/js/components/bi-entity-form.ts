@@ -1,15 +1,14 @@
-import { Context, ContextConsumer, createContext } from "@lit/context";
+import { consume, Context, ContextConsumer, createContext } from "@lit/context";
 import { html, isServer, LitElement, PropertyValues } from "lit";
 import { customElement, property, queryAssignedElements, state } from "lit/decorators.js";
 import { BlackIronApp } from "../black-iron-app";
-import { AbstractEntity, DataValidationError, IEntity } from "../entity";
+import { DataValidationError, Entity, IEntity } from "../entity";
 import { formDataToObject } from "../utils/form-data";
-import { ssrConsume } from "../utils/ssr-context";
 import { BiAppContext } from "./bi-app-context";
 
 @customElement("bi-entity-form")
-export class BiEntityForm extends LitElement {
-  @ssrConsume({ context: BiAppContext.context, subscribe: true })
+export class BiEntityForm<T> extends LitElement {
+  @consume({ context: BiAppContext.context, subscribe: true })
   @property({ attribute: false })
   app?: BlackIronApp;
 
@@ -21,8 +20,8 @@ export class BiEntityForm extends LitElement {
 
   @state()
   consumer?: ContextConsumer<
-    Context<unknown, AbstractEntity | Error | undefined>,
-    BiEntityForm
+    Context<unknown, Entity<T> | Error | undefined>,
+    BiEntityForm<T>
   >;
 
   @queryAssignedElements({ slot: "form-error" })
@@ -111,7 +110,7 @@ export class BiEntityForm extends LitElement {
     }
   }
 
-  #updateForm(entity: AbstractEntity) {
+  #updateForm(entity: Entity<T>) {
     this.#resetErrors();
     const formData = entity.toFormData();
     for (const [key, value] of formData.entries()) {

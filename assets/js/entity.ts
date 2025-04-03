@@ -10,31 +10,47 @@ export interface EntitySchema {
   };
 }
 
-export interface IEntity<T> {
+interface IBaseEntity<T> {
   pid: string;
   rev?: string;
   revisions?: string[];
-  conflict?: IEntity<T>;
   deleted_at?: string | null;
   data: T;
+}
+
+export interface IEntity<T> extends IBaseEntity<T> {
+  conflict?: IBaseEntity<T> | null;
 }
 
 const baseEntitySchema = v.object({
   pid: v.string(),
   rev: v.optional(v.string()),
   revisions: v.optional(v.array(v.string())),
-  deleted_at: v.optional(v.nullable(v.string())),
+  deleted_at: v.optional(v.nullish(v.string())),
   data: v.any(),
 });
 
-// @ts-expect-error -- TS doesn't like this, but it's fine.
-export const entitySchema = baseEntitySchema.extend({
-  // @ts-expect-error -- TS doesn't like this, but it's fine.
-  conflict: z.lazy(() => entitySchema.nullable().optional()),
+export const entitySchema = v.object({
+  ...baseEntitySchema.entries,
+  ...v.object({
+    conflict: v.optional(v.nullish(baseEntitySchema)),
+  }).entries,
 });
 
-// eslint-disable-next-line
-export class AbstractEntity implements IEntity<any> {
+export type ITSchema<T> =
+  & v.BaseSchema<unknown, T, v.BaseIssue<unknown>>
+  & v.ObjectSchema<v.ObjectEntries, v.ErrorMessage<v.ObjectIssue> | undefined>;
+
+export class Entity<T> implements IEntity<T> {
+  static makeSchema<T>(dataSchema: ITSchema<T>): ITSchema<IEntity<T>> {
+    return v.object({
+      ...entitySchema.entries,
+      ...v.object({
+        data: dataSchema,
+      }).entries,
+    });
+  }
+
   get storeName(): StoreNames<BlackIronDBSchema> {
     throw new Error("No store name defined for entity.");
   }
@@ -47,21 +63,18 @@ export class AbstractEntity implements IEntity<any> {
     return "/_abstract";
   }
 
-  get schema() {
+  get schema(): v.BaseSchema<unknown, IEntity<T>, v.BaseIssue<unknown>> {
     return entitySchema;
   }
 
   pid: string;
   rev?: string;
   revisions?: string[];
-  // eslint-disable-next-line
-  conflict?: IEntity<any>;
-  deleted_at?: string;
-  // eslint-disable-next-line
-  data: any;
+  conflict?: IBaseEntity<T> | null;
+  deleted_at?: string | null;
+  data: T;
 
-  // eslint-disable-next-line
-  constructor(data: IEntity<any>) {
+  constructor(data: IEntity<T>) {
     try {
       const parsed = v.parse(this.schema, data);
       this.pid = parsed.pid;
@@ -72,7 +85,7 @@ export class AbstractEntity implements IEntity<any> {
       this.data = parsed.data;
     } catch (e) {
       if (v.isValiError(e)) {
-        throw new DataValidationError(e.issues);
+        throw new DataValidationError(e);
       }
       throw e;
     }
@@ -84,20 +97,20 @@ export class AbstractEntity implements IEntity<any> {
     this.revisions.unshift(this.rev);
   }
 
-  // eslint-disable-next-line
-  eq(other: IEntity<any>): boolean {
+  eq(other: IEntity<T>): boolean {
     return this.pid === other.pid && this.deleted_at == other.deleted_at;
   }
 
   // eslint-disable-next-line
-  merge(other: IEntity<any>): AbstractEntity {
+  merge(other: IEntity<T>): this {
     throw new Error("Not implemented");
   }
 
-  // eslint-disable-next-line
-  toEntity(): IEntity<any> {
-    // eslint-disable-next-line
-    const entity: IEntity<any> = { pid: this.pid, data: structuredClone(this.data) };
+  toEntity(): IEntity<T> {
+    const entity: IEntity<T> = {
+      pid: this.pid,
+      data: structuredClone(this.data),
+    };
     if (this.rev) {
       entity.rev = this.rev;
     }
@@ -108,7 +121,13 @@ export class AbstractEntity implements IEntity<any> {
   }
 
   toFormData(): FormData {
-    return objectToFormData(this, ["pid", "rev", "revisions", "deleted_at", "data"]);
+    return objectToFormData(this, [
+      "pid",
+      "rev",
+      "revisions",
+      "deleted_at",
+      "data",
+    ]);
   }
 }
 
@@ -154,11 +173,25 @@ export class EntityConflictError extends Error {
   }
 }
 
+type ErrValSchema<T> =
+  | v.BaseSchema<unknown, T, v.BaseIssue<unknown>>
+  | v.BaseSchemaAsync<unknown, T, v.BaseIssue<unknown>>;
 export class DataValidationError<T> extends Error {
+  err: v.ValiError<ErrValSchema<T>>;
   errors: { path: string; message: string }[];
-  constructor(values: v.BaseIssue<T>[]) {
-    const errors = values.map((e) => ({ path: v.getDotPath(e) ?? "", message: e.message }));
-    super(`Data validation failed with ${values.length} errors: ${JSON.stringify(errors)}`);
+  constructor(err: v.ValiError<ErrValSchema<T>>) {
+    const errors = err.issues.map((e) => ({
+      path: v.getDotPath(e) ?? "",
+      message: e.message,
+    }));
+    super(
+      `Data validation failed with ${err.issues.length} errors: ${JSON.stringify(errors)}`,
+    );
+    this.err = err;
     this.errors = errors;
+  }
+
+  isFor<U>() {
+    return v.isValiError<ErrValSchema<U>>(this);
   }
 }

@@ -1,7 +1,7 @@
 import { deepStrictEqual } from "node:assert";
 import { test } from "node:test";
 
-import { formDataToObject, objectToFormData } from "../js/utils/form-data.js";
+import { formDataToObject, objectToFormData } from "../js/utils/form-data.ts";
 
 const formData = new FormData();
 formData.append("entity[foo]", "x");

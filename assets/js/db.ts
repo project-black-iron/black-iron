@@ -1,7 +1,7 @@
 import { DBSchema, IDBPDatabase, openDB, StoreNames } from "idb";
 import { BlackIronApp } from "./black-iron-app";
 import { Campaign, CampaignSchema } from "./campaigns/campaign";
-import { AbstractEntity, EntityConflictError, EntitySchema, IEntity } from "./entity";
+import { Entity, EntityConflictError, EntitySchema, IEntity } from "./entity";
 import { PC, PCSchema } from "./pcs/pc";
 import { genPid } from "./utils/pid";
 
@@ -90,7 +90,7 @@ export class BlackIronDB {
     return ret;
   }
 
-  async #uploadEntity(entity: AbstractEntity) {
+  async #uploadEntity<T>(entity: Entity<T>) {
     if (!this.app.userPid) {
       // Skip uploading if we're not logged in.
       return;
@@ -113,7 +113,7 @@ export class BlackIronDB {
     }
   }
 
-  async #getRemote(entity: AbstractEntity) {
+  async #getRemote<T>(entity: Entity<T>) {
     const url = new URL(window.location.href);
     url.pathname = entity.route;
     const res = await this.app.fetch(url);
@@ -124,10 +124,10 @@ export class BlackIronDB {
     return (await res.json()) as IEntity<unknown>;
   }
 
-  async syncEntity<Name extends StoreNames<BlackIronDBSchema>>(
+  async syncEntity<T, Name extends StoreNames<BlackIronDBSchema>>(
     storeName: Name,
-    remote?: AbstractEntity,
-    local?: AbstractEntity,
+    remote?: Entity<T>,
+    local?: Entity<T>,
   ): Promise<void> {
     try {
       if (remote && local) {
@@ -196,11 +196,12 @@ export class BlackIronDB {
   }
 
   async syncEntities<
+    T,
     Name extends StoreNames<BlackIronDBSchema>,
     Entype extends BlackIronDBSchema[Name]["value"],
   >(
     storeName: Name,
-    factory: (data: Entype) => AbstractEntity,
+    factory: (data: Entype) => Entity<T>,
     remoteEntities?: Entype[],
     localEntities?: Entype[],
     filter?: (remote?: Entype, local?: Entype) => boolean,

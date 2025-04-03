@@ -5,7 +5,7 @@ import { convert } from "url-slug";
 import * as v from "valibot";
 import { BlackIronApp } from "../black-iron-app";
 import { BlackIronDBSchema } from "../db";
-import { AbstractEntity, entitySchema } from "../entity";
+import { Entity, IEntity } from "../entity";
 import { PCManager } from "../pcs/pc-manager";
 
 export interface CampaignSchema {
@@ -32,20 +32,23 @@ const campaignDataSchema = v.object({
   memberships: v.array(campaignMembershipSchema),
 });
 
-const campaignSchema = entitySchema.extend({
-  data: campaignDataSchema,
-});
-
+export type ICampaignMembership = v.InferOutput<
+  typeof campaignMembershipSchema
+>;
 export type ICampaignData = v.InferOutput<typeof campaignDataSchema>;
-export type ICampaignMembership = v.InferOutput<typeof campaignMembershipSchema>;
-export type ICampaign = v.InferOutput<typeof campaignSchema>;
+export type ICampaign = IEntity<ICampaignData>;
 
-export class Campaign extends AbstractEntity implements ICampaign {
+export class Campaign extends Entity<ICampaignData> implements ICampaign {
+  static schema = Entity.makeSchema(campaignDataSchema);
+
   // NB(@zkat): Assigned by AbstractEntity's constructor
   data!: ICampaignData;
   pcs: PCManager;
 
-  constructor(data: ICampaign, public app?: BlackIronApp) {
+  constructor(
+    data: ICampaign,
+    public app?: BlackIronApp,
+  ) {
     super(data);
     this.pcs = new PCManager(this);
   }
@@ -57,7 +60,7 @@ export class Campaign extends AbstractEntity implements ICampaign {
   }
 
   get schema() {
-    return campaignSchema;
+    return Campaign.schema;
   }
 
   get storeName(): StoreNames<BlackIronDBSchema> {
@@ -80,22 +83,29 @@ export class Campaign extends AbstractEntity implements ICampaign {
       && cmpMemberships(this.data.memberships, other.data.memberships)
     );
 
-    function cmpMemberships(a: ICampaignMembership[], b: ICampaignMembership[]) {
+    function cmpMemberships(
+      a: ICampaignMembership[],
+      b: ICampaignMembership[],
+    ) {
       if (a.length !== b.length) {
         return false;
       }
       return a.every((membership) =>
-        b.some((otherMembership) =>
-          membership.user_pid === otherMembership.user_pid
-          && membership.roles.length === otherMembership.roles.length
-          && membership.roles.every((role) => otherMembership.roles.includes(role))
+        b.some(
+          (otherMembership) =>
+            membership.user_pid === otherMembership.user_pid
+            && membership.roles.length === otherMembership.roles.length
+            && membership.roles.every((role) => otherMembership.roles.includes(role)),
         )
       );
     }
   }
 
   merge(other: ICampaign) {
-    const campaign = new Campaign({ ...this, ...other }, this.app);
+    const campaign = new Campaign(
+      { ...this, ...other },
+      this.app,
+    ) as unknown as this;
     campaign.bumpRev();
     return campaign;
   }
