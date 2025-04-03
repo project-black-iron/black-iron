@@ -27,9 +27,9 @@ black_iron-*.tar
 
 # Ignore assets that are produced by build tools.
 /priv/static/assets/
-/priv/static/service-worker.js
-/priv/lit-ssr.js
-/priv/lit-ssr.css
+/priv/static/service-worker.js*
+/priv/lit-ssr.js*
+/priv/lit-ssr.css*
 
 # Ignore digested assets cache.
 /priv/static/cache_manifest.json
