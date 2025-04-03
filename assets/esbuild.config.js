@@ -26,6 +26,7 @@ const contextBase = {
   nodePaths: [
     "../deps",
   ],
+  legalComments: "linked",
 };
 
 const mainContext = await esbuild.context({
