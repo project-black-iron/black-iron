@@ -1,6 +1,6 @@
 import { IDBPDatabase, StoreNames } from "idb";
 import convert from "url-slug";
-import { z } from "zod";
+import * as v from "valibot";
 import { Campaign } from "../campaigns/campaign";
 import { BlackIronDBSchema } from "../db";
 import { AbstractEntity, entitySchema } from "../entity";
@@ -19,25 +19,25 @@ export enum Initiative {
   NoInitiative = "no-initiative",
 }
 
-const pcDataSchema = z.object({
-  campaign_pid: z.string(),
-  alias: z.string().nullish(),
-  name: z.string(),
-  description: z.string(),
-  pronouns: z.string(),
-  initiative: z.nativeEnum(Initiative),
-  portrait: z.string().nullish(),
-  xp_added: z.coerce.number().nonnegative(),
-  xp_spent: z.coerce.number().nonnegative(),
+const pcDataSchema = v.object({
+  campaign_pid: v.string(),
+  alias: v.nullish(v.string()),
+  name: v.string(),
+  description: v.string(),
+  pronouns: v.string(),
+  initiative: v.enum(Initiative),
+  portrait: v.nullish(v.string()),
+  xp_added: v.pipe(v.unknown(), v.transform(Number), v.integer(), v.minValue(0)),
+  xp_spent: v.pipe(v.unknown(), v.transform(Number), v.integer(), v.minValue(0)),
 });
 
 const pcSchema = entitySchema.extend({
   data: pcDataSchema,
 });
 
-export type IPCData = z.infer<typeof pcDataSchema>;
+export type IPCData = v.InferOutput<typeof pcDataSchema>;
 
-export type IPC = z.infer<typeof pcSchema>;
+export type IPC = v.InferOutput<typeof pcSchema>;
 
 export class PC extends AbstractEntity implements IPC {
   // NB(@zkat): Assigned by AbstractEntity's constructor

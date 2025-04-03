@@ -2,7 +2,7 @@
 
 import { IDBPDatabase, StoreNames } from "idb";
 import { convert } from "url-slug";
-import { z } from "zod";
+import * as v from "valibot";
 import { BlackIronApp } from "../black-iron-app";
 import { BlackIronDBSchema } from "../db";
 import { AbstractEntity, entitySchema } from "../entity";
@@ -21,24 +21,24 @@ export enum CampaignRole {
   Owner = "owner",
 }
 
-const campaignMembershipSchema = z.object({
-  user_pid: z.string(),
-  roles: z.array(z.nativeEnum(CampaignRole)),
+const campaignMembershipSchema = v.object({
+  user_pid: v.string(),
+  roles: v.array(v.enum(CampaignRole)),
 });
 
-const campaignDataSchema = z.object({
-  name: z.string(),
-  description: z.string(),
-  memberships: z.array(campaignMembershipSchema),
+const campaignDataSchema = v.object({
+  name: v.string(),
+  description: v.string(),
+  memberships: v.array(campaignMembershipSchema),
 });
 
 const campaignSchema = entitySchema.extend({
   data: campaignDataSchema,
 });
 
-export type ICampaignData = z.infer<typeof campaignDataSchema>;
-export type ICampaignMembership = z.infer<typeof campaignMembershipSchema>;
-export type ICampaign = z.infer<typeof campaignSchema>;
+export type ICampaignData = v.InferOutput<typeof campaignDataSchema>;
+export type ICampaignMembership = v.InferOutput<typeof campaignMembershipSchema>;
+export type ICampaign = v.InferOutput<typeof campaignSchema>;
 
 export class Campaign extends AbstractEntity implements ICampaign {
   // NB(@zkat): Assigned by AbstractEntity's constructor

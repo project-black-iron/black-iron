@@ -14,7 +14,7 @@ import { IPC, PC } from "../pc";
 
 @customElement("bi-pc-context")
 export class BiPCContext extends LitElement {
-  static context = createContext<PC | DataValidationError | undefined>("pc");
+  static context = createContext<PC | DataValidationError<PC> | undefined>("pc");
 
   @ssrConsume({ context: BiAppContext.context, subscribe: true })
   @property({ attribute: false })

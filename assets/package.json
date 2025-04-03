@@ -31,8 +31,8 @@
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.29.0",
     "url-slug": "^4.0.1",
+    "valibot": "^1.0.0",
     "workbox-routing": "^7.3.0",
-    "workbox-strategies": "^7.3.0",
-    "zod": "^3.24.2"
+    "workbox-strategies": "^7.3.0"
   }
 }

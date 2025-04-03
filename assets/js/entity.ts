@@ -1,5 +1,5 @@
 import { StoreNames } from "idb";
-import { z, ZodError } from "zod";
+import * as v from "valibot";
 import { BlackIronDBSchema } from "./db";
 import { objectToFormData } from "./utils/form-data";
 
@@ -19,12 +19,12 @@ export interface IEntity<T> {
   data: T;
 }
 
-const baseEntitySchema = z.object({
-  pid: z.string(),
-  rev: z.string().optional(),
-  revisions: z.array(z.string()).optional(),
-  deleted_at: z.string().nullable().optional(),
-  data: z.any(),
+const baseEntitySchema = v.object({
+  pid: v.string(),
+  rev: v.optional(v.string()),
+  revisions: v.optional(v.array(v.string())),
+  deleted_at: v.optional(v.nullable(v.string())),
+  data: v.any(),
 });
 
 // @ts-expect-error -- TS doesn't like this, but it's fine.
@@ -63,7 +63,7 @@ export class AbstractEntity implements IEntity<any> {
   // eslint-disable-next-line
   constructor(data: IEntity<any>) {
     try {
-      const parsed = this.schema.parse(data);
+      const parsed = v.parse(this.schema, data);
       this.pid = parsed.pid;
       this.rev = parsed.rev;
       this.revisions = parsed.revisions;
@@ -71,8 +71,8 @@ export class AbstractEntity implements IEntity<any> {
       this.deleted_at = parsed.deleted_at;
       this.data = parsed.data;
     } catch (e) {
-      if (e instanceof ZodError) {
-        throw new DataValidationError(e.errors);
+      if (v.isValiError(e)) {
+        throw new DataValidationError(e.issues);
       }
       throw e;
     }
@@ -154,19 +154,10 @@ export class EntityConflictError extends Error {
   }
 }
 
-export class DataValidationError extends Error {
+export class DataValidationError<T> extends Error {
   errors: { path: string; message: string }[];
-  constructor(values: { path: string | (string | number)[]; message: string }[]) {
-    const errors = values.map((e) => {
-      if (Array.isArray(e.path)) {
-        const path = e.path.reduce((acc, next) => {
-          return acc + `[${next}]`;
-        }, "entity") as string;
-        return { path, message: e.message };
-      } else {
-        return { path: e.path, message: e.message };
-      }
-    });
+  constructor(values: v.BaseIssue<T>[]) {
+    const errors = values.map((e) => ({ path: v.getDotPath(e) ?? "", message: e.message }));
     super(`Data validation failed with ${values.length} errors: ${JSON.stringify(errors)}`);
     this.errors = errors;
   }
