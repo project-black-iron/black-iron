@@ -12,6 +12,10 @@ config :black_iron,
   ecto_repos: [BlackIron.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+config :black_iron, BlackIron.RateLimit,
+  scale: :timer.minutes(1),
+  limit: 1000
+  
 # Configures the endpoint
 config :black_iron, BlackIronWeb.Endpoint,
   url: [host: "localhost"],

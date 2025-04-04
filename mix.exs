@@ -56,6 +56,8 @@ defmodule BlackIron.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:file_system, "~> 1.0"},
+      {:hammer, "~> 7.0.0"},
+      {:remote_ip, "~> 1.2.0"}
     ]
   end
 

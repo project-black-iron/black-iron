@@ -10,7 +10,13 @@ defmodule BlackIronWeb.Endpoint do
     signing_salt: "ak8E5mYU",
     same_site: "Lax"
   ]
-
+  
+  @scale Application.compile_env!(:black_iron, [BlackIron.RateLimit, :scale])
+  @limit Application.compile_env!(:black_iron, [BlackIron.RateLimit, :limit])
+  
+  plug RemoteIp
+  plug :rate_limit
+  
   socket "/socket", BlackIronWeb.UserSocket,
     websocket: [connect_info: [session: @session_options]]
 
@@ -49,4 +55,21 @@ defmodule BlackIronWeb.Endpoint do
   plug Plug.Head
   plug Plug.Session, @session_options
   plug BlackIronWeb.Router
+  
+  defp rate_limit(conn, _opts) do
+    key = "web_requests:#{:inet.ntoa(conn.remote_ip)}"
+
+    case BlackIron.RateLimit.hit(key, @scale, @limit) do
+      {:allow, _count} ->
+        conn
+
+      {:deny, retry_after} ->
+        retry_after_seconds = div(retry_after, 1000)
+
+        conn
+        |> put_resp_header("retry-after", Integer.to_string(retry_after_seconds))
+        |> send_resp(429, [])
+        |> halt()
+    end
+  end
 end

@@ -18,7 +18,8 @@ defmodule BlackIron.Application do
       # {BlackIron.Worker, arg},
       # Start to serve requests, typically the last entry
       BlackIronWeb.Endpoint,
-      :poolboy.child_spec(:lit_ssr_worker, poolboy_config())
+      :poolboy.child_spec(:lit_ssr_worker, poolboy_config()),
+      {BlackIron.RateLimit, clean_period: :timer.minutes(1)}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
