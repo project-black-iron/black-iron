@@ -106,11 +106,9 @@ defmodule BlackIron.PCs do
             changeset
             |> Ecto.Changeset.put_change(
               :data,
-              %{
-                Ecto.Changeset.get_field(changeset, :data)
-                | campaign_pid: campaign_pid,
-                  player_pid: actor.pid
-              }
+              Ecto.Changeset.get_field(changeset, :data)
+              |> Map.put(:campaign_pid, campaign_pid)
+              |> Map.put(:player_pid, actor.pid)
             )
             |> Repo.insert_or_update()
         end

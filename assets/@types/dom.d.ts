@@ -2,8 +2,7 @@ import { BiEntityForm } from "../js/components/bi-entity-form";
 import { IEntity } from "../js/entity";
 
 interface CustomEventMap {
-  // eslint-disable-next-line
-  "saveentity": CustomEvent<{ target: BiEntityForm; entity: IEntity<any> }>;
+  "saveentity": CustomEvent<{ target: BiEntityForm; entity: IEntity<unknown> }>;
   "ajax-it:beforeRequest": CustomEvent;
   "ajax-it:beforeSend": CustomEvent;
   "ajax-it:afterRequest": CustomEvent;

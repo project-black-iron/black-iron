@@ -1,5 +1,7 @@
-import { StoreNames } from "idb";
+import { IDBPDatabase, StoreNames } from "idb";
+import { PropertyDeclaration } from "lit";
 import * as v from "valibot";
+
 import { BlackIronDBSchema } from "./db";
 import { objectToFormData } from "./utils/form-data";
 
@@ -22,50 +24,124 @@ export interface IEntity<T> extends IBaseEntity<T> {
   conflict?: IBaseEntity<T> | null;
 }
 
-const baseEntitySchema = v.object({
+const baseEntityProps = {
   pid: v.string(),
   rev: v.optional(v.string()),
   revisions: v.optional(v.array(v.string())),
   deleted_at: v.optional(v.nullish(v.string())),
   data: v.any(),
-});
+};
+const baseEntityFields = Object.keys(baseEntityProps);
+const baseEntitySchema = v.object(baseEntityProps);
 
-export const entitySchema = v.object({
+export type ITSchema<T> =
+  & v.BaseSchema<unknown, T, v.BaseIssue<unknown>>
+  & v.ObjectSchema<v.ObjectEntries, v.ErrorMessage<v.ObjectIssue> | undefined>;
+
+const entitySchema = v.object({
   ...baseEntitySchema.entries,
   ...v.object({
     conflict: v.optional(v.nullish(baseEntitySchema)),
   }).entries,
 });
 
-export type ITSchema<T> =
-  & v.BaseSchema<unknown, T, v.BaseIssue<unknown>>
-  & v.ObjectSchema<v.ObjectEntries, v.ErrorMessage<v.ObjectIssue> | undefined>;
+export interface IEntityStatics<T> {
+  readonly storeName: StoreNames<BlackIronDBSchema>;
+  readonly schema: ITSchema<IEntity<T>>;
+  readonly dataSchema: ITSchema<T>;
+  dbUpgrade(db: IDBPDatabase<BlackIronDBSchema>): void;
+  arrayPropOpts(name: string): PropertyDeclaration;
+  propOpts(name: string): PropertyDeclaration;
+  convertArray(data: string | null): IEntity<T>[] | undefined;
+  convert(data: string | null): IEntity<T> | undefined;
+  parse(data: string | Record<string, unknown>): IEntity<T>;
+}
 
-export class Entity<T> implements IEntity<T> {
-  static makeSchema<T>(dataSchema: ITSchema<T>): ITSchema<IEntity<T>> {
-    return v.object({
-      ...entitySchema.entries,
-      ...v.object({
-        data: dataSchema,
-      }).entries,
-    });
-  }
+export interface IEntityInstance<T> extends IEntity<T> {
+  readonly baseRoute: string;
+  readonly route: string;
+  eq(other: IEntity<T>): boolean;
+  merge(other: IEntity<T>): this;
+  toRaw(): IEntity<T>;
+  toFormData(): FormData;
+}
 
-  get storeName(): StoreNames<BlackIronDBSchema> {
-    throw new Error("No store name defined for entity.");
-  }
+function makeSchema<T>(dataSchema: ITSchema<T>): ITSchema<IEntity<T>> {
+  return v.object({
+    ...entitySchema.entries,
+    ...v.object({
+      data: dataSchema,
+    }).entries,
+  });
+}
 
-  get baseRoute() {
-    return "/";
-  }
+export function entity<T>(
+  storeName: StoreNames<BlackIronDBSchema>,
+  dataSchema: ITSchema<T>,
+) {
+  abstract class DerivedEntity<TData> extends AbstractEntity<TData> {
+    static readonly storeName = storeName;
+    static readonly dataSchema = dataSchema;
+    static readonly schema = makeSchema(dataSchema);
 
-  get route() {
-    return "/_abstract";
-  }
+    static dbUpgrade(db: IDBPDatabase<BlackIronDBSchema>): void {
+      db.createObjectStore(this.storeName, {
+        keyPath: "pid",
+      });
+    }
 
-  get schema(): v.BaseSchema<unknown, IEntity<T>, v.BaseIssue<unknown>> {
-    return entitySchema;
+    static propOpts(name: string): PropertyDeclaration {
+      return this.propertyOpts(name, false)
+    }
+    
+    static arrayPropOpts(name: string): PropertyDeclaration {
+      return this.propertyOpts(name, true)
+    }
+      
+    private static propertyOpts(name: string, isArray?: boolean): PropertyDeclaration {
+      return {
+        attribute: name,
+        converter: isArray
+          ? this.convertArray.bind(this)
+          : this.convert.bind(this),
+        hasChanged: isArray ? hasEntityArrayChanged : hasEntityChanged,
+      };
+    }
+
+    static convertArray(data: string | null): IEntity<T>[] | undefined {
+      if (data) {
+        return JSON.parse(data).map(this.convert.bind(this));
+      }
+    }
+
+    static convert(data: string | null): IEntity<T> | undefined {
+      if (data) {
+        return this.parse(data);
+      }
+    }
+
+    static parse(data: string | Record<string, unknown>): IEntity<T> {
+      try {
+        if (typeof data === "string") {
+          data = JSON.parse(data);
+        }
+        return v.parse(this.schema, data);
+      } catch (e) {
+        if (v.isValiError(e)) {
+          throw new DataValidationError(e);
+        }
+        throw e;
+      }
+    }
   }
+  
+  return DerivedEntity<T>;
+}
+
+abstract class AbstractEntity<T> implements IEntityInstance<T> {
+  abstract baseRoute: string;
+  abstract route: string;
+  abstract merge(other: IEntity<T>): this;
 
   pid: string;
   rev?: string;
@@ -75,20 +151,12 @@ export class Entity<T> implements IEntity<T> {
   data: T;
 
   constructor(data: IEntity<T>) {
-    try {
-      const parsed = v.parse(this.schema, data);
-      this.pid = parsed.pid;
-      this.rev = parsed.rev;
-      this.revisions = parsed.revisions;
-      this.conflict = parsed.conflict;
-      this.deleted_at = parsed.deleted_at;
-      this.data = parsed.data;
-    } catch (e) {
-      if (v.isValiError(e)) {
-        throw new DataValidationError(e);
-      }
-      throw e;
-    }
+    this.pid = data.pid;
+    this.rev = data.rev;
+    this.revisions = data.revisions;
+    this.conflict = data.conflict;
+    this.deleted_at = data.deleted_at;
+    this.data = data.data;
   }
 
   bumpRev() {
@@ -101,12 +169,7 @@ export class Entity<T> implements IEntity<T> {
     return this.pid === other.pid && this.deleted_at == other.deleted_at;
   }
 
-  // eslint-disable-next-line
-  merge(other: IEntity<T>): this {
-    throw new Error("Not implemented");
-  }
-
-  toEntity(): IEntity<T> {
+  toRaw(): IEntity<T> {
     const entity: IEntity<T> = {
       pid: this.pid,
       data: structuredClone(this.data),
@@ -121,13 +184,7 @@ export class Entity<T> implements IEntity<T> {
   }
 
   toFormData(): FormData {
-    return objectToFormData(this, [
-      "pid",
-      "rev",
-      "revisions",
-      "deleted_at",
-      "data",
-    ]);
+    return objectToFormData(this, baseEntityFields);
   }
 }
 

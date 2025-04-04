@@ -1,11 +1,8 @@
 // Campaign schema, class, and database definitions.
-
-import { IDBPDatabase, StoreNames } from "idb";
 import { convert } from "url-slug";
 import * as v from "valibot";
 import { BlackIronApp } from "../black-iron-app";
-import { BlackIronDBSchema } from "../db";
-import { Entity, IEntity } from "../entity";
+import { entity, IEntity } from "../entity";
 import { PCManager } from "../pcs/pc-manager";
 
 export interface CampaignSchema {
@@ -38,11 +35,7 @@ export type ICampaignMembership = v.InferOutput<
 export type ICampaignData = v.InferOutput<typeof campaignDataSchema>;
 export type ICampaign = IEntity<ICampaignData>;
 
-export class Campaign extends Entity<ICampaignData> implements ICampaign {
-  static schema = Entity.makeSchema(campaignDataSchema);
-
-  // NB(@zkat): Assigned by AbstractEntity's constructor
-  data!: ICampaignData;
+export class Campaign extends entity("campaigns", campaignDataSchema) {
   pcs: PCManager;
 
   constructor(
@@ -53,28 +46,12 @@ export class Campaign extends Entity<ICampaignData> implements ICampaign {
     this.pcs = new PCManager(this);
   }
 
-  static dbUpgrade(db: IDBPDatabase<BlackIronDBSchema>) {
-    db.createObjectStore("campaigns", {
-      keyPath: "pid",
-    });
-  }
-
-  get schema() {
-    return Campaign.schema;
-  }
-
-  get storeName(): StoreNames<BlackIronDBSchema> {
-    return "campaigns";
-  }
-
-  get baseRoute() {
-    return "/play/campaigns";
-  }
-
+  readonly baseRoute = "/play/campaigns";
+  
   get route() {
     return `${this.baseRoute}/${this.pid}/${convert(this.data.name)}`;
   }
-
+  
   eq(other: ICampaign) {
     return (
       super.eq(other)
@@ -82,23 +59,6 @@ export class Campaign extends Entity<ICampaignData> implements ICampaign {
       && this.data.description === other.data.description
       && cmpMemberships(this.data.memberships, other.data.memberships)
     );
-
-    function cmpMemberships(
-      a: ICampaignMembership[],
-      b: ICampaignMembership[],
-    ) {
-      if (a.length !== b.length) {
-        return false;
-      }
-      return a.every((membership) =>
-        b.some(
-          (otherMembership) =>
-            membership.user_pid === otherMembership.user_pid
-            && membership.roles.length === otherMembership.roles.length
-            && membership.roles.every((role) => otherMembership.roles.includes(role)),
-        )
-      );
-    }
   }
 
   merge(other: ICampaign) {
@@ -109,4 +69,21 @@ export class Campaign extends Entity<ICampaignData> implements ICampaign {
     campaign.bumpRev();
     return campaign;
   }
+}
+
+function cmpMemberships(
+  a: ICampaignMembership[],
+  b: ICampaignMembership[],
+) {
+  if (a.length !== b.length) {
+    return false;
+  }
+  return a.every((membership) =>
+    b.some(
+      (otherMembership) =>
+        membership.user_pid === otherMembership.user_pid
+        && membership.roles.length === otherMembership.roles.length
+        && membership.roles.every((role) => otherMembership.roles.includes(role)),
+    )
+  );
 }

@@ -1,13 +1,16 @@
 import { consume, Context, ContextConsumer, createContext } from "@lit/context";
-import { html, isServer, LitElement, PropertyValues } from "lit";
+import { html, isServer, LitElement, PropertyValues, render } from "lit";
 import { customElement, property, queryAssignedElements, state } from "lit/decorators.js";
 import { BlackIronApp } from "../black-iron-app";
-import { DataValidationError, Entity, IEntity } from "../entity";
+import { DataValidationError, IEntityInstance } from "../entity";
 import { formDataToObject } from "../utils/form-data";
 import { BiAppContext } from "./bi-app-context";
 
 @customElement("bi-entity-form")
-export class BiEntityForm<T> extends LitElement {
+export class BiEntityForm<
+  TEnt extends IEntityInstance<TData>,
+  TData,
+> extends LitElement {
   @consume({ context: BiAppContext.context, subscribe: true })
   @property({ attribute: false })
   app?: BlackIronApp;
@@ -20,8 +23,8 @@ export class BiEntityForm<T> extends LitElement {
 
   @state()
   consumer?: ContextConsumer<
-    Context<unknown, Entity<T> | Error | undefined>,
-    BiEntityForm<T>
+    Context<unknown, TEnt | Error | undefined>,
+    BiEntityForm<TEnt, TData>
   >;
 
   @queryAssignedElements({ slot: "form-error" })
@@ -29,9 +32,10 @@ export class BiEntityForm<T> extends LitElement {
 
   constructor() {
     super();
-    // We disable the submit event here because we're gonna go entirely off change events.
     this.addEventListener("submit", async (e: Event) => {
       e.preventDefault();
+      // We disable the submit event here because we're gonna go entirely off
+      // change events, if we're in `live` mode.
       if (this.live) {
         return;
       }
@@ -52,8 +56,7 @@ export class BiEntityForm<T> extends LitElement {
   }
 
   async #updateEntity(form: HTMLFormElement) {
-    // eslint-disable-next-line
-    const newEnt = formDataToObject<IEntity<any>>(form);
+    const newEnt = formDataToObject(form);
     if (!newEnt) {
       return;
     }
@@ -92,8 +95,7 @@ export class BiEntityForm<T> extends LitElement {
           }
         }
       } else {
-        // TODO(@zkat): we can do better, I think.
-        errorContainer.innerHTML = e.toString();
+        render(html`${e.toString()}`, errorContainer);
       }
     }
   }
@@ -110,7 +112,7 @@ export class BiEntityForm<T> extends LitElement {
     }
   }
 
-  #updateForm(entity: Entity<T>) {
+  #updateForm(entity: TEnt) {
     this.#resetErrors();
     const formData = entity.toFormData();
     for (const [key, value] of formData.entries()) {

@@ -6,7 +6,6 @@ import { BlackIronApp } from "../../black-iron-app";
 import { Campaign } from "../../campaigns/campaign";
 import { BiCampaignContext } from "../../campaigns/components/bi-campaign-context";
 import { BiAppContext } from "../../components/bi-app-context";
-import { hasEntityArrayChanged } from "../../entity";
 import { IPC, PC } from "../pc";
 
 @customElement("bi-pc-list")
@@ -21,11 +20,7 @@ export class BiPCList extends LitElement {
   @consume({ context: BiCampaignContext.context, subscribe: true })
   campaign?: Campaign;
 
-  @property({
-    type: Array,
-    attribute: "pcs",
-    hasChanged: hasEntityArrayChanged,
-  })
+  @property(PC.arrayPropOpts("pcs"))
   pcs?: IPC[];
 
   @state()
