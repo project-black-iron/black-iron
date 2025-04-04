@@ -61,7 +61,7 @@ const litSSRContext = await esbuild.context({
   entryPoints: [
     "js/lit-ssr.ts",
   ],
-  outfile: "../priv/lit-ssr.js",
+  outfile: "../priv/ssr/lit-ssr.js",
   platform: "node",
   format: "cjs",
 });

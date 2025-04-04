@@ -54,12 +54,16 @@ defmodule BlackIron.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:file_system, "~> 1.0"},
     ]
   end
 
   defp aliases do
     [
+      # We do an initial assets.build to make sure the SSR JS is built before
+      # the Elixir app starts
+      serve: ["assets.build", "phx.server"],
       setup: ["deps.get", "assets.setup", "assets.build", "ecto.setup"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
