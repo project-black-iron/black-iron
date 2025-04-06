@@ -1,20 +1,14 @@
-import { consume, Context, ContextConsumer, createContext } from "@lit/context";
+import { Context, ContextConsumer, createContext } from "@lit/context";
 import { html, isServer, LitElement, PropertyValues, render } from "lit";
 import { customElement, property, queryAssignedElements, state } from "lit/decorators.js";
-import { BlackIronApp } from "../black-iron-app";
 import { DataValidationError, IEntityInstance } from "../entity";
 import { formDataToObject } from "../utils/form-data";
-import { BiAppContext } from "./bi-app-context";
 
 @customElement("bi-entity-form")
 export class BiEntityForm<
   TEnt extends IEntityInstance<TData>,
   TData,
 > extends LitElement {
-  @consume({ context: BiAppContext.context, subscribe: true })
-  @property({ attribute: false })
-  app?: BlackIronApp;
-
   @property()
   context?: string;
 
