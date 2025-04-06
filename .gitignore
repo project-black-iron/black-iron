@@ -38,6 +38,7 @@ npm-debug.log
 /assets/node_modules/
 /assets/.tsbuildinfo
 /assets/dist/
+/assets/bundle-analysis
 
 # Elixir LS
 /.elixir_ls

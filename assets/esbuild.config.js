@@ -2,6 +2,13 @@ import { typecheckPlugin } from "@jgoz/esbuild-plugin-typecheck";
 import esbuild from "esbuild";
 import eslint from "esbuild-plugin-eslint";
 import process from "process";
+import AnalyzerPlugin from "esbuild-analyzer";
+
+import { mkdirSync } from "node:fs";
+import { join } from "node:path";
+
+const analysisDir = join(import.meta.dirname, "bundle-analysis");
+mkdirSync(analysisDir);
 
 const prod = process.argv[2] === "production";
 const watch = !prod && process.argv[2] !== "nowatch";
@@ -27,6 +34,7 @@ const contextBase = {
     "../deps",
   ],
   legalComments: "linked",
+  metafile: true,
 };
 
 const mainContext = await esbuild.context({
@@ -42,6 +50,10 @@ const mainContext = await esbuild.context({
   loader: {
     ".svg": "dataurl",
   },
+  plugins: [
+    ...contextBase.plugins,
+    AnalyzerPlugin({outfile: join(analysisDir, "main.html")}),
+  ],
 });
 
 const swContext = await esbuild.context({
@@ -50,6 +62,10 @@ const swContext = await esbuild.context({
     "js/service-worker.ts",
   ],
   outfile: "../priv/static/service-worker.js",
+  plugins: [
+    ...contextBase.plugins,
+    AnalyzerPlugin({outfile: join(analysisDir, "sw.html")}),
+  ],
 });
 
 const litSSRContext = await esbuild.context({
@@ -64,6 +80,10 @@ const litSSRContext = await esbuild.context({
   outfile: "../priv/ssr/lit-ssr.js",
   platform: "node",
   format: "cjs",
+  plugins: [
+    ...contextBase.plugins,
+    AnalyzerPlugin({outfile: join(analysisDir, "ssr.html")}),
+  ],
 });
 
 if (!watch) {
