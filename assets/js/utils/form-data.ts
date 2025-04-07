@@ -1,7 +1,7 @@
 const outerRe = /^([^[\]]+)(.*)$/;
 const regex = /\[([^[\]]*)\]/g;
 
-export function formDataToObject<T>(data: FormData | HTMLFormElement): T {
+export function formDataToObject(data: FormData | HTMLFormElement): Record<string, unknown> {
   if (globalThis.HTMLFormElement && data instanceof globalThis.HTMLFormElement) {
     data = new FormData(data);
   }
@@ -37,7 +37,7 @@ export function formDataToObject<T>(data: FormData | HTMLFormElement): T {
   }
   // TODO(@zkat): some sort of verifier so we can actually guaranatee
   // we're returning what we're supposed to.
-  return obj as T;
+  return obj;
 }
 
 export function objectToFormData<T>(

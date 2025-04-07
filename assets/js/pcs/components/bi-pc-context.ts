@@ -7,7 +7,6 @@ import { BlackIronApp } from "../../black-iron-app";
 import { Campaign } from "../../campaigns/campaign";
 import { BiCampaignContext } from "../../campaigns/components/bi-campaign-context";
 import { BiAppContext } from "../../components/bi-app-context";
-import { DataValidationError, hasEntityChanged } from "../../entity";
 import { Route } from "../../utils/route";
 import { IPC, PC } from "../pc";
 
@@ -21,11 +20,7 @@ export class BiPCContext extends LitElement {
   @property({ attribute: false })
   app?: BlackIronApp;
 
-  @property({
-    type: Object,
-    attribute: "pc",
-    hasChanged: hasEntityChanged,
-  })
+  @property(PC.propOpts("pc"))
   _ipc?: IPC;
 
   @provide({ context: BiPCContext.context })
@@ -57,11 +52,11 @@ export class BiPCContext extends LitElement {
       if (this.campaign && this.app) {
         try {
           const pc = new PC(e.detail.entity, this.campaign);
-          await this.app.db.syncEntity(pc.storeName, pc);
-          await this.app.db.syncEntity(pc.storeName, undefined, pc);
+          await this.app.db.syncEntity(PC.storeName, pc);
+          await this.app.db.syncEntity(PC.storeName, undefined, pc);
           this.pc = pc;
         } catch (e) {
-          if (e instanceof DataValidationError && e.isFor<IPC>()) {
+          if (e instanceof Error) {
             this.pc = e;
           } else {
             throw e;

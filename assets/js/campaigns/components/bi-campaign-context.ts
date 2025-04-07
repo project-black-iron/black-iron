@@ -4,7 +4,6 @@ import { customElement, property } from "lit/decorators.js";
 
 import { BlackIronApp } from "../../black-iron-app";
 import { BiAppContext } from "../../components/bi-app-context";
-import { hasEntityChanged } from "../../entity";
 import { Route } from "../../utils/route";
 import { Campaign, ICampaign } from "../campaign";
 
@@ -16,11 +15,7 @@ export class BiCampaignContext extends LitElement {
   @property({ attribute: false })
   app?: BlackIronApp;
 
-  @property({
-    type: Object,
-    attribute: "campaign",
-    hasChanged: hasEntityChanged,
-  })
+  @property(Campaign.propOpts("campaign"))
   _icampaign?: ICampaign;
 
   @provide({ context: BiCampaignContext.context })

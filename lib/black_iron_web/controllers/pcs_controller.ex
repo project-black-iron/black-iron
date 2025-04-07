@@ -8,6 +8,7 @@ defmodule BlackIronWeb.PCsController do
 
   def insert_or_update(conn, params) do
     campaign = Campaigns.get_campaign(conn.assigns[:current_user], params["campaign_pid"])
+    pcs = PCs.list_pcs_for_campaign(conn.assigns[:current_user], campaign)
 
     PCs.insert_or_update_pc(conn.assigns[:current_user], campaign, params["entity"])
     |> case do
@@ -22,32 +23,31 @@ defmodule BlackIronWeb.PCsController do
       {:error, :unathorized} ->
         conn
         |> put_flash(:error, "Unauthorized.")
-        |> redirect(to: ~p"/play/campaigns/#{params["campaign_pid"]}/#{params["cslug"]}")
+        |> redirect(to: ~p"/play/campaigns/#{params["campaign_pid"]}/#{params["cslug"]}/pcs")
 
       {:error, %Changeset{} = changeset} ->
         conn
         |> put_flash(:error, "Error creating PC.")
-        |> render(:new, changeset: changeset)
+        |> render(:index,
+          campaign_pid: params["campaign_pid"],
+          cslug: params["cslug"],
+          campaign: campaign,
+          pcs: pcs,
+          pc: nil,
+          changeset: changeset
+        )
     end
   end
 
   def index(conn, params) do
     campaign = Campaigns.get_campaign(conn.assigns[:current_user], params["campaign_pid"])
     pcs = PCs.list_pcs_for_campaign(conn.assigns[:current_user], campaign)
-    render(conn, :index, campaign: campaign, pcs: pcs)
-  end
-
-  def new(conn, params) do
-    campaign =
-      Campaigns.get_campaign(
-        conn.assigns[:current_user],
-        params["campaign_pid"]
-      )
-
-    render(conn, :new,
+    render(conn, :index,
       campaign_pid: params["campaign_pid"],
       cslug: params["cslug"],
       campaign: campaign,
+      pcs: pcs,
+      pc: nil,
       changeset: PCs.change_pc(%Entity{}, %{})
     )
   end

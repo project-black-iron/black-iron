@@ -1,9 +1,8 @@
-import { IDBPDatabase, StoreNames } from "idb";
 import convert from "url-slug";
 import * as v from "valibot";
+
 import { Campaign } from "../campaigns/campaign";
-import { BlackIronDBSchema } from "../db";
-import { Entity, IEntity } from "../entity";
+import { entity, IEntity } from "../entity";
 import { mergeDeep } from "../utils/merge-deep";
 
 export interface PCSchema {
@@ -45,12 +44,7 @@ export type IPCData = v.InferOutput<typeof pcDataSchema>;
 
 export type IPC = IEntity<IPCData>;
 
-export class PC extends Entity<IPCData> implements IPC {
-  static schema = Entity.makeSchema(pcDataSchema);
-
-  // NB(@zkat): Assigned by AbstractEntity's constructor
-  data!: IPCData;
-
+export class PC extends entity("pcs", pcDataSchema) {
   constructor(
     data: IPC,
     public campaign: Campaign,
@@ -60,20 +54,6 @@ export class PC extends Entity<IPCData> implements IPC {
     if (bumpRev) {
       this.bumpRev();
     }
-  }
-
-  static dbUpgrade(db: IDBPDatabase<BlackIronDBSchema>) {
-    db.createObjectStore("pcs", {
-      keyPath: "pid",
-    });
-  }
-
-  get schema() {
-    return PC.schema;
-  }
-
-  get storeName(): StoreNames<BlackIronDBSchema> {
-    return "pcs";
   }
 
   get baseRoute() {
@@ -89,8 +69,8 @@ export class PC extends Entity<IPCData> implements IPC {
   }
 
   eq(other: IPC) {
-    return super.eq(other);
     // TODO(@zkat): fill this in
+    return super.eq(other);
   }
 
   merge(other: IPC) {

@@ -4,7 +4,6 @@ import { customElement, property, state } from "lit/decorators.js";
 
 import { BlackIronApp } from "../../black-iron-app";
 import { BiAppContext } from "../../components/bi-app-context";
-import { hasEntityArrayChanged } from "../../entity";
 import { formDataToObject } from "../../utils/form-data";
 import { genPid } from "../../utils/pid";
 import { Campaign, CampaignRole, ICampaign } from "../campaign";
@@ -56,11 +55,7 @@ export class BiCampaignList extends LitElement {
   @consume({ context: BiAppContext.context, subscribe: true })
   app?: BlackIronApp;
 
-  @property({
-    type: Array,
-    attribute: "campaigns",
-    hasChanged: hasEntityArrayChanged,
-  })
+  @property(Campaign.arrayPropOpts("campaigns"))
   campaigns?: ICampaign[];
 
   @state()
@@ -69,8 +64,7 @@ export class BiCampaignList extends LitElement {
   constructor() {
     super();
     this.addEventListener("ajax-it:beforeRequest", async (e: Event) => {
-      // TODO(@zkat): validate this! ajax-it:beforeRequest can cancel requests (if validation fails).
-      const campaign: ICampaign = formDataToObject(e.target as HTMLFormElement);
+      const campaign = Campaign.parse(formDataToObject(e.target as HTMLFormElement));
       campaign.data.memberships = this.app?.userPid
         ? [
           {
