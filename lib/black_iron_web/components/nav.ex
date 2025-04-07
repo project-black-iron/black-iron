@@ -25,7 +25,7 @@ defmodule BlackIronWeb.Components.Nav do
         </li>
         <%= if @current_user do %>
           <li>
-            <%= @current_user.email %>
+            <%= @current_user.handle %>
           </li>
           <li>
             <a href={~p"/users/settings"}>
