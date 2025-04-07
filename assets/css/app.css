@@ -22,6 +22,18 @@ body {
   padding: 0;
   margin: 0;
   font-family: var(--font-family);
+  a {
+    color: var(--link);
+    &:hover {
+      color: var(--link-hover);
+      &:visited {
+        color: var(--link-hover-visited);
+      }
+    }
+    &:visited {
+      color: var(--link-visited);
+    }
+  }
 
   min-height: 100vh;
   & > header {
@@ -32,6 +44,29 @@ body {
     display: flex;
     flex-flow: column nowrap;
     padding: 0 1rem;
+    /* Link styling, from https://css-tricks.com/css-link-hover-effects/ */
+    a {
+      text-decoration: none;
+      position: relative;
+      font-weight: var(--font-semibold);
+      color: var(--text-strong);
+      &:hover::before {
+        bottom: 0;
+        height: 100%;
+        color: var(--text-accent);
+      }
+      &::before {
+        content: '';
+        background-color: var(--background-accent);
+        position: absolute;
+        left: 0;
+        bottom: -.1rem;
+        width: 100%;
+        height: 50%;
+        z-index: -1;
+        transition: all .3s ease-in-out;
+      }
+    }
     &.sidebar {
       padding: 0;
     }
@@ -40,6 +75,7 @@ body {
     flex: 0 1 auto;
   }
 }
+
 
 /*
 Some fun view transition stuff. See

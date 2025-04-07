@@ -16,13 +16,13 @@ Non-theme variables
 
   /* Colors (from themes) */
   --background-primary: var(--theme-bg-color);
-  --background-primary-alt: var(--theme-light-color);
+  --background-accent: var(--theme-special-bg-color);
   --text-normal: var(--theme-text-color);
   --text-muted: var(--theme-text-soft-color);
   --text-faint: var(--theme-subtle-color);
   --text-strong: var(--theme-text-strong-color);
   --text-hover: var(--theme-text-soft-color);
-  --text-on-accent: var(--theme-special-text-color);
+  --text-accent: var(--theme-special-text-color);
   --shadow: var(--theme-shadow-color);
   --text-success: var(--theme-success, green);
   --text-warning: var(--theme-warning, orange);
@@ -30,4 +30,8 @@ Non-theme variables
   --text-on-success: var(--theme-text-success, green);
   --text-on-warning: var(--theme-text-warning, orange);
   --text-on-error: var(--theme-text-error, red);
+  --link: var(--theme-link);
+  --link-hover: var(--theme-link-hover);
+  --link-hover-visited: var(--theme-link-hover-visited);
+  --link-visited: var(--theme-link-hover-visited);
 }
