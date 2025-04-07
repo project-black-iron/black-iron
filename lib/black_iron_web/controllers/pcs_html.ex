@@ -5,20 +5,26 @@ defmodule BlackIronWeb.PCsHTML do
   
   alias BlackIronWeb.Components.Entity
 
-  def new(assigns) do
-  end
-
   def index(assigns) do
     ~H"""
     <h3><%= gettext("Player character list") %></h3>
     <bi-campaign-context campaign={Jason.encode!(assigns[:campaign])}>
-      <bi-pc-list pcs={Jason.encode!(assigns[:pcs])}>
-      </bi-pc-list>
+      <bi-pc-list pcs={Jason.encode!(assigns[:pcs])} />
+      <details>
+        <summary><%= gettext("Create a new character") %></summary>
+        <.pc_character_sheet {assigns} />
+      </details>
     </bi-campaign-context>
     """
   end
 
   def show(assigns) do
+    ~H"""
+    <.pc_character_sheet {assigns} />
+    """
+  end
+
+  defp pc_character_sheet(assigns) do
     ~H"""
     <bi-campaign-context campaign={Jason.encode!(assigns[:campaign])}>
       <bi-pc-context pc={Jason.encode!(assigns[:pc])}>
@@ -31,7 +37,11 @@ defmodule BlackIronWeb.PCsHTML do
             autocomplete="off"
             live
             action={
-              ~p"/play/campaigns/#{assigns[:campaign_pid]}/#{assigns[:cslug]}/pcs/#{assigns[:pc_pid]}/#{assigns[:pc_slug]}"
+              if assigns[:pc] do
+                ~p"/play/campaigns/#{assigns[:campaign_pid]}/#{assigns[:cslug]}/pcs/#{assigns[:pc_pid]}/#{assigns[:pc_slug]}"
+              else
+                ~p"/play/campaigns/#{assigns[:campaign_pid]}/#{assigns[:cslug]}/pcs"
+              end
             }
           >
             <:form_error>
@@ -46,7 +56,7 @@ defmodule BlackIronWeb.PCsHTML do
     </bi-campaign-context>
     """
   end
-
+  
   defp pc_form_fields(assigns) do
     ~H"""
     <.input type="hidden" field={@cs[:pid]} />

@@ -225,7 +225,6 @@ defmodule BlackIronWeb.Router do
         get "/tracks", TracksController, :index
         get "/tracks/:track_pid/:slug", TracksController, :show
         get "/pcs", PCsController, :index
-        get "/pcs/new", PCsController, :new
         get "/pcs/:pc_pid/:slug", PCsController, :show
       end
     end

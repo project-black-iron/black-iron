@@ -110,21 +110,24 @@ export function entity<T>(
 
     static convertArray(data: string | null): IEntity<T>[] | undefined {
       if (data) {
-        return JSON.parse(data).map(this.convert.bind(this));
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed)) {
+          return parsed.map((p) => this.parse(p));
+        }
       }
     }
 
     static convert(data: string | null): IEntity<T> | undefined {
       if (data) {
-        return this.parse(data);
+        const parsed = JSON.parse(data);
+        if (parsed) {
+          return this.parse(parsed);
+        }
       }
     }
 
-    static parse(data: string | Record<string, unknown>): IEntity<T> {
+    static parse(data: Record<string, unknown>): IEntity<T> {
       try {
-        if (typeof data === "string") {
-          data = JSON.parse(data);
-        }
         return v.parse(this.schema, data);
       } catch (e) {
         if (v.isValiError(e)) {
