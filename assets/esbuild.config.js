@@ -8,7 +8,7 @@ import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 
 const analysisDir = join(import.meta.dirname, "bundle-analysis");
-mkdirSync(analysisDir);
+mkdirSync(analysisDir, { recursive: true });
 
 const prod = process.argv[2] === "production";
 const watch = !prod && process.argv[2] !== "nowatch";
