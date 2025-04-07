@@ -6,12 +6,13 @@ defmodule BlackIronWeb.PlayHTML do
 
   def show(assigns) do
     ~H"""
-    <p>
-      This is the Play page. It's the entry point for all offline-first
-      game playing.
-    </p>
-    <ul class="campaigns-list">
-      <!-- Campaigns go here -->
+    <h3>
+      <%= gettext("Let's Play!") %>
+    </h3>
+    <ul>
+      <li><a href={~p"/play/campaigns"}><%= gettext("My Campaigns") %></a></li>
+      <li><a href="#"><%= gettext("How to Play") %></a></li>
+      <li><a href="#"><%= gettext("Friends") %></a></li>
     </ul>
     """
   end

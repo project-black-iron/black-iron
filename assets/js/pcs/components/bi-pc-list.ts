@@ -25,7 +25,11 @@ export class BiPCList extends LitElement {
 
   @state()
   conflicted: IPC[] = [];
-
+  
+  protected createRenderRoot() {
+    return this;
+  }
+  
   willUpdate(changed: Map<string | number | symbol, unknown>) {
     if (!isServer) {
       if (
