@@ -1,5 +1,4 @@
-import { Socket } from "../vendor/phoenix/socket.js";
-import { Channel } from "../vendor/phoenix/channel.js";
+import { Channel, Socket } from "phoenix";
 
 import { CampaignManager } from "./campaigns/campaign-manager";
 import { BlackIronDB } from "./db";
