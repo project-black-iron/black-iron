@@ -2,6 +2,8 @@ defmodule BlackIronWeb.PCsHTML do
   @moduledoc """
   """
   use BlackIronWeb, :html
+  
+  alias BlackIronWeb.Components.Entity
 
   def new(assigns) do
   end
@@ -10,7 +12,8 @@ defmodule BlackIronWeb.PCsHTML do
     ~H"""
     <h3><%= gettext("Player character list") %></h3>
     <bi-campaign-context campaign={Jason.encode!(assigns[:campaign])}>
-      <bi-pc-list pcs={Jason.encode!(assigns[:pcs])} />
+      <bi-pc-list pcs={Jason.encode!(assigns[:pcs])}>
+      </bi-pc-list>
     </bi-campaign-context>
     """
   end
@@ -21,7 +24,7 @@ defmodule BlackIronWeb.PCsHTML do
       <bi-pc-context pc={Jason.encode!(assigns[:pc])}>
         <article>
           <header><%= gettext("Character Sheet") %></header>
-          <.entity_form
+          <Entity.entity_form
             :let={cs}
             context="pc"
             for={@changeset}
@@ -37,7 +40,7 @@ defmodule BlackIronWeb.PCsHTML do
               </.error>
             </:form_error>
             <.pc_form_fields cs={cs} {assigns} />
-          </.entity_form>
+          </Entity.entity_form>
         </article>
       </bi-pc-context>
     </bi-campaign-context>
