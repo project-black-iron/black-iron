@@ -1,3 +1,6 @@
+> [!NOTE]
+> This repo has [moved to Codeberg](https://codeberg.org/zkat/black-iron).
+
 # BlackIron
 
 To start the app:
